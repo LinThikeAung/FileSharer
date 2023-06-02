@@ -11,14 +11,14 @@
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('admin/vendors/feather/feather.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/vendors/ti-icons/css/themify-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/vendors/css/vendor.bundle.base.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
-    <link rel="stylesheet" href="{{ asset('admin/vendors/ti-icons/css/themify-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/js/select.dataTables.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('admin/css/vertical-layout-light/style.css') }}">
-    <link rel="shortcut icon" href="{{ asset('admin/images/favicon.png') }}" />
+    <link rel="stylesheet" href="{{ asset('backend/vendors/feather/feather.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/vendors/ti-icons/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
+    <link rel="stylesheet" href="{{ asset('backend/vendors/ti-icons/css/themify-icons.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/js/select.dataTables.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('backend/css/vertical-layout-light/style.css') }}">
+    <link rel="shortcut icon" href="{{ asset('backend/images/favicon.png') }}" />
 </head>
 
 <body>
@@ -146,7 +146,7 @@
                             </div>
                             <ul class="chat-list">
                                 <li class="list active">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face1.jpg') }}" alt="image"><span class="online"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face1.jpg') }}" alt="image"><span class="online"></span></div>
                                     <div class="info">
                                         <p>Thomas Douglas</p>
                                         <p>Available</p>
@@ -154,7 +154,7 @@
                                     <small class="text-muted my-auto">19 min</small>
                                 </li>
                                 <li class="list">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face2.jpg') }}" alt="image"><span class="offline"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face2.jpg') }}" alt="image"><span class="offline"></span></div>
                                     <div class="info">
                                         <div class="wrapper d-flex">
                                             <p>Catherine</p>
@@ -165,7 +165,7 @@
                                     <small class="text-muted my-auto">23 min</small>
                                 </li>
                                 <li class="list">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face3.jpg') }}" alt="image"><span class="online"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face3.jpg') }}" alt="image"><span class="online"></span></div>
                                     <div class="info">
                                         <p>Daniel Russell</p>
                                         <p>Available</p>
@@ -173,7 +173,7 @@
                                     <small class="text-muted my-auto">14 min</small>
                                 </li>
                                 <li class="list">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face4.jpg') }}" alt="image"><span class="offline"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face4.jpg') }}" alt="image"><span class="offline"></span></div>
                                     <div class="info">
                                         <p>James Richardson</p>
                                         <p>Away</p>
@@ -181,7 +181,7 @@
                                     <small class="text-muted my-auto">2 min</small>
                                 </li>
                                 <li class="list">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face5.jpg') }}" alt="image"><span class="online"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face5.jpg') }}" alt="image"><span class="online"></span></div>
                                     <div class="info">
                                         <p>Madeline Kennedy</p>
                                         <p>Available</p>
@@ -189,7 +189,7 @@
                                     <small class="text-muted my-auto">5 min</small>
                                 </li>
                                 <li class="list">
-                                    <div class="profile"><img src="{{ asset('admin/images/faces/face6.jpg') }}" alt="image"><span class="online"></span></div>
+                                    <div class="profile"><img src="{{ asset('backend/images/faces/face6.jpg') }}" alt="image"><span class="online"></span></div>
                                     <div class="info">
                                         <p>Sarah Graves</p>
                                         <p>Available</p>
@@ -211,7 +211,7 @@
                     <!-- partial:partials/_footer.html -->
                     <footer class="footer">
                         <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap admin template</a> from BootstrapDash.
+                            <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2021. Premium <a href="https://www.bootstrapdash.com/" target="_blank">Bootstrap backend template</a> from BootstrapDash.
                                 All rights reserved.</span>
                             <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="ti-heart text-danger ml-1"></i></span>
                         </div>
@@ -226,25 +226,25 @@
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="{{ asset('admin/vendors/js/vendor.bundle.base.js') }}"></script>
+<script src="{{ asset('backend/vendors/js/vendor.bundle.base.js') }}"></script>
 <!-- endinject -->
 <!-- Plugin js for this page -->
-<script src="{{ asset('admin/vendors/chart.js/Chart.min.js') }}"></script>
-<script src="{{ asset('admin/vendors/datatables.net/jquery.dataTables.js') }}"></script>
-<script src="{{ asset('admin/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
-<script src="{{ asset('admin/js/dataTables.select.min.js') }}"></script>
+<script src="{{ asset('backend/vendors/chart.js/Chart.min.js') }}"></script>
+<script src="{{ asset('backend/vendors/datatables.net/jquery.dataTables.js') }}"></script>
+<script src="{{ asset('backend/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
+<script src="{{ asset('backend/js/dataTables.select.min.js') }}"></script>
 
 <!-- End plugin js for this page -->
 <!-- inject:js -->
-<script src="{{ asset('admin/js/off-canvas.js') }}"></script>
-<script src="{{ asset('admin/js/hoverable-collapse.js') }}"></script>
-<script src="{{ asset('admin/js/template.js') }}"></script>
-<script src="{{ asset('admin/js/settings.js') }}"></script>
-<script src="{{ asset('admin/js/todolist.js') }}"></script>
+<script src="{{ asset('backend/js/off-canvas.js') }}"></script>
+<script src="{{ asset('backend/js/hoverable-collapse.js') }}"></script>
+<script src="{{ asset('backend/js/template.js') }}"></script>
+<script src="{{ asset('backend/js/settings.js') }}"></script>
+<script src="{{ asset('backend/js/todolist.js') }}"></script>
 <!-- endinject -->
 <!-- Custom js for this page-->
-<script src="{{ asset('admin/js/dashboard.js') }}"></script>
-<script src="{{ asset('admin/js/Chart.roundedBarCharts.js') }}"></script>
+<script src="{{ asset('backend/js/dashboard.js') }}"></script>
+<script src="{{ asset('backend/js/Chart.roundedBarCharts.js') }}"></script>
 <script src="{{ mix('js/app.js') }}"></script>
 @stack('scripts')
 </html>
