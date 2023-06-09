@@ -1,12 +1,23 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
     <ul class="nav">
-        <li class="nav-item">
-            <a class="nav-link" href="index.html">
-                <i class="icon-grid menu-icon"></i>
+        <!-- Start of Home Section -->
+        <li class="nav-item @yield('home-active')">
+            <a class="nav-link" href="{{ route('home') }}" >
+                <i class="icon-grid menu-icon mb-1"></i>
                 <span class="menu-title">Dashboard</span>
             </a>
         </li>
-        <li class="nav-item">
+        <!-- End of Home Section -->
+        <!-- Start of Upload Section -->
+        <li class="nav-item @yield('upload-active')">
+            <a class="nav-link" href="{{ route('upload') }}" >
+                <i class="icon-grid menu-icon ti-upload mb-1"></i>
+                <span class="menu-title">Upload</span>
+            </a>
+        </li>
+        <!-- End of Upload Section -->
+
+        {{-- <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                 <i class="icon-layout menu-icon"></i>
                 <span class="menu-title">UI Elements</span>
@@ -99,6 +110,6 @@
                 <i class="icon-paper menu-icon"></i>
                 <span class="menu-title">Documentation</span>
             </a>
-        </li>
+        </li> --}}
     </ul>
 </nav>

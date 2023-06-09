@@ -1,0 +1,12 @@
+.active{
+    background-color: #4B49AC !important;
+    color: #fff !important;
+}
+
+.content-wrapper{
+    padding: 20px !important;
+}
+
+.card{
+    border-radius: 5px !important;
+}

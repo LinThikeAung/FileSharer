@@ -16,6 +16,6 @@ class CategoryController extends Controller
 
     public function save(Request $request)
     {
-        return $this->category->save($request);
+      return $this->category->save($request);
     }
 }

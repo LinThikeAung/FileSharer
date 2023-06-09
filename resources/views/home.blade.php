@@ -1,7 +1,9 @@
 @extends('layouts.admin')
 @section('content')
+@section('home-active','active')
+@section('title','Home')
 <div class="content-wrapper">
-    <div class="row">
+    {{-- <div class="row">
         <div class="col-md-12 grid-margin">
             <div class="row">
                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
@@ -703,6 +705,6 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 </div>
 @endsection
