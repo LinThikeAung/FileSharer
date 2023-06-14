@@ -28586,20 +28586,6 @@ div.tagsinput span.tag a {
   transform: rotate(90deg);
 }
 
-.sidebar .nav .nav-item.active {
-  border-radius: 8px;
-}
-
-.sidebar .nav .nav-item.active > .nav-link {
-  background: #4B49AC;
-  position: relative;
-}
-
-.sidebar .nav .nav-item.active > .nav-link i,
-.sidebar .nav .nav-item.active > .nav-link .menu-title,
-.sidebar .nav .nav-item.active > .nav-link .menu-arrow {
-  color: #fff;
-}
 
 .sidebar .nav .nav-item.active > .nav-link i.menu-arrow::before {
   content: "\e64b";
@@ -28636,9 +28622,6 @@ div.tagsinput span.tag a {
   color: #fff;
 }
 
-.sidebar .nav:not(.sub-menu) > .nav-item.active {
-  background: #4B49AC;
-}
 
 .sidebar .nav.sub-menu {
   margin-bottom: 0;
@@ -28710,14 +28693,6 @@ div.tagsinput span.tag a {
   color: #FFFFFF;
 }
 
-.sidebar-dark .sidebar .nav .nav-item.active > .nav-link {
-  background: #4B49AC;
-}
-
-.sidebar-dark .sidebar .nav .nav-item.active > .nav-link .menu-title,
-.sidebar-dark .sidebar .nav .nav-item.active > .nav-link i {
-  color: #ffffff;
-}
 
 .sidebar-dark .sidebar .nav:not(.sub-menu) > .nav-item:hover > .nav-link {
   background: #4B49AC;
@@ -30077,9 +30052,7 @@ div.tagsinput span.tag a {
     -webkit-box-shadow: -4px 4px 7px 0px rgba(182, 185, 189, 0.25);
     box-shadow: -4px 4px 7px 0px rgba(182, 185, 189, 0.25);
   }
-  .sidebar-icon-only .sidebar .nav:not(.sub-menu) .nav-item.active {
-    border-radius: 0;
-  }
+
   .sidebar-icon-only .sidebar .nav:not(.sub-menu) .nav-item:hover .nav-link {
     border-radius: 0;
   }

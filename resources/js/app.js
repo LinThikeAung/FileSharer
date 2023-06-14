@@ -28,10 +28,11 @@ import axios from 'axios';
 //component
 import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
-
+import UploadListComponent from './components/UploadListComponent.vue';
 const app = createApp({});
 
 app.use(VueAxios, axios);
 app.component('app',App);
 app.component('upload-component',UploadComponent);
+app.component('list-component',UploadListComponent);
 app.mount("#app");

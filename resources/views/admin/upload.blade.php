@@ -1,7 +1,7 @@
 @extends('layouts.admin')
-@section('content')
-@section('upload-active','active')
+@section('upload-active','side-active')
 @section('title','Upload')
+@section('content')
 <div class="content-wrapper">
    <upload-component></upload-component>
 </div>

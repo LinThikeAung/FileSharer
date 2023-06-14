@@ -14,11 +14,17 @@
     <link rel="stylesheet" href="{{ asset('backend/vendors/feather/feather.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/vendors/ti-icons/css/themify-icons.css') }}">
     <link rel="stylesheet" href="{{ asset('backend/vendors/css/vendor.bundle.base.css') }}">
-    <link rel="stylesheet" href="{{ asset('backend/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}">
+    {{-- <link rel="stylesheet" href="{{ asset('backend/vendors/datatables.net-bs4/dataTables.bootstrap4.css')}}"> --}}
     <link rel="stylesheet" href="{{ asset('backend/vendors/ti-icons/css/themify-icons.css') }}">
-    <link rel="stylesheet" href="{{ asset('backend/js/select.dataTables.min.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('backend/js/select.dataTables.min.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('backend/css/vertical-layout-light/style.css') }}">
     <link rel="shortcut icon" href="{{ asset('backend/images/favicon.png') }}" />
+    <!-- Datatable -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <!--DaterangePicker -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- Bootstrap Icon -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <!-- Custom Css -->
     <link rel="stylesheet" href="{{ asset('backend/css/style.css') }}">
 </head>
@@ -42,15 +48,11 @@
         </div>
     </div>
 </body>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
 <script src="{{ asset('backend/vendors/js/vendor.bundle.base.js') }}"></script>
 <!-- endinject -->
 <!-- Plugin js for this page -->
 <script src="{{ asset('backend/vendors/chart.js/Chart.min.js') }}"></script>
-<script src="{{ asset('backend/vendors/datatables.net/jquery.dataTables.js') }}"></script>
-<script src="{{ asset('backend/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
-<script src="{{ asset('backend/js/dataTables.select.min.js') }}"></script>
-
 <!-- End plugin js for this page -->
 <!-- inject:js -->
 <script src="{{ asset('backend/js/off-canvas.js') }}"></script>
@@ -63,5 +65,11 @@
 <script src="{{ asset('backend/js/dashboard.js') }}"></script>
 <script src="{{ asset('backend/js/Chart.roundedBarCharts.js') }}"></script>
 <script src="{{ mix('js/app.js') }}"></script>
+<!-- Datatable -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<!-- DaterangePicker -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+@yield('scripts')
 @stack('scripts')
 </html>

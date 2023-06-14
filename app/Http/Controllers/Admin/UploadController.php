@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\UploadFile;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
@@ -33,7 +34,7 @@ class UploadController extends Controller
             $type = $file->getClientOriginalExtension();
             Storage::disk('public')->put('backend/admin/fileUploads/'.$fileName, file_get_contents($file));
         }
-        $url = public_path('storage/backend/admin/fileUploads/'.$fileName);
+        $url = asset('/storage/backend/admin/fileUploads/'.$fileName);
         $files = [
             "name" =>$name,
             "user_id"=>$id,
@@ -47,6 +48,24 @@ class UploadController extends Controller
         return response()->json([
             'status'=>'success',
             'message'=>'Successfully Created'
+        ]);
+    }
+
+
+    public function uploadList(){
+        $user = auth()->user();
+        return view('admin.upload_list',compact('user'));
+    }
+
+    public function uploadData(){
+        return  $this->file_upload->getAllFiles();
+    }
+
+    public function getType(){
+        $files = $this->file_upload->getTypeData();
+        return response()->json([
+            'data'=>$files,
+            'success'=>'Successfully Submitted'
         ]);
     }
 }
