@@ -26,10 +26,12 @@ class UploadController extends Controller
     public function store(Request $request){
         $files = [];
         $id = auth()->id();
-        $name = $request->name;
-        $size =Crypt::encryptString($request->size);
-        if($request->file('file')){
-            $file = $request->file('file');
+        $file = $request->file('file');
+        $fileSize = $file->getSize();
+        $formattedSize = $this->formatFileSize($fileSize);
+        $size =Crypt::encryptString($formattedSize);
+        if($file){
+            $name = $file->getClientOriginalName();
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
             Storage::disk('public')->put('backend/admin/fileUploads/'.$fileName, file_get_contents($file));
@@ -44,13 +46,28 @@ class UploadController extends Controller
             "url"=>Crypt::encryptString($url)
         ];
         $this->file_upload->storeFile($files);
-
-        return response()->json([
-            'status'=>'success',
-            'message'=>'Successfully Created'
-        ]);
+        return $fileName;
     }
 
+    private function formatFileSize($bytes)
+    {
+        $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        if ($bytes === 0) return '0 Byte';
+        $i = floor(log($bytes, 1024));
+        return round($bytes / pow(1024, $i)).' '. $sizes[$i];
+    }
+
+    public function delete(){
+        $data = UploadFile::where('file',request()->getContent())->first();
+        if($data){
+            $data->delete();
+            Storage::disk('public')->delete('backend/admin/fileUploads/'.$data->file);
+            return response()->json([
+                'status'=>'success',
+                'message'=>'Successfully Created'
+            ]);
+        }
+    }
 
     public function uploadList(){
         $user = auth()->user();

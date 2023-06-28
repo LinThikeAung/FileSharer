@@ -135,3 +135,6 @@ button.dropdown-toggle{
     line-height: 17px !important; 
 }
 
+.filepond--credits{
+    display: none !important;
+}
