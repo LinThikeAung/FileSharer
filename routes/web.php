@@ -25,10 +25,14 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/upload',[UploadController::class,'index'])->name('upload');
     Route::post('/upload',[UploadController::class,'store']);
+    Route::post('/upload-delete',[UploadController::class,'delete']);
     Route::get('/upload-list',[UploadController::class,'uploadList'])->name('upload-list');
     Route::get('/upload-list/data',[UploadController::class,'uploadData']);
     Route::get('/upload-list/type',[UploadController::class,'getType']);
     Route::post('/category/save', [CategoryController::class, 'save'])->name('category.save');
+    Route::post('/test',function(){
+        return "hit";
+    });
 });
 
 
