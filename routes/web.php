@@ -30,9 +30,7 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/upload-list/data',[UploadController::class,'uploadData']);
     Route::get('/upload-list/type',[UploadController::class,'getType']);
     Route::post('/category/save', [CategoryController::class, 'save'])->name('category.save');
-    Route::post('/test',function(){
-        return "hit";
-    });
+    Route::post('/reset',[UploadController::class,'test']);
 });
 
 

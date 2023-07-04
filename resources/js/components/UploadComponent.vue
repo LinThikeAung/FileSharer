@@ -1,58 +1,38 @@
 <template>
-  <file-pond 
-    name="file"
-    ref="pond"
-    v-on:initfile="handleFilePondInit"
-    v-on:warning="handleFilePond"
-    allowMultiple = true
-    maxFiles = 5
-    :server="{
-        url : '',
-        process : {
-            url : '/upload',
-            method : 'POST'
-        },
-        revert : {
-            url : '/upload-delete',
-            method : 'POST'
-        },
-        headers : {
-                'X-CSRF-TOKEN' : this.token
-        },
-    }"
-    />
-    <p v-if="showError" class="text-danger">The maximum number of files is 5</p>
+    <input type="file" name="folder" webkitdirectory directory multiple @change="onChangeEvent">
 </template>
 
 <script>
-// import vueFilePond from 'vue-filepond';
-import vueFilePond from 'vue-filepond';
-import 'filepond/dist/filepond.min.css';
-import $ from "jquery";
-var csrf_token = $('meta[name="csrf-token"]').attr('content');
+import axios from 'axios';
+// import { filter, map } from 'lodash';
 export default {
-    components: {
-        FilePond: vueFilePond()
-    },
     data(){
         return {
-            token  : csrf_token,
-            showError : false
+            files : [],
         }
     },
-    methods : {
-        handleFilePond(){
-            this.showError = true;
+    methods:{
+        onChangeEvent(event){  
+            this.files = event.target.files;   
+            let formData = new FormData();
+            for(var i=0;i < this.files.length;i++)
+            {
+                formData.append('folder[]',this.files[i]);
+            }
+            axios.post('/reset',formData,{
+                    headers : {
+                        'Content-Type': 'multipart/form-data'
+                    }
+            })
+            .then(response=>{
+                console.log(response);
+            })
+            .catch(console.error());
         },
-        handleFilePondInit(){
-            this.showError = false;
-        }
     }
 }
 </script>
-<style scoped>
-.filepond--root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
-        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-}
+
+<style>
+
 </style>
