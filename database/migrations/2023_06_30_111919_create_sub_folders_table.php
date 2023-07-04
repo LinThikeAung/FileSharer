@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('sub_folders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('parent_id')->nullable()->constrained('main_folders')->cascadeOnDelete();
-            $table->integer('main_sub_id')->nullable();
+            $table->integer('main_sub_id')->nullable()->constrained('sub_folders')->cascadeOnDelete();
             $table->string('name');
             $table->timestamps();
         });

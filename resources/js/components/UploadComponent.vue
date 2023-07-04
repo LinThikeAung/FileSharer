@@ -22,7 +22,8 @@ export default {
             axios.post('/reset',formData,{
                     headers : {
                         'Content-Type': 'multipart/form-data'
-                    }
+                    },
+                
             })
             .then(response=>{
                 console.log(response);
