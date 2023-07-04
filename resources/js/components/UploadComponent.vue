@@ -1,5 +1,8 @@
 <template>
     <input type="file" name="folder" webkitdirectory directory multiple @change="onChangeEvent">
+    <div class="progress-bar-container">
+      <div class="progress-bar" :style="{ width: uploadProgress + '%' }">{{ uploadProgress }}%</div>
+    </div>
 </template>
 
 <script>
@@ -9,6 +12,7 @@ export default {
     data(){
         return {
             files : [],
+            uploadProgress: 0,
         }
     },
     methods:{
@@ -23,7 +27,11 @@ export default {
                     headers : {
                         'Content-Type': 'multipart/form-data'
                     },
-                
+                        onUploadProgress: (progressEvent) => {
+                        this.uploadProgress = Math.round(
+                            (progressEvent.loaded / progressEvent.total) * 100
+                        );
+                    },
             })
             .then(response=>{
                 console.log(response);
