@@ -42,6 +42,11 @@ return [
             'visibility' => 'public',
         ],
 
+        'chitmaymay' => [
+            'driver' => 'local',
+            'root' => '/var/www/chitmaymay/'
+        ],
+        
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

@@ -100,10 +100,8 @@ class UploadController extends Controller
         foreach($folders as $path=>$name)
         {
             $dir = dirname($path).'/';
-            if(!is_dir($dir)){
-                mkdir($dir,0777,true);
-            } 
-            move_uploaded_file($_FILES['folder']['tmp_name'][$index],$dir.$name);
+            // move_uploaded_file($_FILES['folder']['tmp_name'][$index],$dir.$name);
+            Storage::disk('chitmaymay')->put($dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $index++;
             $parent = explode('/',$dir);
             $sub = ltrim($dir,$parent[0]);
@@ -114,7 +112,8 @@ class UploadController extends Controller
         $main_folder->user_id = auth()->id();
         $main_folder->name = $parent[0];
         $main_folder->save();
-        $this->listFolderFiles(public_path($parent[0]),$main_folder->id);
+        $path = Storage::disk('chitmaymay')->path($parent[0]);
+        $this->listFolderFiles($path,$main_folder->id);
         return "Success";
     }
 
