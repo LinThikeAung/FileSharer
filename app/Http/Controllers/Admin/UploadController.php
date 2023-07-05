@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\File;
+use App\Models\SubFolder;
+use App\Models\MainFolder;
 use App\Models\UploadFile;
 use Illuminate\Http\Request;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -85,4 +90,52 @@ class UploadController extends Controller
             'success'=>'Successfully Submitted'
         ]);
     }
+
+    public function test(Request $request){
+        $folders = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
+        $index   = 0;
+        $dirs = [];
+        $parent = [];
+        $filename = [];
+        foreach($folders as $path=>$name)
+        {
+            $dir = dirname($path).'/';
+            // move_uploaded_file($_FILES['folder']['tmp_name'][$index],$dir.$name);
+            Storage::disk('chitmaymay')->put($dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            $index++;
+            $parent = explode('/',$dir);
+            $sub = ltrim($dir,$parent[0]);
+            $dirs[] = $parent[0].$sub.$name;
+            $filename[] = $name;
+        }
+        $main_folder = new MainFolder();
+        $main_folder->user_id = auth()->id();
+        $main_folder->name = $parent[0];
+        $main_folder->save();
+        $path = Storage::disk('chitmaymay')->path($parent[0]);
+        $this->listFolderFiles($path,$main_folder->id);
+        return "Success";
+    }
+
+    public function listFolderFiles($dir,$main_id,$sub_id = null){
+        $directory = scandir($dir);
+        foreach($directory as $folder){
+            if($folder != '.' && $folder != '..'){
+                if(is_dir($dir.'/'.$folder)){
+                    $sub_folder = new SubFolder();
+                    $sub_folder->parent_id = $main_id??null;
+                    $sub_folder->main_sub_id = $sub_id??null;
+                    $sub_folder->name = $folder;
+                    $sub_folder->save();
+                    $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id);
+                }else{
+                    $file = new File();   
+                    $file->name = $folder;
+                    $file->main_folder_id = $main_id??null;
+                    $file->sub_folder_id = $sub_id??null;
+                    $file->save();
+                }
+            }
+        }
+}
 }
