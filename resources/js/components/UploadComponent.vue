@@ -1,18 +1,19 @@
 <template>
     <input type="file" name="folder" webkitdirectory directory multiple @change="onChangeEvent">
-    <div class="progress-bar-container">
-      <div class="progress-bar" :style="{ width: uploadProgress + '%' }">{{ uploadProgress }}%</div>
+    <div v-if="showProgress">
+        <progress-component :fileName = "fileName" :uploadProgress="uploadProgress"></progress-component>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
-// import { filter, map } from 'lodash';
 export default {
     data(){
         return {
             files : [],
             uploadProgress: 0,
+            showProgress : false,
+            fileName : null
         }
     },
     methods:{
@@ -23,6 +24,9 @@ export default {
             {
                 formData.append('folder[]',this.files[i]);
             }
+            this.showProgress = true;
+            let file = event.target.files[0].webkitRelativePath;
+            this.fileName = file.split('/')[0];
             axios.post('/reset',formData,{
                     headers : {
                         'Content-Type': 'multipart/form-data'
