@@ -7,8 +7,6 @@ use App\Models\SubFolder;
 use App\Models\MainFolder;
 use App\Models\UploadFile;
 use Illuminate\Http\Request;
-use RecursiveIteratorIterator;
-use RecursiveDirectoryIterator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -100,7 +98,6 @@ class UploadController extends Controller
         foreach($folders as $path=>$name)
         {
             $dir = dirname($path).'/';
-            // move_uploaded_file($_FILES['folder']['tmp_name'][$index],$dir.$name);
             Storage::disk('chitmaymay')->put($dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $index++;
             $parent = explode('/',$dir);
@@ -113,7 +110,7 @@ class UploadController extends Controller
         $main_folder->name = $parent[0];
         $main_folder->save();
         $path = Storage::disk('chitmaymay')->path($parent[0]);
-        $this->listFolderFiles($path,$main_folder->id);
+        return $this->listFolderFiles($path,$main_folder->id);
         return "Success";
     }
 
@@ -129,8 +126,24 @@ class UploadController extends Controller
                     $sub_folder->save();
                     $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id);
                 }else{
+                    $array = $_FILES['folder']['name'];
+                    $index = null;
+                    foreach ($array as $key => $value) {
+                        if($value == $folder){
+                            $index = $key;
+                            break;
+                        }
+                    }
+                    $path = $_FILES['folder']['full_path'][$index];
+                    $url =  Storage::disk('chitmaymay')->url($path);
+                    $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
+                    $type = explode('.',$folder)[1];
                     $file = new File();   
                     $file->name = $folder;
+                    $file->url = $url;
+                    $file->file = $folder;
+                    $file->size = $size;
+                    $file->type = $type;
                     $file->main_folder_id = $main_id??null;
                     $file->sub_folder_id = $sub_id??null;
                     $file->save();

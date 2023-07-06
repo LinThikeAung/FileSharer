@@ -29,10 +29,14 @@ import axios from 'axios';
 import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
 import UploadListComponent from './components/UploadListComponent.vue';
+import ProgressComponent from './components/ProgressComponent.vue';
+import '@fortawesome/fontawesome-free/css/all.css';
+
 const app = createApp({});
 
 app.use(VueAxios, axios);
 app.component('app',App);
 app.component('upload-component',UploadComponent);
 app.component('list-component',UploadListComponent);
+app.component('progress-component',ProgressComponent);
 app.mount("#app");
