@@ -30,7 +30,6 @@ import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
 import UploadListComponent from './components/UploadListComponent.vue';
 import ProgressComponent from './components/ProgressComponent.vue';
-import '@fortawesome/fontawesome-free/css/all.css';
 
 const app = createApp({});
 
