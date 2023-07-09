@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\File;
+use App\Models\MainFile;
 use App\Models\SubFolder;
 use App\Models\MainFolder;
 use App\Models\UploadFile;
@@ -32,21 +33,23 @@ class UploadController extends Controller
         $file = $request->file('file');
         $fileSize = $file->getSize();
         $formattedSize = $this->formatFileSize($fileSize);
-        $size =Crypt::encryptString($formattedSize);
+        $size =$formattedSize;
         if($file){
             $name = $file->getClientOriginalName();
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
-            Storage::disk('public')->put('backend/admin/fileUploads/'.$fileName, file_get_contents($file));
+            $name = auth()->user()->name;
+            Storage::disk('chitmaymay')->put("$name/".$fileName, file_get_contents($file));
         }
-        $url = asset('/storage/backend/admin/fileUploads/'.$fileName);
+        $path = "$name/".$fileName;
+        $url = Storage::disk('chitmaymay')->url($path);
         $files = [
             "name" =>$name,
             "user_id"=>$id,
             "size"=>$size,
             "type"=>$type,
             "file"=>$fileName,
-            "url"=>Crypt::encryptString($url)
+            "url"=>$url
         ];
         $this->file_upload->storeFile($files);
         return $fileName;
@@ -60,11 +63,25 @@ class UploadController extends Controller
         return round($bytes / pow(1024, $i)).' '. $sizes[$i];
     }
 
+    public function upload(Request $request){ 
+        $fileName = MainFolder::firstWhere('name',$request->fileName);
+        if($fileName){
+            return response()->json([
+                'status'=>'success',
+                'name'=>$fileName->name
+            ]);
+        }else{
+            return response()->json([
+                'status'=> 'fail'
+            ]);
+        }
+    }
     public function delete(){
-        $data = UploadFile::where('file',request()->getContent())->first();
+        $data = MainFile::where('file',request()->getContent())->first();
         if($data){
             $data->delete();
-            Storage::disk('public')->delete('backend/admin/fileUploads/'.$data->file);
+            $name = auth()->user()->name;
+            Storage::disk('chitmaymay')->delete("$name/".$data->file);
             return response()->json([
                 'status'=>'success',
                 'message'=>'Successfully Created'
@@ -114,6 +131,29 @@ class UploadController extends Controller
         return "Success";
     }
 
+    public function uploadOption(Request $request){
+        $file = MainFolder::firstWhere('name',$request->fileName);
+        if($file){
+                $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
+                $array  = $sub_folder->toArray();
+                SubFolder::whereIn('main_sub_id',$array)->delete();
+                $file->delete();
+                return response()->json([
+                    'status'=>'success'
+                ]);
+        }
+    }
+
+    public function uploadOptionBoth(Request $request){
+        $file = MainFolder::where('name',$request->fileName)->get();
+        if($file){
+            $count = count($file);
+            return response()->json([
+                'status'=>'success',
+                'data'=>$request->fileName ." " . "(" . $count .")"
+            ]);
+        }
+    }
     public function listFolderFiles($dir,$main_id,$sub_id = null){
         $directory = scandir($dir);
         foreach($directory as $folder){

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use datatables;
+use App\Models\MainFile;
 use App\Models\UploadFile;
 use Illuminate\Support\Facades\Crypt;
 
@@ -18,7 +19,7 @@ class FileUploadRepository
      *  Return the model
      */
     public function storeFile(array $data){
-        return UploadFile::create([
+        return MainFile::create([
             'name'=>$data['name'],
             'user_id'=>$data['user_id'],
             'size'=>$data['size'],

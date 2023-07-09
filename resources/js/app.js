@@ -24,13 +24,13 @@ require('./bootstrap');
 import { createApp } from 'vue'
 import VueAxios from 'vue-axios';
 import axios from 'axios';
-
 //component
 import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
 import UploadListComponent from './components/UploadListComponent.vue';
 import ProgressComponent from './components/ProgressComponent.vue';
-import '@fortawesome/fontawesome-free/css/all.css';
+import UploadOptionComponent from './components/UploadOptionComponent.vue';
+import FilePondComponent from './components/FilePondComponent.vue';
 
 const app = createApp({});
 
@@ -39,4 +39,6 @@ app.component('app',App);
 app.component('upload-component',UploadComponent);
 app.component('list-component',UploadListComponent);
 app.component('progress-component',ProgressComponent);
+app.component('uploadOption-component',UploadOptionComponent);
+app.component('file-pond-component',FilePondComponent);
 app.mount("#app");

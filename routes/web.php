@@ -25,7 +25,10 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/upload',[UploadController::class,'index'])->name('upload');
     Route::post('/upload',[UploadController::class,'store']);
+    Route::get('/upload-exist',[UploadController::class,'upload']);
     Route::post('/upload-delete',[UploadController::class,'delete']);
+    Route::get('/upload-option-check',[UploadController::class,'uploadOption']);
+    Route::get('//upload-option-both',[UploadController::class,'uploadOptionBoth']);
     Route::get('/upload-list',[UploadController::class,'uploadList'])->name('upload-list');
     Route::get('/upload-list/data',[UploadController::class,'uploadData']);
     Route::get('/upload-list/type',[UploadController::class,'getType']);

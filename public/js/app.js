@@ -22264,6 +22264,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vue_filepond__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue-filepond */ "./node_modules/vue-filepond/dist/vue-filepond.js");
+/* harmony import */ var vue_filepond__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue_filepond__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var filepond_dist_filepond_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! filepond/dist/filepond.min.css */ "./node_modules/filepond/dist/filepond.min.css");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
+/* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_2__);
+// import vueFilePond from 'vue-filepond';
+
+
+
+var csrf_token = jquery__WEBPACK_IMPORTED_MODULE_2___default()('meta[name="csrf-token"]').attr('content');
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    FilePond: vue_filepond__WEBPACK_IMPORTED_MODULE_0___default()()
+  },
+  data: function data() {
+    return {
+      token: csrf_token,
+      showError: false,
+      showClose: false
+    };
+  },
+  methods: {
+    handleFilePond: function handleFilePond() {
+      this.showError = true;
+    },
+    handleFilePondInit: function handleFilePondInit() {
+      this.showError = false;
+    },
+    onCloseFilePond: function onCloseFilePond() {
+      this.$emit('close-file-pond');
+    },
+    handleFilePondProcessFile: function handleFilePondProcessFile() {
+      this.showClose = true;
+    },
+    stopFileClose: function stopFileClose() {
+      this.showClose = false;
+    },
+    onProcessfileabort: function onProcessfileabort() {
+      this.showClose = false;
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressComponent.vue?vue&type=script&lang=js":
 /*!***********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressComponent.vue?vue&type=script&lang=js ***!
@@ -22276,7 +22332,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  props: ['fileName', 'uploadProgress']
+  props: ['fileName', 'uploadProgress', 'uploading', 'uploadCancel', 'showSuccess'],
+  data: function data() {
+    return {
+      imageUrl: '/backend/images/folder.png'
+    };
+  },
+  methods: {
+    cancelUpload: function cancelUpload() {
+      this.$emit('update-parent-data');
+    },
+    closeDialoag: function closeDialoag() {
+      this.$emit('close-dialoag');
+    },
+    closeUpload: function closeUpload() {
+      this.$emit('close-upload');
+    }
+  }
 });
 
 /***/ }),
@@ -22294,37 +22366,179 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
+/* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _FilePondComponent_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FilePondComponent.vue */ "./resources/js/components/FilePondComponent.vue");
+
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    FilePondComponent: _FilePondComponent_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+  },
   data: function data() {
     return {
       files: [],
       uploadProgress: 0,
       showProgress: false,
-      fileName: null
+      fileName: null,
+      uploadCancelToken: null,
+      uploading: false,
+      uploadCancel: false,
+      showSuccess: false,
+      fileImageUrl: "/backend/images/upload-file.png",
+      folderImageUrl: "/backend/images/upload-folder.png",
+      showOptionComponent: false,
+      showFilePond: false
     };
   },
   methods: {
     onChangeEvent: function onChangeEvent(event) {
       var _this = this;
-      this.files = event.target.files;
+      this.files = [];
+      this.files = Array.from(event.target.files);
+      if (this.files.length > 50) {
+        alert('You files less than 50');
+      }
+      var file = this.files[0].webkitRelativePath;
+      this.fileName = file.split('/')[0];
+      axios__WEBPACK_IMPORTED_MODULE_0___default().get("/upload-exist?fileName=".concat(this.fileName)).then(function (response) {
+        if (response.data.status == 'success') {
+          _this.showOptionComponent = true;
+          _this.fileName = response.data.name;
+        } else {
+          _this.uploadData();
+        }
+      })["catch"](function (error) {
+        console.log(error);
+      });
+    },
+    uploadData: function uploadData() {
+      var _this2 = this;
       var formData = new FormData();
       for (var i = 0; i < this.files.length; i++) {
         formData.append('folder[]', this.files[i]);
       }
+      this.uploadCancel = false;
       this.showProgress = true;
-      var file = event.target.files[0].webkitRelativePath;
-      this.fileName = file.split('/')[0];
+      this.showSuccess = false;
+      this.uploadProgress = 0;
+      this.uploading = true;
+      this.uploadCancelToken = axios__WEBPACK_IMPORTED_MODULE_0___default().CancelToken.source();
       axios__WEBPACK_IMPORTED_MODULE_0___default().post('/reset', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         },
         onUploadProgress: function onUploadProgress(progressEvent) {
-          _this.uploadProgress = Math.round(progressEvent.loaded / progressEvent.total * 100);
-        }
+          _this2.uploadProgress = Math.round(progressEvent.loaded / progressEvent.total * 100);
+          if (_this2.uploadProgress === 100) {
+            _this2.uploading = false;
+            _this2.showSuccess = true;
+            _this2.$refs.fileInput.value = '';
+          }
+        },
+        cancelToken: this.uploadCancelToken.token
       }).then(function (response) {
         console.log(response);
-      })["catch"](console.error());
+      })["catch"](function (error) {
+        if (axios__WEBPACK_IMPORTED_MODULE_0___default().isCancel(error)) {
+          console.log(error);
+        } else {
+          console.log('Error:', error.message);
+        }
+      });
+    },
+    updateParentData: function updateParentData() {
+      if (this.uploadCancelToken) {
+        this.uploadCancelToken.cancel('Upload canceled by the user.');
+        this.uploadProgress = 0;
+        this.files = [];
+        this.$refs.fileInput.value = '';
+        this.uploading = false;
+        this.uploadCancel = true;
+        this.files = [];
+      }
+    },
+    onCloseDialoag: function onCloseDialoag() {
+      var _this3 = this;
+      sweetalert2__WEBPACK_IMPORTED_MODULE_1___default().fire({
+        title: 'Cancel upload?',
+        text: "Your upload is not complete. Would you like to cancel the upload?",
+        showCancelButton: true,
+        confirmButtonText: 'Cancel Upload',
+        cancelButtonText: 'Continue Upload',
+        reverseButtons: true,
+        focusConfirm: false,
+        focusCancel: false
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this3.cancelUpload();
+        }
+      });
+    },
+    cancelUpload: function cancelUpload() {
+      this.showProgress = false;
+      if (this.uploadCancelToken) {
+        this.uploadCancelToken.cancel('Upload canceled by the user.');
+        this.fileName = null;
+        this.uploadProgress = 0;
+        this.files = [];
+        this.$refs.fileInput.value = '';
+        this.uploading = false;
+      }
+    },
+    onCloseUpload: function onCloseUpload() {
+      this.$refs.fileInput.value = '';
+      this.files = [];
+      this.showProgress = false;
+      this.uploadCancel = false;
+      this.showSuccess = false;
+    },
+    onClickHandler: function onClickHandler() {
+      this.$refs.fileInput.click();
+    },
+    closeUploadOption: function closeUploadOption() {
+      this.showOptionComponent = false;
+      this.fileName = null;
+      this.$refs.fileInput.value = '';
+      this.files = [];
+    },
+    onReplaceData: function onReplaceData() {
+      this.showOptionComponent = false;
+      this.uploadData();
+    },
+    onUpdateOptionBoth: function onUpdateOptionBoth(value) {
+      var _this4 = this;
+      console.log(this.files);
+      if (!this.files) return;
+      var _loop = function _loop(i) {
+        var fileReader = new FileReader();
+        fileReader.onload = function (event) {
+          var modifiedContent = event.target.result.toLowerCase();
+          var modifiedFile = new File([modifiedContent], _this4.files[i].name, {
+            type: _this4.files[i].type,
+            lastModified: _this4.files[i].lastModified
+          });
+        };
+        console.log(_this4.files[i]);
+      };
+      for (var i = 0; i < this.files.length; i++) {
+        _loop(i);
+      }
+
+      // for (let i = 0; i < this.formattedUsers.length; i++) {
+      //     let name = this.formattedUsers[i].webkitRelativePath.split('/')[1];
+      //     let real_path = value + "/" + name;
+      //     this.formattedUsers[i].webkitRelativePath = real_path;
+      // }
+      // this.files = this.formattedUsers;
+      // this.uploadData();
+    },
+    onFileUpload: function onFileUpload() {
+      this.showFilePond = true;
+    },
+    onCloseFilePond: function onCloseFilePond() {
+      this.showFilePond = false;
     }
   }
 });
@@ -22420,6 +22634,53 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      selectedOption: 'option1'
+    };
+  },
+  props: ['fileName'],
+  methods: {
+    canCelUpload: function canCelUpload() {
+      this.$emit('close-upload-option');
+    },
+    uploadOptionData: function uploadOptionData() {
+      var _this = this;
+      if (this.selectedOption == 'option1') {
+        axios__WEBPACK_IMPORTED_MODULE_0___default().get("/upload-option-check?fileName=".concat(this.fileName)).then(function (response) {
+          if (response.data.status == 'success') {
+            _this.$emit('replace-data');
+          }
+        })["catch"](console.error());
+      } else {
+        axios__WEBPACK_IMPORTED_MODULE_0___default().get("/upload-option-both?fileName=".concat(this.fileName)).then(function (response) {
+          if (response.data.status == 'success') {
+            var data = response.data.data;
+            _this.$emit('update-option-both', data);
+          }
+        })["catch"](console.error());
+      }
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/App.vue?vue&type=template&id=332fccf4":
 /*!*************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/App.vue?vue&type=template&id=332fccf4 ***!
@@ -22461,6 +22722,85 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-aa48f8de"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
+var _hoisted_1 = {
+  "class": "modal-content"
+};
+var _hoisted_2 = {
+  "class": "modal-header"
+};
+var _hoisted_3 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+    "class": "modal-title"
+  }, "File Pond", -1 /* HOISTED */);
+});
+var _hoisted_4 = ["disabled"];
+var _hoisted_5 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-x"
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_6 = [_hoisted_5];
+var _hoisted_7 = {
+  "class": "modal-body"
+};
+var _hoisted_8 = {
+  key: 0,
+  "class": "text-danger"
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_file_pond = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("file-pond");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn-close",
+    onClick: _cache[0] || (_cache[0] = function () {
+      return $options.onCloseFilePond && $options.onCloseFilePond.apply($options, arguments);
+    }),
+    disabled: $data.showClose
+  }, _hoisted_6, 8 /* PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_file_pond, {
+    name: "file",
+    ref: "pond",
+    onInitfile: $options.handleFilePondInit,
+    onWarning: $options.handleFilePond,
+    onProcessfilestart: $options.handleFilePondProcessFile,
+    onProcessfile: $options.stopFileClose,
+    onProcessfileabort: $options.onProcessfileabort,
+    allowMultiple: "true",
+    maxFiles: "5",
+    server: {
+      url: '',
+      process: {
+        url: '/upload',
+        method: 'POST'
+      },
+      revert: {
+        url: '/upload-delete',
+        method: 'POST'
+      },
+      headers: {
+        'X-CSRF-TOKEN': this.token
+      }
+    }
+  }, null, 8 /* PROPS */, ["onInitfile", "onWarning", "onProcessfilestart", "onProcessfile", "onProcessfileabort", "server"]), $data.showError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_8, "The maximum number of files is 5")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]);
+}
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressComponent.vue?vue&type=template&id=23cd4275&scoped=true":
 /*!***************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/ProgressComponent.vue?vue&type=template&id=23cd4275&scoped=true ***!
@@ -22480,46 +22820,137 @@ var _withScopeId = function _withScopeId(n) {
 var _hoisted_1 = {
   "class": "modal-content"
 };
-var _hoisted_2 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "modal-header"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
+var _hoisted_2 = {
+  "class": "modal-header"
+};
+var _hoisted_3 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", {
     "class": "modal-title"
-  }, "1 upload complete"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "close",
-    "aria-label": "Close"
-  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "bi bi-x"
-  })])], -1 /* HOISTED */);
+  }, "Folder upload", -1 /* HOISTED */);
 });
-var _hoisted_3 = {
-  "class": "modal-body"
-};
-var _hoisted_4 = {
-  "class": "d-flex align-items-center justify-content-between"
-};
-var _hoisted_5 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_4 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": "fa-solid fa-folder mr-4"
+    "class": "bi bi-x"
   }, null, -1 /* HOISTED */);
 });
+var _hoisted_5 = [_hoisted_4];
 var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    "class": "btn-default"
-  }, "Cancel", -1 /* HOISTED */);
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-x"
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_7 = [_hoisted_6];
+var _hoisted_8 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-x"
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_9 = [_hoisted_8];
+var _hoisted_10 = {
+  "class": "modal-body"
+};
+var _hoisted_11 = {
+  key: 0
+};
+var _hoisted_12 = {
+  "class": "d-flex align-items-center justify-content-between"
+};
+var _hoisted_13 = {
+  "class": "d-flex align-items-center"
+};
+var _hoisted_14 = ["src"];
+var _hoisted_15 = {
+  "class": "progress my-1",
+  role: "progressbar",
+  "aria-label": "Example with label",
+  "aria-valuemin": "0",
+  "aria-valuemax": "100"
+};
+var _hoisted_16 = {
+  key: 1
+};
+var _hoisted_17 = {
+  "class": "d-flex align-items-center justify-content-between"
+};
+var _hoisted_18 = {
+  "class": "d-flex align-items-center"
+};
+var _hoisted_19 = ["src"];
+var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Upload Canceled", -1 /* HOISTED */);
+});
+var _hoisted_21 = {
+  key: 2
+};
+var _hoisted_22 = {
+  "class": "d-flex align-items-center justify-content-between"
+};
+var _hoisted_23 = {
+  "class": "d-flex align-items-center"
+};
+var _hoisted_24 = ["src"];
+var _hoisted_25 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-check2"
+  }, null, -1 /* HOISTED */);
 });
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.fileName), 1 /* TEXT */)]), _hoisted_6]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.upload) + " ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"progress mt-3\">\r\n                    {{  }} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"progress-bar\" role=\"progressbar\" :style=\"{width: uploadProgress}\" aria-valuenow=\"25\" aria-valuemin=\"0\" aria-valuemax=\"100\">{{ uploadProgress }}</div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" </div> ")])]);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, $props.uploading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "close",
+    "aria-label": "Close",
+    onClick: _cache[0] || (_cache[0] = function () {
+      return $options.closeDialoag && $options.closeDialoag.apply($options, arguments);
+    })
+  }, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.uploadCancel ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
+    type: "button",
+    "class": "close",
+    "aria-label": "Close",
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $options.closeUpload && $options.closeUpload.apply($options, arguments);
+    })
+  }, _hoisted_7)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.showSuccess ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 2,
+    type: "button",
+    "class": "close",
+    "aria-label": "Close",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.closeUpload && $options.closeUpload.apply($options, arguments);
+    })
+  }, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [$props.uploading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.imageUrl,
+    "class": "folder-image mr-4"
+  }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.fileName), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-x",
+    style: {
+      "cursor": "pointer"
+    },
+    onClick: _cache[3] || (_cache[3] = function () {
+      return $options.cancelUpload && $options.cancelUpload.apply($options, arguments);
+    })
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "progress-bar",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      width: $props.uploadProgress + '%'
+    })
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.uploadProgress) + "%", 5 /* TEXT, STYLE */)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.uploadCancel ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.imageUrl,
+    "class": "folder-image mr-4"
+  }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.fileName), 1 /* TEXT */)]), _hoisted_20])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.showSuccess ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.imageUrl,
+    "class": "folder-image mr-4"
+  }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.fileName), 1 /* TEXT */)]), _hoisted_25])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]);
 }
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61 ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -22529,24 +22960,112 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-602a0e61"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
 var _hoisted_1 = {
+  "class": "d-flex justify-content-between align-items-center upload-container"
+};
+var _hoisted_2 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h5", null, "Upload Lists", -1 /* HOISTED */);
+});
+var _hoisted_3 = {
+  "class": "dropdown dropstart"
+};
+var _hoisted_4 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": "btn btn-theme",
+    type: "button",
+    "data-bs-toggle": "dropdown",
+    "aria-expanded": "false"
+  }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": "bi bi-plus"
+  }), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "New")], -1 /* HOISTED */);
+});
+var _hoisted_5 = {
+  "class": "dropdown-menu mr-1 shadow",
+  style: {
+    "border-radius": "10px"
+  }
+};
+var _hoisted_6 = ["disabled"];
+var _hoisted_7 = {
+  "class": "dropdown-item px-3",
+  type: "button"
+};
+var _hoisted_8 = ["src"];
+var _hoisted_9 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "mr-4"
+  }, "File upload", -1 /* HOISTED */);
+});
+var _hoisted_10 = {
+  "class": "dropdown-item px-3",
+  type: "button"
+};
+var _hoisted_11 = ["src"];
+var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "mr-4"
+  }, "Folder upload", -1 /* HOISTED */);
+});
+var _hoisted_13 = {
   key: 0
+};
+var _hoisted_14 = {
+  key: 1
+};
+var _hoisted_15 = {
+  key: 2
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_progress_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("progress-component");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  var _component_uploadOption_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("uploadOption-component");
+  var _component_file_pond_component = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("file-pond-component");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "file",
-    name: "folder",
+    hidden: "",
+    ref: "fileInput",
     webkitdirectory: "",
     directory: "",
     multiple: "",
     onChange: _cache[0] || (_cache[0] = function () {
       return $options.onChangeEvent && $options.onChangeEvent.apply($options, arguments);
+    }),
+    disabled: $data.uploading
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+    "class": "mb-2 text-dark",
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $options.onFileUpload && $options.onFileUpload.apply($options, arguments);
     })
-  }, null, 32 /* HYDRATE_EVENTS */), $data.showProgress ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_progress_component, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.fileImageUrl,
+    "class": "image"
+  }, null, 8 /* PROPS */, _hoisted_8), _hoisted_9])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", {
+    "class": "mb-2",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.onClickHandler && $options.onClickHandler.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.folderImageUrl,
+    "class": "image"
+  }, null, 8 /* PROPS */, _hoisted_11), _hoisted_12])])])])]), $data.showProgress ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_progress_component, {
     fileName: $data.fileName,
-    uploadProgress: $data.uploadProgress
-  }, null, 8 /* PROPS */, ["fileName", "uploadProgress"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+    uploadProgress: $data.uploadProgress,
+    uploading: $data.uploading,
+    uploadCancel: $data.uploadCancel,
+    showSuccess: $data.showSuccess,
+    onUpdateParentData: $options.updateParentData,
+    onCloseDialoag: $options.onCloseDialoag,
+    onCloseUpload: $options.onCloseUpload
+  }, null, 8 /* PROPS */, ["fileName", "uploadProgress", "uploading", "uploadCancel", "showSuccess", "onUpdateParentData", "onCloseDialoag", "onCloseUpload"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showOptionComponent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_uploadOption_component, {
+    fileName: this.fileName,
+    onReplaceData: $options.onReplaceData,
+    onCloseUploadOption: $options.closeUploadOption,
+    onUpdateOptionBoth: $options.onUpdateOptionBoth
+  }, null, 8 /* PROPS */, ["fileName", "onReplaceData", "onCloseUploadOption", "onUpdateOptionBoth"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showFilePond ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_file_pond_component, {
+    onCloseFilePond: $options.onCloseFilePond
+  }, null, 8 /* PROPS */, ["onCloseFilePond"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
 }
 
 /***/ }),
@@ -22638,6 +23157,98 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.searchEvent && $options.searchEvent.apply($options, arguments);
     })
   }, "Search")])])])]), _hoisted_12], 64 /* STABLE_FRAGMENT */);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-4d7ab2ec"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
+var _hoisted_1 = {
+  "class": "modal-content shadow"
+};
+var _hoisted_2 = {
+  "class": "modal-body"
+};
+var _hoisted_3 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", {
+    "class": "mb-4"
+  }, "Upload options", -1 /* HOISTED */);
+});
+var _hoisted_4 = {
+  "class": "mb-4"
+};
+var _hoisted_5 = {
+  "class": "ml-4"
+};
+var _hoisted_6 = {
+  "class": "form-check mb-3"
+};
+var _hoisted_7 = ["checked"];
+var _hoisted_8 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "form-check-label ml-2",
+    "for": "flexRadioDefault1"
+  }, " Replace existing folder ", -1 /* HOISTED */);
+});
+var _hoisted_9 = {
+  "class": "form-check"
+};
+var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "form-check-label ml-2",
+    "for": "flexRadioDefault2"
+  }, " Keep both folders ", -1 /* HOISTED */);
+});
+var _hoisted_11 = {
+  "class": "d-flex justify-content-end mt-4"
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.fileName) + " already exists in this location.Do you want to replace the existing folder with a new version or keep both folders?Replacing the folder won't change sharing settings.", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "class": "form-check-input",
+    type: "radio",
+    name: "flexRadioDefault",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $data.selectedOption = $event;
+    }),
+    value: "option1",
+    id: "flexRadioDefault1",
+    checked: $data.selectedOption === 'option1'
+  }, null, 8 /* PROPS */, _hoisted_7), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.selectedOption]]), _hoisted_8]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "class": "form-check-input",
+    type: "radio",
+    name: "flexRadioDefault",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $data.selectedOption = $event;
+    }),
+    value: "option2",
+    id: "flexRadioDefault2"
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.selectedOption]]), _hoisted_10])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-default mr-2",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.canCelUpload && $options.canCelUpload.apply($options, arguments);
+    })
+  }, "Cancel"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "btn btn-primary",
+    onClick: _cache[3] || (_cache[3] = function () {
+      return $options.uploadOptionData && $options.uploadOptionData.apply($options, arguments);
+    })
+  }, "Upload")])])]);
 }
 
 /***/ }),
@@ -27918,10 +28529,10 @@ defineJQueryPlugin(Toast);
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/@fortawesome/fontawesome-free/css/all.css":
-/*!************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/@fortawesome/fontawesome-free/css/all.css ***!
-  \************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/filepond/dist/filepond.min.css":
+/*!*************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/filepond/dist/filepond.min.css ***!
+  \*************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -27929,40 +28540,37 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
-/* harmony import */ var _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _webfonts_fa_brands_400_woff2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../webfonts/fa-brands-400.woff2 */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2");
-/* harmony import */ var _webfonts_fa_brands_400_ttf__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../webfonts/fa-brands-400.ttf */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf");
-/* harmony import */ var _webfonts_fa_regular_400_woff2__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../webfonts/fa-regular-400.woff2 */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2");
-/* harmony import */ var _webfonts_fa_regular_400_ttf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../webfonts/fa-regular-400.ttf */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf");
-/* harmony import */ var _webfonts_fa_solid_900_woff2__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../webfonts/fa-solid-900.woff2 */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2");
-/* harmony import */ var _webfonts_fa_solid_900_ttf__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../webfonts/fa-solid-900.ttf */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf");
-/* harmony import */ var _webfonts_fa_v4compatibility_woff2__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../webfonts/fa-v4compatibility.woff2 */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2");
-/* harmony import */ var _webfonts_fa_v4compatibility_ttf__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../webfonts/fa-v4compatibility.ttf */ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf");
 // Imports
 
-
-
-
-
-
-
-
-
-
 var ___CSS_LOADER_EXPORT___ = _css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-var ___CSS_LOADER_URL_REPLACEMENT_0___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_brands_400_woff2__WEBPACK_IMPORTED_MODULE_2__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_1___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_brands_400_ttf__WEBPACK_IMPORTED_MODULE_3__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_2___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_regular_400_woff2__WEBPACK_IMPORTED_MODULE_4__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_3___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_regular_400_ttf__WEBPACK_IMPORTED_MODULE_5__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_4___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_solid_900_woff2__WEBPACK_IMPORTED_MODULE_6__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_5___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_solid_900_ttf__WEBPACK_IMPORTED_MODULE_7__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_6___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_v4compatibility_woff2__WEBPACK_IMPORTED_MODULE_8__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_7___ = _css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_1___default()(_webfonts_fa_v4compatibility_ttf__WEBPACK_IMPORTED_MODULE_9__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/*!\n * Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com\n * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)\n * Copyright 2023 Fonticons, Inc.\n */\n.fa {\n  font-family: var(--fa-style-family, \"Font Awesome 6 Free\");\n  font-weight: var(--fa-style, 900); }\n\n.fa,\n.fa-classic,\n.fa-sharp,\n.fas,\n.fa-solid,\n.far,\n.fa-regular,\n.fab,\n.fa-brands {\n  -moz-osx-font-smoothing: grayscale;\n  -webkit-font-smoothing: antialiased;\n  display: var(--fa-display, inline-block);\n  font-style: normal;\n  font-variant: normal;\n  line-height: 1;\n  text-rendering: auto; }\n\n.fas,\n.fa-classic,\n.fa-solid,\n.far,\n.fa-regular {\n  font-family: 'Font Awesome 6 Free'; }\n\n.fab,\n.fa-brands {\n  font-family: 'Font Awesome 6 Brands'; }\n\n.fa-1x {\n  font-size: 1em; }\n\n.fa-2x {\n  font-size: 2em; }\n\n.fa-3x {\n  font-size: 3em; }\n\n.fa-4x {\n  font-size: 4em; }\n\n.fa-5x {\n  font-size: 5em; }\n\n.fa-6x {\n  font-size: 6em; }\n\n.fa-7x {\n  font-size: 7em; }\n\n.fa-8x {\n  font-size: 8em; }\n\n.fa-9x {\n  font-size: 9em; }\n\n.fa-10x {\n  font-size: 10em; }\n\n.fa-2xs {\n  font-size: 0.625em;\n  line-height: 0.1em;\n  vertical-align: 0.225em; }\n\n.fa-xs {\n  font-size: 0.75em;\n  line-height: 0.08333em;\n  vertical-align: 0.125em; }\n\n.fa-sm {\n  font-size: 0.875em;\n  line-height: 0.07143em;\n  vertical-align: 0.05357em; }\n\n.fa-lg {\n  font-size: 1.25em;\n  line-height: 0.05em;\n  vertical-align: -0.075em; }\n\n.fa-xl {\n  font-size: 1.5em;\n  line-height: 0.04167em;\n  vertical-align: -0.125em; }\n\n.fa-2xl {\n  font-size: 2em;\n  line-height: 0.03125em;\n  vertical-align: -0.1875em; }\n\n.fa-fw {\n  text-align: center;\n  width: 1.25em; }\n\n.fa-ul {\n  list-style-type: none;\n  margin-left: var(--fa-li-margin, 2.5em);\n  padding-left: 0; }\n  .fa-ul > li {\n    position: relative; }\n\n.fa-li {\n  left: calc(var(--fa-li-width, 2em) * -1);\n  position: absolute;\n  text-align: center;\n  width: var(--fa-li-width, 2em);\n  line-height: inherit; }\n\n.fa-border {\n  border-color: var(--fa-border-color, #eee);\n  border-radius: var(--fa-border-radius, 0.1em);\n  border-style: var(--fa-border-style, solid);\n  border-width: var(--fa-border-width, 0.08em);\n  padding: var(--fa-border-padding, 0.2em 0.25em 0.15em); }\n\n.fa-pull-left {\n  float: left;\n  margin-right: var(--fa-pull-margin, 0.3em); }\n\n.fa-pull-right {\n  float: right;\n  margin-left: var(--fa-pull-margin, 0.3em); }\n\n.fa-beat {\n  animation-name: fa-beat;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, ease-in-out); }\n\n.fa-bounce {\n  animation-name: fa-bounce;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1)); }\n\n.fa-fade {\n  animation-name: fa-fade;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1)); }\n\n.fa-beat-fade {\n  animation-name: fa-beat-fade;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1)); }\n\n.fa-flip {\n  animation-name: fa-flip;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, ease-in-out); }\n\n.fa-shake {\n  animation-name: fa-shake;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, linear); }\n\n.fa-spin {\n  animation-name: fa-spin;\n  animation-delay: var(--fa-animation-delay, 0s);\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 2s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, linear); }\n\n.fa-spin-reverse {\n  --fa-animation-direction: reverse; }\n\n.fa-pulse,\n.fa-spin-pulse {\n  animation-name: fa-spin;\n  animation-direction: var(--fa-animation-direction, normal);\n  animation-duration: var(--fa-animation-duration, 1s);\n  animation-iteration-count: var(--fa-animation-iteration-count, infinite);\n  animation-timing-function: var(--fa-animation-timing, steps(8)); }\n\n@media (prefers-reduced-motion: reduce) {\n  .fa-beat,\n  .fa-bounce,\n  .fa-fade,\n  .fa-beat-fade,\n  .fa-flip,\n  .fa-pulse,\n  .fa-shake,\n  .fa-spin,\n  .fa-spin-pulse {\n    animation-delay: -1ms;\n    animation-duration: 1ms;\n    animation-iteration-count: 1;\n    transition-delay: 0s;\n    transition-duration: 0s; } }\n\n@keyframes fa-beat {\n  0%, 90% {\n    transform: scale(1); }\n  45% {\n    transform: scale(var(--fa-beat-scale, 1.25)); } }\n\n@keyframes fa-bounce {\n  0% {\n    transform: scale(1, 1) translateY(0); }\n  10% {\n    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0); }\n  30% {\n    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em)); }\n  50% {\n    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0); }\n  57% {\n    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em)); }\n  64% {\n    transform: scale(1, 1) translateY(0); }\n  100% {\n    transform: scale(1, 1) translateY(0); } }\n\n@keyframes fa-fade {\n  50% {\n    opacity: var(--fa-fade-opacity, 0.4); } }\n\n@keyframes fa-beat-fade {\n  0%, 100% {\n    opacity: var(--fa-beat-fade-opacity, 0.4);\n    transform: scale(1); }\n  50% {\n    opacity: 1;\n    transform: scale(var(--fa-beat-fade-scale, 1.125)); } }\n\n@keyframes fa-flip {\n  50% {\n    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg)); } }\n\n@keyframes fa-shake {\n  0% {\n    transform: rotate(-15deg); }\n  4% {\n    transform: rotate(15deg); }\n  8%, 24% {\n    transform: rotate(-18deg); }\n  12%, 28% {\n    transform: rotate(18deg); }\n  16% {\n    transform: rotate(-22deg); }\n  20% {\n    transform: rotate(22deg); }\n  32% {\n    transform: rotate(-12deg); }\n  36% {\n    transform: rotate(12deg); }\n  40%, 100% {\n    transform: rotate(0deg); } }\n\n@keyframes fa-spin {\n  0% {\n    transform: rotate(0deg); }\n  100% {\n    transform: rotate(360deg); } }\n\n.fa-rotate-90 {\n  transform: rotate(90deg); }\n\n.fa-rotate-180 {\n  transform: rotate(180deg); }\n\n.fa-rotate-270 {\n  transform: rotate(270deg); }\n\n.fa-flip-horizontal {\n  transform: scale(-1, 1); }\n\n.fa-flip-vertical {\n  transform: scale(1, -1); }\n\n.fa-flip-both,\n.fa-flip-horizontal.fa-flip-vertical {\n  transform: scale(-1, -1); }\n\n.fa-rotate-by {\n  transform: rotate(var(--fa-rotate-angle, none)); }\n\n.fa-stack {\n  display: inline-block;\n  height: 2em;\n  line-height: 2em;\n  position: relative;\n  vertical-align: middle;\n  width: 2.5em; }\n\n.fa-stack-1x,\n.fa-stack-2x {\n  left: 0;\n  position: absolute;\n  text-align: center;\n  width: 100%;\n  z-index: var(--fa-stack-z-index, auto); }\n\n.fa-stack-1x {\n  line-height: inherit; }\n\n.fa-stack-2x {\n  font-size: 2em; }\n\n.fa-inverse {\n  color: var(--fa-inverse, #fff); }\n\n/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen\nreaders do not read off random characters that represent icons */\n\n.fa-0::before {\n  content: \"\\30\"; }\n\n.fa-1::before {\n  content: \"\\31\"; }\n\n.fa-2::before {\n  content: \"\\32\"; }\n\n.fa-3::before {\n  content: \"\\33\"; }\n\n.fa-4::before {\n  content: \"\\34\"; }\n\n.fa-5::before {\n  content: \"\\35\"; }\n\n.fa-6::before {\n  content: \"\\36\"; }\n\n.fa-7::before {\n  content: \"\\37\"; }\n\n.fa-8::before {\n  content: \"\\38\"; }\n\n.fa-9::before {\n  content: \"\\39\"; }\n\n.fa-fill-drip::before {\n  content: \"\\f576\"; }\n\n.fa-arrows-to-circle::before {\n  content: \"\\e4bd\"; }\n\n.fa-circle-chevron-right::before {\n  content: \"\\f138\"; }\n\n.fa-chevron-circle-right::before {\n  content: \"\\f138\"; }\n\n.fa-at::before {\n  content: \"\\40\"; }\n\n.fa-trash-can::before {\n  content: \"\\f2ed\"; }\n\n.fa-trash-alt::before {\n  content: \"\\f2ed\"; }\n\n.fa-text-height::before {\n  content: \"\\f034\"; }\n\n.fa-user-xmark::before {\n  content: \"\\f235\"; }\n\n.fa-user-times::before {\n  content: \"\\f235\"; }\n\n.fa-stethoscope::before {\n  content: \"\\f0f1\"; }\n\n.fa-message::before {\n  content: \"\\f27a\"; }\n\n.fa-comment-alt::before {\n  content: \"\\f27a\"; }\n\n.fa-info::before {\n  content: \"\\f129\"; }\n\n.fa-down-left-and-up-right-to-center::before {\n  content: \"\\f422\"; }\n\n.fa-compress-alt::before {\n  content: \"\\f422\"; }\n\n.fa-explosion::before {\n  content: \"\\e4e9\"; }\n\n.fa-file-lines::before {\n  content: \"\\f15c\"; }\n\n.fa-file-alt::before {\n  content: \"\\f15c\"; }\n\n.fa-file-text::before {\n  content: \"\\f15c\"; }\n\n.fa-wave-square::before {\n  content: \"\\f83e\"; }\n\n.fa-ring::before {\n  content: \"\\f70b\"; }\n\n.fa-building-un::before {\n  content: \"\\e4d9\"; }\n\n.fa-dice-three::before {\n  content: \"\\f527\"; }\n\n.fa-calendar-days::before {\n  content: \"\\f073\"; }\n\n.fa-calendar-alt::before {\n  content: \"\\f073\"; }\n\n.fa-anchor-circle-check::before {\n  content: \"\\e4aa\"; }\n\n.fa-building-circle-arrow-right::before {\n  content: \"\\e4d1\"; }\n\n.fa-volleyball::before {\n  content: \"\\f45f\"; }\n\n.fa-volleyball-ball::before {\n  content: \"\\f45f\"; }\n\n.fa-arrows-up-to-line::before {\n  content: \"\\e4c2\"; }\n\n.fa-sort-down::before {\n  content: \"\\f0dd\"; }\n\n.fa-sort-desc::before {\n  content: \"\\f0dd\"; }\n\n.fa-circle-minus::before {\n  content: \"\\f056\"; }\n\n.fa-minus-circle::before {\n  content: \"\\f056\"; }\n\n.fa-door-open::before {\n  content: \"\\f52b\"; }\n\n.fa-right-from-bracket::before {\n  content: \"\\f2f5\"; }\n\n.fa-sign-out-alt::before {\n  content: \"\\f2f5\"; }\n\n.fa-atom::before {\n  content: \"\\f5d2\"; }\n\n.fa-soap::before {\n  content: \"\\e06e\"; }\n\n.fa-icons::before {\n  content: \"\\f86d\"; }\n\n.fa-heart-music-camera-bolt::before {\n  content: \"\\f86d\"; }\n\n.fa-microphone-lines-slash::before {\n  content: \"\\f539\"; }\n\n.fa-microphone-alt-slash::before {\n  content: \"\\f539\"; }\n\n.fa-bridge-circle-check::before {\n  content: \"\\e4c9\"; }\n\n.fa-pump-medical::before {\n  content: \"\\e06a\"; }\n\n.fa-fingerprint::before {\n  content: \"\\f577\"; }\n\n.fa-hand-point-right::before {\n  content: \"\\f0a4\"; }\n\n.fa-magnifying-glass-location::before {\n  content: \"\\f689\"; }\n\n.fa-search-location::before {\n  content: \"\\f689\"; }\n\n.fa-forward-step::before {\n  content: \"\\f051\"; }\n\n.fa-step-forward::before {\n  content: \"\\f051\"; }\n\n.fa-face-smile-beam::before {\n  content: \"\\f5b8\"; }\n\n.fa-smile-beam::before {\n  content: \"\\f5b8\"; }\n\n.fa-flag-checkered::before {\n  content: \"\\f11e\"; }\n\n.fa-football::before {\n  content: \"\\f44e\"; }\n\n.fa-football-ball::before {\n  content: \"\\f44e\"; }\n\n.fa-school-circle-exclamation::before {\n  content: \"\\e56c\"; }\n\n.fa-crop::before {\n  content: \"\\f125\"; }\n\n.fa-angles-down::before {\n  content: \"\\f103\"; }\n\n.fa-angle-double-down::before {\n  content: \"\\f103\"; }\n\n.fa-users-rectangle::before {\n  content: \"\\e594\"; }\n\n.fa-people-roof::before {\n  content: \"\\e537\"; }\n\n.fa-people-line::before {\n  content: \"\\e534\"; }\n\n.fa-beer-mug-empty::before {\n  content: \"\\f0fc\"; }\n\n.fa-beer::before {\n  content: \"\\f0fc\"; }\n\n.fa-diagram-predecessor::before {\n  content: \"\\e477\"; }\n\n.fa-arrow-up-long::before {\n  content: \"\\f176\"; }\n\n.fa-long-arrow-up::before {\n  content: \"\\f176\"; }\n\n.fa-fire-flame-simple::before {\n  content: \"\\f46a\"; }\n\n.fa-burn::before {\n  content: \"\\f46a\"; }\n\n.fa-person::before {\n  content: \"\\f183\"; }\n\n.fa-male::before {\n  content: \"\\f183\"; }\n\n.fa-laptop::before {\n  content: \"\\f109\"; }\n\n.fa-file-csv::before {\n  content: \"\\f6dd\"; }\n\n.fa-menorah::before {\n  content: \"\\f676\"; }\n\n.fa-truck-plane::before {\n  content: \"\\e58f\"; }\n\n.fa-record-vinyl::before {\n  content: \"\\f8d9\"; }\n\n.fa-face-grin-stars::before {\n  content: \"\\f587\"; }\n\n.fa-grin-stars::before {\n  content: \"\\f587\"; }\n\n.fa-bong::before {\n  content: \"\\f55c\"; }\n\n.fa-spaghetti-monster-flying::before {\n  content: \"\\f67b\"; }\n\n.fa-pastafarianism::before {\n  content: \"\\f67b\"; }\n\n.fa-arrow-down-up-across-line::before {\n  content: \"\\e4af\"; }\n\n.fa-spoon::before {\n  content: \"\\f2e5\"; }\n\n.fa-utensil-spoon::before {\n  content: \"\\f2e5\"; }\n\n.fa-jar-wheat::before {\n  content: \"\\e517\"; }\n\n.fa-envelopes-bulk::before {\n  content: \"\\f674\"; }\n\n.fa-mail-bulk::before {\n  content: \"\\f674\"; }\n\n.fa-file-circle-exclamation::before {\n  content: \"\\e4eb\"; }\n\n.fa-circle-h::before {\n  content: \"\\f47e\"; }\n\n.fa-hospital-symbol::before {\n  content: \"\\f47e\"; }\n\n.fa-pager::before {\n  content: \"\\f815\"; }\n\n.fa-address-book::before {\n  content: \"\\f2b9\"; }\n\n.fa-contact-book::before {\n  content: \"\\f2b9\"; }\n\n.fa-strikethrough::before {\n  content: \"\\f0cc\"; }\n\n.fa-k::before {\n  content: \"\\4b\"; }\n\n.fa-landmark-flag::before {\n  content: \"\\e51c\"; }\n\n.fa-pencil::before {\n  content: \"\\f303\"; }\n\n.fa-pencil-alt::before {\n  content: \"\\f303\"; }\n\n.fa-backward::before {\n  content: \"\\f04a\"; }\n\n.fa-caret-right::before {\n  content: \"\\f0da\"; }\n\n.fa-comments::before {\n  content: \"\\f086\"; }\n\n.fa-paste::before {\n  content: \"\\f0ea\"; }\n\n.fa-file-clipboard::before {\n  content: \"\\f0ea\"; }\n\n.fa-code-pull-request::before {\n  content: \"\\e13c\"; }\n\n.fa-clipboard-list::before {\n  content: \"\\f46d\"; }\n\n.fa-truck-ramp-box::before {\n  content: \"\\f4de\"; }\n\n.fa-truck-loading::before {\n  content: \"\\f4de\"; }\n\n.fa-user-check::before {\n  content: \"\\f4fc\"; }\n\n.fa-vial-virus::before {\n  content: \"\\e597\"; }\n\n.fa-sheet-plastic::before {\n  content: \"\\e571\"; }\n\n.fa-blog::before {\n  content: \"\\f781\"; }\n\n.fa-user-ninja::before {\n  content: \"\\f504\"; }\n\n.fa-person-arrow-up-from-line::before {\n  content: \"\\e539\"; }\n\n.fa-scroll-torah::before {\n  content: \"\\f6a0\"; }\n\n.fa-torah::before {\n  content: \"\\f6a0\"; }\n\n.fa-broom-ball::before {\n  content: \"\\f458\"; }\n\n.fa-quidditch::before {\n  content: \"\\f458\"; }\n\n.fa-quidditch-broom-ball::before {\n  content: \"\\f458\"; }\n\n.fa-toggle-off::before {\n  content: \"\\f204\"; }\n\n.fa-box-archive::before {\n  content: \"\\f187\"; }\n\n.fa-archive::before {\n  content: \"\\f187\"; }\n\n.fa-person-drowning::before {\n  content: \"\\e545\"; }\n\n.fa-arrow-down-9-1::before {\n  content: \"\\f886\"; }\n\n.fa-sort-numeric-desc::before {\n  content: \"\\f886\"; }\n\n.fa-sort-numeric-down-alt::before {\n  content: \"\\f886\"; }\n\n.fa-face-grin-tongue-squint::before {\n  content: \"\\f58a\"; }\n\n.fa-grin-tongue-squint::before {\n  content: \"\\f58a\"; }\n\n.fa-spray-can::before {\n  content: \"\\f5bd\"; }\n\n.fa-truck-monster::before {\n  content: \"\\f63b\"; }\n\n.fa-w::before {\n  content: \"\\57\"; }\n\n.fa-earth-africa::before {\n  content: \"\\f57c\"; }\n\n.fa-globe-africa::before {\n  content: \"\\f57c\"; }\n\n.fa-rainbow::before {\n  content: \"\\f75b\"; }\n\n.fa-circle-notch::before {\n  content: \"\\f1ce\"; }\n\n.fa-tablet-screen-button::before {\n  content: \"\\f3fa\"; }\n\n.fa-tablet-alt::before {\n  content: \"\\f3fa\"; }\n\n.fa-paw::before {\n  content: \"\\f1b0\"; }\n\n.fa-cloud::before {\n  content: \"\\f0c2\"; }\n\n.fa-trowel-bricks::before {\n  content: \"\\e58a\"; }\n\n.fa-face-flushed::before {\n  content: \"\\f579\"; }\n\n.fa-flushed::before {\n  content: \"\\f579\"; }\n\n.fa-hospital-user::before {\n  content: \"\\f80d\"; }\n\n.fa-tent-arrow-left-right::before {\n  content: \"\\e57f\"; }\n\n.fa-gavel::before {\n  content: \"\\f0e3\"; }\n\n.fa-legal::before {\n  content: \"\\f0e3\"; }\n\n.fa-binoculars::before {\n  content: \"\\f1e5\"; }\n\n.fa-microphone-slash::before {\n  content: \"\\f131\"; }\n\n.fa-box-tissue::before {\n  content: \"\\e05b\"; }\n\n.fa-motorcycle::before {\n  content: \"\\f21c\"; }\n\n.fa-bell-concierge::before {\n  content: \"\\f562\"; }\n\n.fa-concierge-bell::before {\n  content: \"\\f562\"; }\n\n.fa-pen-ruler::before {\n  content: \"\\f5ae\"; }\n\n.fa-pencil-ruler::before {\n  content: \"\\f5ae\"; }\n\n.fa-people-arrows::before {\n  content: \"\\e068\"; }\n\n.fa-people-arrows-left-right::before {\n  content: \"\\e068\"; }\n\n.fa-mars-and-venus-burst::before {\n  content: \"\\e523\"; }\n\n.fa-square-caret-right::before {\n  content: \"\\f152\"; }\n\n.fa-caret-square-right::before {\n  content: \"\\f152\"; }\n\n.fa-scissors::before {\n  content: \"\\f0c4\"; }\n\n.fa-cut::before {\n  content: \"\\f0c4\"; }\n\n.fa-sun-plant-wilt::before {\n  content: \"\\e57a\"; }\n\n.fa-toilets-portable::before {\n  content: \"\\e584\"; }\n\n.fa-hockey-puck::before {\n  content: \"\\f453\"; }\n\n.fa-table::before {\n  content: \"\\f0ce\"; }\n\n.fa-magnifying-glass-arrow-right::before {\n  content: \"\\e521\"; }\n\n.fa-tachograph-digital::before {\n  content: \"\\f566\"; }\n\n.fa-digital-tachograph::before {\n  content: \"\\f566\"; }\n\n.fa-users-slash::before {\n  content: \"\\e073\"; }\n\n.fa-clover::before {\n  content: \"\\e139\"; }\n\n.fa-reply::before {\n  content: \"\\f3e5\"; }\n\n.fa-mail-reply::before {\n  content: \"\\f3e5\"; }\n\n.fa-star-and-crescent::before {\n  content: \"\\f699\"; }\n\n.fa-house-fire::before {\n  content: \"\\e50c\"; }\n\n.fa-square-minus::before {\n  content: \"\\f146\"; }\n\n.fa-minus-square::before {\n  content: \"\\f146\"; }\n\n.fa-helicopter::before {\n  content: \"\\f533\"; }\n\n.fa-compass::before {\n  content: \"\\f14e\"; }\n\n.fa-square-caret-down::before {\n  content: \"\\f150\"; }\n\n.fa-caret-square-down::before {\n  content: \"\\f150\"; }\n\n.fa-file-circle-question::before {\n  content: \"\\e4ef\"; }\n\n.fa-laptop-code::before {\n  content: \"\\f5fc\"; }\n\n.fa-swatchbook::before {\n  content: \"\\f5c3\"; }\n\n.fa-prescription-bottle::before {\n  content: \"\\f485\"; }\n\n.fa-bars::before {\n  content: \"\\f0c9\"; }\n\n.fa-navicon::before {\n  content: \"\\f0c9\"; }\n\n.fa-people-group::before {\n  content: \"\\e533\"; }\n\n.fa-hourglass-end::before {\n  content: \"\\f253\"; }\n\n.fa-hourglass-3::before {\n  content: \"\\f253\"; }\n\n.fa-heart-crack::before {\n  content: \"\\f7a9\"; }\n\n.fa-heart-broken::before {\n  content: \"\\f7a9\"; }\n\n.fa-square-up-right::before {\n  content: \"\\f360\"; }\n\n.fa-external-link-square-alt::before {\n  content: \"\\f360\"; }\n\n.fa-face-kiss-beam::before {\n  content: \"\\f597\"; }\n\n.fa-kiss-beam::before {\n  content: \"\\f597\"; }\n\n.fa-film::before {\n  content: \"\\f008\"; }\n\n.fa-ruler-horizontal::before {\n  content: \"\\f547\"; }\n\n.fa-people-robbery::before {\n  content: \"\\e536\"; }\n\n.fa-lightbulb::before {\n  content: \"\\f0eb\"; }\n\n.fa-caret-left::before {\n  content: \"\\f0d9\"; }\n\n.fa-circle-exclamation::before {\n  content: \"\\f06a\"; }\n\n.fa-exclamation-circle::before {\n  content: \"\\f06a\"; }\n\n.fa-school-circle-xmark::before {\n  content: \"\\e56d\"; }\n\n.fa-arrow-right-from-bracket::before {\n  content: \"\\f08b\"; }\n\n.fa-sign-out::before {\n  content: \"\\f08b\"; }\n\n.fa-circle-chevron-down::before {\n  content: \"\\f13a\"; }\n\n.fa-chevron-circle-down::before {\n  content: \"\\f13a\"; }\n\n.fa-unlock-keyhole::before {\n  content: \"\\f13e\"; }\n\n.fa-unlock-alt::before {\n  content: \"\\f13e\"; }\n\n.fa-cloud-showers-heavy::before {\n  content: \"\\f740\"; }\n\n.fa-headphones-simple::before {\n  content: \"\\f58f\"; }\n\n.fa-headphones-alt::before {\n  content: \"\\f58f\"; }\n\n.fa-sitemap::before {\n  content: \"\\f0e8\"; }\n\n.fa-circle-dollar-to-slot::before {\n  content: \"\\f4b9\"; }\n\n.fa-donate::before {\n  content: \"\\f4b9\"; }\n\n.fa-memory::before {\n  content: \"\\f538\"; }\n\n.fa-road-spikes::before {\n  content: \"\\e568\"; }\n\n.fa-fire-burner::before {\n  content: \"\\e4f1\"; }\n\n.fa-flag::before {\n  content: \"\\f024\"; }\n\n.fa-hanukiah::before {\n  content: \"\\f6e6\"; }\n\n.fa-feather::before {\n  content: \"\\f52d\"; }\n\n.fa-volume-low::before {\n  content: \"\\f027\"; }\n\n.fa-volume-down::before {\n  content: \"\\f027\"; }\n\n.fa-comment-slash::before {\n  content: \"\\f4b3\"; }\n\n.fa-cloud-sun-rain::before {\n  content: \"\\f743\"; }\n\n.fa-compress::before {\n  content: \"\\f066\"; }\n\n.fa-wheat-awn::before {\n  content: \"\\e2cd\"; }\n\n.fa-wheat-alt::before {\n  content: \"\\e2cd\"; }\n\n.fa-ankh::before {\n  content: \"\\f644\"; }\n\n.fa-hands-holding-child::before {\n  content: \"\\e4fa\"; }\n\n.fa-asterisk::before {\n  content: \"\\2a\"; }\n\n.fa-square-check::before {\n  content: \"\\f14a\"; }\n\n.fa-check-square::before {\n  content: \"\\f14a\"; }\n\n.fa-peseta-sign::before {\n  content: \"\\e221\"; }\n\n.fa-heading::before {\n  content: \"\\f1dc\"; }\n\n.fa-header::before {\n  content: \"\\f1dc\"; }\n\n.fa-ghost::before {\n  content: \"\\f6e2\"; }\n\n.fa-list::before {\n  content: \"\\f03a\"; }\n\n.fa-list-squares::before {\n  content: \"\\f03a\"; }\n\n.fa-square-phone-flip::before {\n  content: \"\\f87b\"; }\n\n.fa-phone-square-alt::before {\n  content: \"\\f87b\"; }\n\n.fa-cart-plus::before {\n  content: \"\\f217\"; }\n\n.fa-gamepad::before {\n  content: \"\\f11b\"; }\n\n.fa-circle-dot::before {\n  content: \"\\f192\"; }\n\n.fa-dot-circle::before {\n  content: \"\\f192\"; }\n\n.fa-face-dizzy::before {\n  content: \"\\f567\"; }\n\n.fa-dizzy::before {\n  content: \"\\f567\"; }\n\n.fa-egg::before {\n  content: \"\\f7fb\"; }\n\n.fa-house-medical-circle-xmark::before {\n  content: \"\\e513\"; }\n\n.fa-campground::before {\n  content: \"\\f6bb\"; }\n\n.fa-folder-plus::before {\n  content: \"\\f65e\"; }\n\n.fa-futbol::before {\n  content: \"\\f1e3\"; }\n\n.fa-futbol-ball::before {\n  content: \"\\f1e3\"; }\n\n.fa-soccer-ball::before {\n  content: \"\\f1e3\"; }\n\n.fa-paintbrush::before {\n  content: \"\\f1fc\"; }\n\n.fa-paint-brush::before {\n  content: \"\\f1fc\"; }\n\n.fa-lock::before {\n  content: \"\\f023\"; }\n\n.fa-gas-pump::before {\n  content: \"\\f52f\"; }\n\n.fa-hot-tub-person::before {\n  content: \"\\f593\"; }\n\n.fa-hot-tub::before {\n  content: \"\\f593\"; }\n\n.fa-map-location::before {\n  content: \"\\f59f\"; }\n\n.fa-map-marked::before {\n  content: \"\\f59f\"; }\n\n.fa-house-flood-water::before {\n  content: \"\\e50e\"; }\n\n.fa-tree::before {\n  content: \"\\f1bb\"; }\n\n.fa-bridge-lock::before {\n  content: \"\\e4cc\"; }\n\n.fa-sack-dollar::before {\n  content: \"\\f81d\"; }\n\n.fa-pen-to-square::before {\n  content: \"\\f044\"; }\n\n.fa-edit::before {\n  content: \"\\f044\"; }\n\n.fa-car-side::before {\n  content: \"\\f5e4\"; }\n\n.fa-share-nodes::before {\n  content: \"\\f1e0\"; }\n\n.fa-share-alt::before {\n  content: \"\\f1e0\"; }\n\n.fa-heart-circle-minus::before {\n  content: \"\\e4ff\"; }\n\n.fa-hourglass-half::before {\n  content: \"\\f252\"; }\n\n.fa-hourglass-2::before {\n  content: \"\\f252\"; }\n\n.fa-microscope::before {\n  content: \"\\f610\"; }\n\n.fa-sink::before {\n  content: \"\\e06d\"; }\n\n.fa-bag-shopping::before {\n  content: \"\\f290\"; }\n\n.fa-shopping-bag::before {\n  content: \"\\f290\"; }\n\n.fa-arrow-down-z-a::before {\n  content: \"\\f881\"; }\n\n.fa-sort-alpha-desc::before {\n  content: \"\\f881\"; }\n\n.fa-sort-alpha-down-alt::before {\n  content: \"\\f881\"; }\n\n.fa-mitten::before {\n  content: \"\\f7b5\"; }\n\n.fa-person-rays::before {\n  content: \"\\e54d\"; }\n\n.fa-users::before {\n  content: \"\\f0c0\"; }\n\n.fa-eye-slash::before {\n  content: \"\\f070\"; }\n\n.fa-flask-vial::before {\n  content: \"\\e4f3\"; }\n\n.fa-hand::before {\n  content: \"\\f256\"; }\n\n.fa-hand-paper::before {\n  content: \"\\f256\"; }\n\n.fa-om::before {\n  content: \"\\f679\"; }\n\n.fa-worm::before {\n  content: \"\\e599\"; }\n\n.fa-house-circle-xmark::before {\n  content: \"\\e50b\"; }\n\n.fa-plug::before {\n  content: \"\\f1e6\"; }\n\n.fa-chevron-up::before {\n  content: \"\\f077\"; }\n\n.fa-hand-spock::before {\n  content: \"\\f259\"; }\n\n.fa-stopwatch::before {\n  content: \"\\f2f2\"; }\n\n.fa-face-kiss::before {\n  content: \"\\f596\"; }\n\n.fa-kiss::before {\n  content: \"\\f596\"; }\n\n.fa-bridge-circle-xmark::before {\n  content: \"\\e4cb\"; }\n\n.fa-face-grin-tongue::before {\n  content: \"\\f589\"; }\n\n.fa-grin-tongue::before {\n  content: \"\\f589\"; }\n\n.fa-chess-bishop::before {\n  content: \"\\f43a\"; }\n\n.fa-face-grin-wink::before {\n  content: \"\\f58c\"; }\n\n.fa-grin-wink::before {\n  content: \"\\f58c\"; }\n\n.fa-ear-deaf::before {\n  content: \"\\f2a4\"; }\n\n.fa-deaf::before {\n  content: \"\\f2a4\"; }\n\n.fa-deafness::before {\n  content: \"\\f2a4\"; }\n\n.fa-hard-of-hearing::before {\n  content: \"\\f2a4\"; }\n\n.fa-road-circle-check::before {\n  content: \"\\e564\"; }\n\n.fa-dice-five::before {\n  content: \"\\f523\"; }\n\n.fa-square-rss::before {\n  content: \"\\f143\"; }\n\n.fa-rss-square::before {\n  content: \"\\f143\"; }\n\n.fa-land-mine-on::before {\n  content: \"\\e51b\"; }\n\n.fa-i-cursor::before {\n  content: \"\\f246\"; }\n\n.fa-stamp::before {\n  content: \"\\f5bf\"; }\n\n.fa-stairs::before {\n  content: \"\\e289\"; }\n\n.fa-i::before {\n  content: \"\\49\"; }\n\n.fa-hryvnia-sign::before {\n  content: \"\\f6f2\"; }\n\n.fa-hryvnia::before {\n  content: \"\\f6f2\"; }\n\n.fa-pills::before {\n  content: \"\\f484\"; }\n\n.fa-face-grin-wide::before {\n  content: \"\\f581\"; }\n\n.fa-grin-alt::before {\n  content: \"\\f581\"; }\n\n.fa-tooth::before {\n  content: \"\\f5c9\"; }\n\n.fa-v::before {\n  content: \"\\56\"; }\n\n.fa-bangladeshi-taka-sign::before {\n  content: \"\\e2e6\"; }\n\n.fa-bicycle::before {\n  content: \"\\f206\"; }\n\n.fa-staff-snake::before {\n  content: \"\\e579\"; }\n\n.fa-rod-asclepius::before {\n  content: \"\\e579\"; }\n\n.fa-rod-snake::before {\n  content: \"\\e579\"; }\n\n.fa-staff-aesculapius::before {\n  content: \"\\e579\"; }\n\n.fa-head-side-cough-slash::before {\n  content: \"\\e062\"; }\n\n.fa-truck-medical::before {\n  content: \"\\f0f9\"; }\n\n.fa-ambulance::before {\n  content: \"\\f0f9\"; }\n\n.fa-wheat-awn-circle-exclamation::before {\n  content: \"\\e598\"; }\n\n.fa-snowman::before {\n  content: \"\\f7d0\"; }\n\n.fa-mortar-pestle::before {\n  content: \"\\f5a7\"; }\n\n.fa-road-barrier::before {\n  content: \"\\e562\"; }\n\n.fa-school::before {\n  content: \"\\f549\"; }\n\n.fa-igloo::before {\n  content: \"\\f7ae\"; }\n\n.fa-joint::before {\n  content: \"\\f595\"; }\n\n.fa-angle-right::before {\n  content: \"\\f105\"; }\n\n.fa-horse::before {\n  content: \"\\f6f0\"; }\n\n.fa-q::before {\n  content: \"\\51\"; }\n\n.fa-g::before {\n  content: \"\\47\"; }\n\n.fa-notes-medical::before {\n  content: \"\\f481\"; }\n\n.fa-temperature-half::before {\n  content: \"\\f2c9\"; }\n\n.fa-temperature-2::before {\n  content: \"\\f2c9\"; }\n\n.fa-thermometer-2::before {\n  content: \"\\f2c9\"; }\n\n.fa-thermometer-half::before {\n  content: \"\\f2c9\"; }\n\n.fa-dong-sign::before {\n  content: \"\\e169\"; }\n\n.fa-capsules::before {\n  content: \"\\f46b\"; }\n\n.fa-poo-storm::before {\n  content: \"\\f75a\"; }\n\n.fa-poo-bolt::before {\n  content: \"\\f75a\"; }\n\n.fa-face-frown-open::before {\n  content: \"\\f57a\"; }\n\n.fa-frown-open::before {\n  content: \"\\f57a\"; }\n\n.fa-hand-point-up::before {\n  content: \"\\f0a6\"; }\n\n.fa-money-bill::before {\n  content: \"\\f0d6\"; }\n\n.fa-bookmark::before {\n  content: \"\\f02e\"; }\n\n.fa-align-justify::before {\n  content: \"\\f039\"; }\n\n.fa-umbrella-beach::before {\n  content: \"\\f5ca\"; }\n\n.fa-helmet-un::before {\n  content: \"\\e503\"; }\n\n.fa-bullseye::before {\n  content: \"\\f140\"; }\n\n.fa-bacon::before {\n  content: \"\\f7e5\"; }\n\n.fa-hand-point-down::before {\n  content: \"\\f0a7\"; }\n\n.fa-arrow-up-from-bracket::before {\n  content: \"\\e09a\"; }\n\n.fa-folder::before {\n  content: \"\\f07b\"; }\n\n.fa-folder-blank::before {\n  content: \"\\f07b\"; }\n\n.fa-file-waveform::before {\n  content: \"\\f478\"; }\n\n.fa-file-medical-alt::before {\n  content: \"\\f478\"; }\n\n.fa-radiation::before {\n  content: \"\\f7b9\"; }\n\n.fa-chart-simple::before {\n  content: \"\\e473\"; }\n\n.fa-mars-stroke::before {\n  content: \"\\f229\"; }\n\n.fa-vial::before {\n  content: \"\\f492\"; }\n\n.fa-gauge::before {\n  content: \"\\f624\"; }\n\n.fa-dashboard::before {\n  content: \"\\f624\"; }\n\n.fa-gauge-med::before {\n  content: \"\\f624\"; }\n\n.fa-tachometer-alt-average::before {\n  content: \"\\f624\"; }\n\n.fa-wand-magic-sparkles::before {\n  content: \"\\e2ca\"; }\n\n.fa-magic-wand-sparkles::before {\n  content: \"\\e2ca\"; }\n\n.fa-e::before {\n  content: \"\\45\"; }\n\n.fa-pen-clip::before {\n  content: \"\\f305\"; }\n\n.fa-pen-alt::before {\n  content: \"\\f305\"; }\n\n.fa-bridge-circle-exclamation::before {\n  content: \"\\e4ca\"; }\n\n.fa-user::before {\n  content: \"\\f007\"; }\n\n.fa-school-circle-check::before {\n  content: \"\\e56b\"; }\n\n.fa-dumpster::before {\n  content: \"\\f793\"; }\n\n.fa-van-shuttle::before {\n  content: \"\\f5b6\"; }\n\n.fa-shuttle-van::before {\n  content: \"\\f5b6\"; }\n\n.fa-building-user::before {\n  content: \"\\e4da\"; }\n\n.fa-square-caret-left::before {\n  content: \"\\f191\"; }\n\n.fa-caret-square-left::before {\n  content: \"\\f191\"; }\n\n.fa-highlighter::before {\n  content: \"\\f591\"; }\n\n.fa-key::before {\n  content: \"\\f084\"; }\n\n.fa-bullhorn::before {\n  content: \"\\f0a1\"; }\n\n.fa-globe::before {\n  content: \"\\f0ac\"; }\n\n.fa-synagogue::before {\n  content: \"\\f69b\"; }\n\n.fa-person-half-dress::before {\n  content: \"\\e548\"; }\n\n.fa-road-bridge::before {\n  content: \"\\e563\"; }\n\n.fa-location-arrow::before {\n  content: \"\\f124\"; }\n\n.fa-c::before {\n  content: \"\\43\"; }\n\n.fa-tablet-button::before {\n  content: \"\\f10a\"; }\n\n.fa-building-lock::before {\n  content: \"\\e4d6\"; }\n\n.fa-pizza-slice::before {\n  content: \"\\f818\"; }\n\n.fa-money-bill-wave::before {\n  content: \"\\f53a\"; }\n\n.fa-chart-area::before {\n  content: \"\\f1fe\"; }\n\n.fa-area-chart::before {\n  content: \"\\f1fe\"; }\n\n.fa-house-flag::before {\n  content: \"\\e50d\"; }\n\n.fa-person-circle-minus::before {\n  content: \"\\e540\"; }\n\n.fa-ban::before {\n  content: \"\\f05e\"; }\n\n.fa-cancel::before {\n  content: \"\\f05e\"; }\n\n.fa-camera-rotate::before {\n  content: \"\\e0d8\"; }\n\n.fa-spray-can-sparkles::before {\n  content: \"\\f5d0\"; }\n\n.fa-air-freshener::before {\n  content: \"\\f5d0\"; }\n\n.fa-star::before {\n  content: \"\\f005\"; }\n\n.fa-repeat::before {\n  content: \"\\f363\"; }\n\n.fa-cross::before {\n  content: \"\\f654\"; }\n\n.fa-box::before {\n  content: \"\\f466\"; }\n\n.fa-venus-mars::before {\n  content: \"\\f228\"; }\n\n.fa-arrow-pointer::before {\n  content: \"\\f245\"; }\n\n.fa-mouse-pointer::before {\n  content: \"\\f245\"; }\n\n.fa-maximize::before {\n  content: \"\\f31e\"; }\n\n.fa-expand-arrows-alt::before {\n  content: \"\\f31e\"; }\n\n.fa-charging-station::before {\n  content: \"\\f5e7\"; }\n\n.fa-shapes::before {\n  content: \"\\f61f\"; }\n\n.fa-triangle-circle-square::before {\n  content: \"\\f61f\"; }\n\n.fa-shuffle::before {\n  content: \"\\f074\"; }\n\n.fa-random::before {\n  content: \"\\f074\"; }\n\n.fa-person-running::before {\n  content: \"\\f70c\"; }\n\n.fa-running::before {\n  content: \"\\f70c\"; }\n\n.fa-mobile-retro::before {\n  content: \"\\e527\"; }\n\n.fa-grip-lines-vertical::before {\n  content: \"\\f7a5\"; }\n\n.fa-spider::before {\n  content: \"\\f717\"; }\n\n.fa-hands-bound::before {\n  content: \"\\e4f9\"; }\n\n.fa-file-invoice-dollar::before {\n  content: \"\\f571\"; }\n\n.fa-plane-circle-exclamation::before {\n  content: \"\\e556\"; }\n\n.fa-x-ray::before {\n  content: \"\\f497\"; }\n\n.fa-spell-check::before {\n  content: \"\\f891\"; }\n\n.fa-slash::before {\n  content: \"\\f715\"; }\n\n.fa-computer-mouse::before {\n  content: \"\\f8cc\"; }\n\n.fa-mouse::before {\n  content: \"\\f8cc\"; }\n\n.fa-arrow-right-to-bracket::before {\n  content: \"\\f090\"; }\n\n.fa-sign-in::before {\n  content: \"\\f090\"; }\n\n.fa-shop-slash::before {\n  content: \"\\e070\"; }\n\n.fa-store-alt-slash::before {\n  content: \"\\e070\"; }\n\n.fa-server::before {\n  content: \"\\f233\"; }\n\n.fa-virus-covid-slash::before {\n  content: \"\\e4a9\"; }\n\n.fa-shop-lock::before {\n  content: \"\\e4a5\"; }\n\n.fa-hourglass-start::before {\n  content: \"\\f251\"; }\n\n.fa-hourglass-1::before {\n  content: \"\\f251\"; }\n\n.fa-blender-phone::before {\n  content: \"\\f6b6\"; }\n\n.fa-building-wheat::before {\n  content: \"\\e4db\"; }\n\n.fa-person-breastfeeding::before {\n  content: \"\\e53a\"; }\n\n.fa-right-to-bracket::before {\n  content: \"\\f2f6\"; }\n\n.fa-sign-in-alt::before {\n  content: \"\\f2f6\"; }\n\n.fa-venus::before {\n  content: \"\\f221\"; }\n\n.fa-passport::before {\n  content: \"\\f5ab\"; }\n\n.fa-heart-pulse::before {\n  content: \"\\f21e\"; }\n\n.fa-heartbeat::before {\n  content: \"\\f21e\"; }\n\n.fa-people-carry-box::before {\n  content: \"\\f4ce\"; }\n\n.fa-people-carry::before {\n  content: \"\\f4ce\"; }\n\n.fa-temperature-high::before {\n  content: \"\\f769\"; }\n\n.fa-microchip::before {\n  content: \"\\f2db\"; }\n\n.fa-crown::before {\n  content: \"\\f521\"; }\n\n.fa-weight-hanging::before {\n  content: \"\\f5cd\"; }\n\n.fa-xmarks-lines::before {\n  content: \"\\e59a\"; }\n\n.fa-file-prescription::before {\n  content: \"\\f572\"; }\n\n.fa-weight-scale::before {\n  content: \"\\f496\"; }\n\n.fa-weight::before {\n  content: \"\\f496\"; }\n\n.fa-user-group::before {\n  content: \"\\f500\"; }\n\n.fa-user-friends::before {\n  content: \"\\f500\"; }\n\n.fa-arrow-up-a-z::before {\n  content: \"\\f15e\"; }\n\n.fa-sort-alpha-up::before {\n  content: \"\\f15e\"; }\n\n.fa-chess-knight::before {\n  content: \"\\f441\"; }\n\n.fa-face-laugh-squint::before {\n  content: \"\\f59b\"; }\n\n.fa-laugh-squint::before {\n  content: \"\\f59b\"; }\n\n.fa-wheelchair::before {\n  content: \"\\f193\"; }\n\n.fa-circle-arrow-up::before {\n  content: \"\\f0aa\"; }\n\n.fa-arrow-circle-up::before {\n  content: \"\\f0aa\"; }\n\n.fa-toggle-on::before {\n  content: \"\\f205\"; }\n\n.fa-person-walking::before {\n  content: \"\\f554\"; }\n\n.fa-walking::before {\n  content: \"\\f554\"; }\n\n.fa-l::before {\n  content: \"\\4c\"; }\n\n.fa-fire::before {\n  content: \"\\f06d\"; }\n\n.fa-bed-pulse::before {\n  content: \"\\f487\"; }\n\n.fa-procedures::before {\n  content: \"\\f487\"; }\n\n.fa-shuttle-space::before {\n  content: \"\\f197\"; }\n\n.fa-space-shuttle::before {\n  content: \"\\f197\"; }\n\n.fa-face-laugh::before {\n  content: \"\\f599\"; }\n\n.fa-laugh::before {\n  content: \"\\f599\"; }\n\n.fa-folder-open::before {\n  content: \"\\f07c\"; }\n\n.fa-heart-circle-plus::before {\n  content: \"\\e500\"; }\n\n.fa-code-fork::before {\n  content: \"\\e13b\"; }\n\n.fa-city::before {\n  content: \"\\f64f\"; }\n\n.fa-microphone-lines::before {\n  content: \"\\f3c9\"; }\n\n.fa-microphone-alt::before {\n  content: \"\\f3c9\"; }\n\n.fa-pepper-hot::before {\n  content: \"\\f816\"; }\n\n.fa-unlock::before {\n  content: \"\\f09c\"; }\n\n.fa-colon-sign::before {\n  content: \"\\e140\"; }\n\n.fa-headset::before {\n  content: \"\\f590\"; }\n\n.fa-store-slash::before {\n  content: \"\\e071\"; }\n\n.fa-road-circle-xmark::before {\n  content: \"\\e566\"; }\n\n.fa-user-minus::before {\n  content: \"\\f503\"; }\n\n.fa-mars-stroke-up::before {\n  content: \"\\f22a\"; }\n\n.fa-mars-stroke-v::before {\n  content: \"\\f22a\"; }\n\n.fa-champagne-glasses::before {\n  content: \"\\f79f\"; }\n\n.fa-glass-cheers::before {\n  content: \"\\f79f\"; }\n\n.fa-clipboard::before {\n  content: \"\\f328\"; }\n\n.fa-house-circle-exclamation::before {\n  content: \"\\e50a\"; }\n\n.fa-file-arrow-up::before {\n  content: \"\\f574\"; }\n\n.fa-file-upload::before {\n  content: \"\\f574\"; }\n\n.fa-wifi::before {\n  content: \"\\f1eb\"; }\n\n.fa-wifi-3::before {\n  content: \"\\f1eb\"; }\n\n.fa-wifi-strong::before {\n  content: \"\\f1eb\"; }\n\n.fa-bath::before {\n  content: \"\\f2cd\"; }\n\n.fa-bathtub::before {\n  content: \"\\f2cd\"; }\n\n.fa-underline::before {\n  content: \"\\f0cd\"; }\n\n.fa-user-pen::before {\n  content: \"\\f4ff\"; }\n\n.fa-user-edit::before {\n  content: \"\\f4ff\"; }\n\n.fa-signature::before {\n  content: \"\\f5b7\"; }\n\n.fa-stroopwafel::before {\n  content: \"\\f551\"; }\n\n.fa-bold::before {\n  content: \"\\f032\"; }\n\n.fa-anchor-lock::before {\n  content: \"\\e4ad\"; }\n\n.fa-building-ngo::before {\n  content: \"\\e4d7\"; }\n\n.fa-manat-sign::before {\n  content: \"\\e1d5\"; }\n\n.fa-not-equal::before {\n  content: \"\\f53e\"; }\n\n.fa-border-top-left::before {\n  content: \"\\f853\"; }\n\n.fa-border-style::before {\n  content: \"\\f853\"; }\n\n.fa-map-location-dot::before {\n  content: \"\\f5a0\"; }\n\n.fa-map-marked-alt::before {\n  content: \"\\f5a0\"; }\n\n.fa-jedi::before {\n  content: \"\\f669\"; }\n\n.fa-square-poll-vertical::before {\n  content: \"\\f681\"; }\n\n.fa-poll::before {\n  content: \"\\f681\"; }\n\n.fa-mug-hot::before {\n  content: \"\\f7b6\"; }\n\n.fa-car-battery::before {\n  content: \"\\f5df\"; }\n\n.fa-battery-car::before {\n  content: \"\\f5df\"; }\n\n.fa-gift::before {\n  content: \"\\f06b\"; }\n\n.fa-dice-two::before {\n  content: \"\\f528\"; }\n\n.fa-chess-queen::before {\n  content: \"\\f445\"; }\n\n.fa-glasses::before {\n  content: \"\\f530\"; }\n\n.fa-chess-board::before {\n  content: \"\\f43c\"; }\n\n.fa-building-circle-check::before {\n  content: \"\\e4d2\"; }\n\n.fa-person-chalkboard::before {\n  content: \"\\e53d\"; }\n\n.fa-mars-stroke-right::before {\n  content: \"\\f22b\"; }\n\n.fa-mars-stroke-h::before {\n  content: \"\\f22b\"; }\n\n.fa-hand-back-fist::before {\n  content: \"\\f255\"; }\n\n.fa-hand-rock::before {\n  content: \"\\f255\"; }\n\n.fa-square-caret-up::before {\n  content: \"\\f151\"; }\n\n.fa-caret-square-up::before {\n  content: \"\\f151\"; }\n\n.fa-cloud-showers-water::before {\n  content: \"\\e4e4\"; }\n\n.fa-chart-bar::before {\n  content: \"\\f080\"; }\n\n.fa-bar-chart::before {\n  content: \"\\f080\"; }\n\n.fa-hands-bubbles::before {\n  content: \"\\e05e\"; }\n\n.fa-hands-wash::before {\n  content: \"\\e05e\"; }\n\n.fa-less-than-equal::before {\n  content: \"\\f537\"; }\n\n.fa-train::before {\n  content: \"\\f238\"; }\n\n.fa-eye-low-vision::before {\n  content: \"\\f2a8\"; }\n\n.fa-low-vision::before {\n  content: \"\\f2a8\"; }\n\n.fa-crow::before {\n  content: \"\\f520\"; }\n\n.fa-sailboat::before {\n  content: \"\\e445\"; }\n\n.fa-window-restore::before {\n  content: \"\\f2d2\"; }\n\n.fa-square-plus::before {\n  content: \"\\f0fe\"; }\n\n.fa-plus-square::before {\n  content: \"\\f0fe\"; }\n\n.fa-torii-gate::before {\n  content: \"\\f6a1\"; }\n\n.fa-frog::before {\n  content: \"\\f52e\"; }\n\n.fa-bucket::before {\n  content: \"\\e4cf\"; }\n\n.fa-image::before {\n  content: \"\\f03e\"; }\n\n.fa-microphone::before {\n  content: \"\\f130\"; }\n\n.fa-cow::before {\n  content: \"\\f6c8\"; }\n\n.fa-caret-up::before {\n  content: \"\\f0d8\"; }\n\n.fa-screwdriver::before {\n  content: \"\\f54a\"; }\n\n.fa-folder-closed::before {\n  content: \"\\e185\"; }\n\n.fa-house-tsunami::before {\n  content: \"\\e515\"; }\n\n.fa-square-nfi::before {\n  content: \"\\e576\"; }\n\n.fa-arrow-up-from-ground-water::before {\n  content: \"\\e4b5\"; }\n\n.fa-martini-glass::before {\n  content: \"\\f57b\"; }\n\n.fa-glass-martini-alt::before {\n  content: \"\\f57b\"; }\n\n.fa-rotate-left::before {\n  content: \"\\f2ea\"; }\n\n.fa-rotate-back::before {\n  content: \"\\f2ea\"; }\n\n.fa-rotate-backward::before {\n  content: \"\\f2ea\"; }\n\n.fa-undo-alt::before {\n  content: \"\\f2ea\"; }\n\n.fa-table-columns::before {\n  content: \"\\f0db\"; }\n\n.fa-columns::before {\n  content: \"\\f0db\"; }\n\n.fa-lemon::before {\n  content: \"\\f094\"; }\n\n.fa-head-side-mask::before {\n  content: \"\\e063\"; }\n\n.fa-handshake::before {\n  content: \"\\f2b5\"; }\n\n.fa-gem::before {\n  content: \"\\f3a5\"; }\n\n.fa-dolly::before {\n  content: \"\\f472\"; }\n\n.fa-dolly-box::before {\n  content: \"\\f472\"; }\n\n.fa-smoking::before {\n  content: \"\\f48d\"; }\n\n.fa-minimize::before {\n  content: \"\\f78c\"; }\n\n.fa-compress-arrows-alt::before {\n  content: \"\\f78c\"; }\n\n.fa-monument::before {\n  content: \"\\f5a6\"; }\n\n.fa-snowplow::before {\n  content: \"\\f7d2\"; }\n\n.fa-angles-right::before {\n  content: \"\\f101\"; }\n\n.fa-angle-double-right::before {\n  content: \"\\f101\"; }\n\n.fa-cannabis::before {\n  content: \"\\f55f\"; }\n\n.fa-circle-play::before {\n  content: \"\\f144\"; }\n\n.fa-play-circle::before {\n  content: \"\\f144\"; }\n\n.fa-tablets::before {\n  content: \"\\f490\"; }\n\n.fa-ethernet::before {\n  content: \"\\f796\"; }\n\n.fa-euro-sign::before {\n  content: \"\\f153\"; }\n\n.fa-eur::before {\n  content: \"\\f153\"; }\n\n.fa-euro::before {\n  content: \"\\f153\"; }\n\n.fa-chair::before {\n  content: \"\\f6c0\"; }\n\n.fa-circle-check::before {\n  content: \"\\f058\"; }\n\n.fa-check-circle::before {\n  content: \"\\f058\"; }\n\n.fa-circle-stop::before {\n  content: \"\\f28d\"; }\n\n.fa-stop-circle::before {\n  content: \"\\f28d\"; }\n\n.fa-compass-drafting::before {\n  content: \"\\f568\"; }\n\n.fa-drafting-compass::before {\n  content: \"\\f568\"; }\n\n.fa-plate-wheat::before {\n  content: \"\\e55a\"; }\n\n.fa-icicles::before {\n  content: \"\\f7ad\"; }\n\n.fa-person-shelter::before {\n  content: \"\\e54f\"; }\n\n.fa-neuter::before {\n  content: \"\\f22c\"; }\n\n.fa-id-badge::before {\n  content: \"\\f2c1\"; }\n\n.fa-marker::before {\n  content: \"\\f5a1\"; }\n\n.fa-face-laugh-beam::before {\n  content: \"\\f59a\"; }\n\n.fa-laugh-beam::before {\n  content: \"\\f59a\"; }\n\n.fa-helicopter-symbol::before {\n  content: \"\\e502\"; }\n\n.fa-universal-access::before {\n  content: \"\\f29a\"; }\n\n.fa-circle-chevron-up::before {\n  content: \"\\f139\"; }\n\n.fa-chevron-circle-up::before {\n  content: \"\\f139\"; }\n\n.fa-lari-sign::before {\n  content: \"\\e1c8\"; }\n\n.fa-volcano::before {\n  content: \"\\f770\"; }\n\n.fa-person-walking-dashed-line-arrow-right::before {\n  content: \"\\e553\"; }\n\n.fa-sterling-sign::before {\n  content: \"\\f154\"; }\n\n.fa-gbp::before {\n  content: \"\\f154\"; }\n\n.fa-pound-sign::before {\n  content: \"\\f154\"; }\n\n.fa-viruses::before {\n  content: \"\\e076\"; }\n\n.fa-square-person-confined::before {\n  content: \"\\e577\"; }\n\n.fa-user-tie::before {\n  content: \"\\f508\"; }\n\n.fa-arrow-down-long::before {\n  content: \"\\f175\"; }\n\n.fa-long-arrow-down::before {\n  content: \"\\f175\"; }\n\n.fa-tent-arrow-down-to-line::before {\n  content: \"\\e57e\"; }\n\n.fa-certificate::before {\n  content: \"\\f0a3\"; }\n\n.fa-reply-all::before {\n  content: \"\\f122\"; }\n\n.fa-mail-reply-all::before {\n  content: \"\\f122\"; }\n\n.fa-suitcase::before {\n  content: \"\\f0f2\"; }\n\n.fa-person-skating::before {\n  content: \"\\f7c5\"; }\n\n.fa-skating::before {\n  content: \"\\f7c5\"; }\n\n.fa-filter-circle-dollar::before {\n  content: \"\\f662\"; }\n\n.fa-funnel-dollar::before {\n  content: \"\\f662\"; }\n\n.fa-camera-retro::before {\n  content: \"\\f083\"; }\n\n.fa-circle-arrow-down::before {\n  content: \"\\f0ab\"; }\n\n.fa-arrow-circle-down::before {\n  content: \"\\f0ab\"; }\n\n.fa-file-import::before {\n  content: \"\\f56f\"; }\n\n.fa-arrow-right-to-file::before {\n  content: \"\\f56f\"; }\n\n.fa-square-arrow-up-right::before {\n  content: \"\\f14c\"; }\n\n.fa-external-link-square::before {\n  content: \"\\f14c\"; }\n\n.fa-box-open::before {\n  content: \"\\f49e\"; }\n\n.fa-scroll::before {\n  content: \"\\f70e\"; }\n\n.fa-spa::before {\n  content: \"\\f5bb\"; }\n\n.fa-location-pin-lock::before {\n  content: \"\\e51f\"; }\n\n.fa-pause::before {\n  content: \"\\f04c\"; }\n\n.fa-hill-avalanche::before {\n  content: \"\\e507\"; }\n\n.fa-temperature-empty::before {\n  content: \"\\f2cb\"; }\n\n.fa-temperature-0::before {\n  content: \"\\f2cb\"; }\n\n.fa-thermometer-0::before {\n  content: \"\\f2cb\"; }\n\n.fa-thermometer-empty::before {\n  content: \"\\f2cb\"; }\n\n.fa-bomb::before {\n  content: \"\\f1e2\"; }\n\n.fa-registered::before {\n  content: \"\\f25d\"; }\n\n.fa-address-card::before {\n  content: \"\\f2bb\"; }\n\n.fa-contact-card::before {\n  content: \"\\f2bb\"; }\n\n.fa-vcard::before {\n  content: \"\\f2bb\"; }\n\n.fa-scale-unbalanced-flip::before {\n  content: \"\\f516\"; }\n\n.fa-balance-scale-right::before {\n  content: \"\\f516\"; }\n\n.fa-subscript::before {\n  content: \"\\f12c\"; }\n\n.fa-diamond-turn-right::before {\n  content: \"\\f5eb\"; }\n\n.fa-directions::before {\n  content: \"\\f5eb\"; }\n\n.fa-burst::before {\n  content: \"\\e4dc\"; }\n\n.fa-house-laptop::before {\n  content: \"\\e066\"; }\n\n.fa-laptop-house::before {\n  content: \"\\e066\"; }\n\n.fa-face-tired::before {\n  content: \"\\f5c8\"; }\n\n.fa-tired::before {\n  content: \"\\f5c8\"; }\n\n.fa-money-bills::before {\n  content: \"\\e1f3\"; }\n\n.fa-smog::before {\n  content: \"\\f75f\"; }\n\n.fa-crutch::before {\n  content: \"\\f7f7\"; }\n\n.fa-cloud-arrow-up::before {\n  content: \"\\f0ee\"; }\n\n.fa-cloud-upload::before {\n  content: \"\\f0ee\"; }\n\n.fa-cloud-upload-alt::before {\n  content: \"\\f0ee\"; }\n\n.fa-palette::before {\n  content: \"\\f53f\"; }\n\n.fa-arrows-turn-right::before {\n  content: \"\\e4c0\"; }\n\n.fa-vest::before {\n  content: \"\\e085\"; }\n\n.fa-ferry::before {\n  content: \"\\e4ea\"; }\n\n.fa-arrows-down-to-people::before {\n  content: \"\\e4b9\"; }\n\n.fa-seedling::before {\n  content: \"\\f4d8\"; }\n\n.fa-sprout::before {\n  content: \"\\f4d8\"; }\n\n.fa-left-right::before {\n  content: \"\\f337\"; }\n\n.fa-arrows-alt-h::before {\n  content: \"\\f337\"; }\n\n.fa-boxes-packing::before {\n  content: \"\\e4c7\"; }\n\n.fa-circle-arrow-left::before {\n  content: \"\\f0a8\"; }\n\n.fa-arrow-circle-left::before {\n  content: \"\\f0a8\"; }\n\n.fa-group-arrows-rotate::before {\n  content: \"\\e4f6\"; }\n\n.fa-bowl-food::before {\n  content: \"\\e4c6\"; }\n\n.fa-candy-cane::before {\n  content: \"\\f786\"; }\n\n.fa-arrow-down-wide-short::before {\n  content: \"\\f160\"; }\n\n.fa-sort-amount-asc::before {\n  content: \"\\f160\"; }\n\n.fa-sort-amount-down::before {\n  content: \"\\f160\"; }\n\n.fa-cloud-bolt::before {\n  content: \"\\f76c\"; }\n\n.fa-thunderstorm::before {\n  content: \"\\f76c\"; }\n\n.fa-text-slash::before {\n  content: \"\\f87d\"; }\n\n.fa-remove-format::before {\n  content: \"\\f87d\"; }\n\n.fa-face-smile-wink::before {\n  content: \"\\f4da\"; }\n\n.fa-smile-wink::before {\n  content: \"\\f4da\"; }\n\n.fa-file-word::before {\n  content: \"\\f1c2\"; }\n\n.fa-file-powerpoint::before {\n  content: \"\\f1c4\"; }\n\n.fa-arrows-left-right::before {\n  content: \"\\f07e\"; }\n\n.fa-arrows-h::before {\n  content: \"\\f07e\"; }\n\n.fa-house-lock::before {\n  content: \"\\e510\"; }\n\n.fa-cloud-arrow-down::before {\n  content: \"\\f0ed\"; }\n\n.fa-cloud-download::before {\n  content: \"\\f0ed\"; }\n\n.fa-cloud-download-alt::before {\n  content: \"\\f0ed\"; }\n\n.fa-children::before {\n  content: \"\\e4e1\"; }\n\n.fa-chalkboard::before {\n  content: \"\\f51b\"; }\n\n.fa-blackboard::before {\n  content: \"\\f51b\"; }\n\n.fa-user-large-slash::before {\n  content: \"\\f4fa\"; }\n\n.fa-user-alt-slash::before {\n  content: \"\\f4fa\"; }\n\n.fa-envelope-open::before {\n  content: \"\\f2b6\"; }\n\n.fa-handshake-simple-slash::before {\n  content: \"\\e05f\"; }\n\n.fa-handshake-alt-slash::before {\n  content: \"\\e05f\"; }\n\n.fa-mattress-pillow::before {\n  content: \"\\e525\"; }\n\n.fa-guarani-sign::before {\n  content: \"\\e19a\"; }\n\n.fa-arrows-rotate::before {\n  content: \"\\f021\"; }\n\n.fa-refresh::before {\n  content: \"\\f021\"; }\n\n.fa-sync::before {\n  content: \"\\f021\"; }\n\n.fa-fire-extinguisher::before {\n  content: \"\\f134\"; }\n\n.fa-cruzeiro-sign::before {\n  content: \"\\e152\"; }\n\n.fa-greater-than-equal::before {\n  content: \"\\f532\"; }\n\n.fa-shield-halved::before {\n  content: \"\\f3ed\"; }\n\n.fa-shield-alt::before {\n  content: \"\\f3ed\"; }\n\n.fa-book-atlas::before {\n  content: \"\\f558\"; }\n\n.fa-atlas::before {\n  content: \"\\f558\"; }\n\n.fa-virus::before {\n  content: \"\\e074\"; }\n\n.fa-envelope-circle-check::before {\n  content: \"\\e4e8\"; }\n\n.fa-layer-group::before {\n  content: \"\\f5fd\"; }\n\n.fa-arrows-to-dot::before {\n  content: \"\\e4be\"; }\n\n.fa-archway::before {\n  content: \"\\f557\"; }\n\n.fa-heart-circle-check::before {\n  content: \"\\e4fd\"; }\n\n.fa-house-chimney-crack::before {\n  content: \"\\f6f1\"; }\n\n.fa-house-damage::before {\n  content: \"\\f6f1\"; }\n\n.fa-file-zipper::before {\n  content: \"\\f1c6\"; }\n\n.fa-file-archive::before {\n  content: \"\\f1c6\"; }\n\n.fa-square::before {\n  content: \"\\f0c8\"; }\n\n.fa-martini-glass-empty::before {\n  content: \"\\f000\"; }\n\n.fa-glass-martini::before {\n  content: \"\\f000\"; }\n\n.fa-couch::before {\n  content: \"\\f4b8\"; }\n\n.fa-cedi-sign::before {\n  content: \"\\e0df\"; }\n\n.fa-italic::before {\n  content: \"\\f033\"; }\n\n.fa-church::before {\n  content: \"\\f51d\"; }\n\n.fa-comments-dollar::before {\n  content: \"\\f653\"; }\n\n.fa-democrat::before {\n  content: \"\\f747\"; }\n\n.fa-z::before {\n  content: \"\\5a\"; }\n\n.fa-person-skiing::before {\n  content: \"\\f7c9\"; }\n\n.fa-skiing::before {\n  content: \"\\f7c9\"; }\n\n.fa-road-lock::before {\n  content: \"\\e567\"; }\n\n.fa-a::before {\n  content: \"\\41\"; }\n\n.fa-temperature-arrow-down::before {\n  content: \"\\e03f\"; }\n\n.fa-temperature-down::before {\n  content: \"\\e03f\"; }\n\n.fa-feather-pointed::before {\n  content: \"\\f56b\"; }\n\n.fa-feather-alt::before {\n  content: \"\\f56b\"; }\n\n.fa-p::before {\n  content: \"\\50\"; }\n\n.fa-snowflake::before {\n  content: \"\\f2dc\"; }\n\n.fa-newspaper::before {\n  content: \"\\f1ea\"; }\n\n.fa-rectangle-ad::before {\n  content: \"\\f641\"; }\n\n.fa-ad::before {\n  content: \"\\f641\"; }\n\n.fa-circle-arrow-right::before {\n  content: \"\\f0a9\"; }\n\n.fa-arrow-circle-right::before {\n  content: \"\\f0a9\"; }\n\n.fa-filter-circle-xmark::before {\n  content: \"\\e17b\"; }\n\n.fa-locust::before {\n  content: \"\\e520\"; }\n\n.fa-sort::before {\n  content: \"\\f0dc\"; }\n\n.fa-unsorted::before {\n  content: \"\\f0dc\"; }\n\n.fa-list-ol::before {\n  content: \"\\f0cb\"; }\n\n.fa-list-1-2::before {\n  content: \"\\f0cb\"; }\n\n.fa-list-numeric::before {\n  content: \"\\f0cb\"; }\n\n.fa-person-dress-burst::before {\n  content: \"\\e544\"; }\n\n.fa-money-check-dollar::before {\n  content: \"\\f53d\"; }\n\n.fa-money-check-alt::before {\n  content: \"\\f53d\"; }\n\n.fa-vector-square::before {\n  content: \"\\f5cb\"; }\n\n.fa-bread-slice::before {\n  content: \"\\f7ec\"; }\n\n.fa-language::before {\n  content: \"\\f1ab\"; }\n\n.fa-face-kiss-wink-heart::before {\n  content: \"\\f598\"; }\n\n.fa-kiss-wink-heart::before {\n  content: \"\\f598\"; }\n\n.fa-filter::before {\n  content: \"\\f0b0\"; }\n\n.fa-question::before {\n  content: \"\\3f\"; }\n\n.fa-file-signature::before {\n  content: \"\\f573\"; }\n\n.fa-up-down-left-right::before {\n  content: \"\\f0b2\"; }\n\n.fa-arrows-alt::before {\n  content: \"\\f0b2\"; }\n\n.fa-house-chimney-user::before {\n  content: \"\\e065\"; }\n\n.fa-hand-holding-heart::before {\n  content: \"\\f4be\"; }\n\n.fa-puzzle-piece::before {\n  content: \"\\f12e\"; }\n\n.fa-money-check::before {\n  content: \"\\f53c\"; }\n\n.fa-star-half-stroke::before {\n  content: \"\\f5c0\"; }\n\n.fa-star-half-alt::before {\n  content: \"\\f5c0\"; }\n\n.fa-code::before {\n  content: \"\\f121\"; }\n\n.fa-whiskey-glass::before {\n  content: \"\\f7a0\"; }\n\n.fa-glass-whiskey::before {\n  content: \"\\f7a0\"; }\n\n.fa-building-circle-exclamation::before {\n  content: \"\\e4d3\"; }\n\n.fa-magnifying-glass-chart::before {\n  content: \"\\e522\"; }\n\n.fa-arrow-up-right-from-square::before {\n  content: \"\\f08e\"; }\n\n.fa-external-link::before {\n  content: \"\\f08e\"; }\n\n.fa-cubes-stacked::before {\n  content: \"\\e4e6\"; }\n\n.fa-won-sign::before {\n  content: \"\\f159\"; }\n\n.fa-krw::before {\n  content: \"\\f159\"; }\n\n.fa-won::before {\n  content: \"\\f159\"; }\n\n.fa-virus-covid::before {\n  content: \"\\e4a8\"; }\n\n.fa-austral-sign::before {\n  content: \"\\e0a9\"; }\n\n.fa-f::before {\n  content: \"\\46\"; }\n\n.fa-leaf::before {\n  content: \"\\f06c\"; }\n\n.fa-road::before {\n  content: \"\\f018\"; }\n\n.fa-taxi::before {\n  content: \"\\f1ba\"; }\n\n.fa-cab::before {\n  content: \"\\f1ba\"; }\n\n.fa-person-circle-plus::before {\n  content: \"\\e541\"; }\n\n.fa-chart-pie::before {\n  content: \"\\f200\"; }\n\n.fa-pie-chart::before {\n  content: \"\\f200\"; }\n\n.fa-bolt-lightning::before {\n  content: \"\\e0b7\"; }\n\n.fa-sack-xmark::before {\n  content: \"\\e56a\"; }\n\n.fa-file-excel::before {\n  content: \"\\f1c3\"; }\n\n.fa-file-contract::before {\n  content: \"\\f56c\"; }\n\n.fa-fish-fins::before {\n  content: \"\\e4f2\"; }\n\n.fa-building-flag::before {\n  content: \"\\e4d5\"; }\n\n.fa-face-grin-beam::before {\n  content: \"\\f582\"; }\n\n.fa-grin-beam::before {\n  content: \"\\f582\"; }\n\n.fa-object-ungroup::before {\n  content: \"\\f248\"; }\n\n.fa-poop::before {\n  content: \"\\f619\"; }\n\n.fa-location-pin::before {\n  content: \"\\f041\"; }\n\n.fa-map-marker::before {\n  content: \"\\f041\"; }\n\n.fa-kaaba::before {\n  content: \"\\f66b\"; }\n\n.fa-toilet-paper::before {\n  content: \"\\f71e\"; }\n\n.fa-helmet-safety::before {\n  content: \"\\f807\"; }\n\n.fa-hard-hat::before {\n  content: \"\\f807\"; }\n\n.fa-hat-hard::before {\n  content: \"\\f807\"; }\n\n.fa-eject::before {\n  content: \"\\f052\"; }\n\n.fa-circle-right::before {\n  content: \"\\f35a\"; }\n\n.fa-arrow-alt-circle-right::before {\n  content: \"\\f35a\"; }\n\n.fa-plane-circle-check::before {\n  content: \"\\e555\"; }\n\n.fa-face-rolling-eyes::before {\n  content: \"\\f5a5\"; }\n\n.fa-meh-rolling-eyes::before {\n  content: \"\\f5a5\"; }\n\n.fa-object-group::before {\n  content: \"\\f247\"; }\n\n.fa-chart-line::before {\n  content: \"\\f201\"; }\n\n.fa-line-chart::before {\n  content: \"\\f201\"; }\n\n.fa-mask-ventilator::before {\n  content: \"\\e524\"; }\n\n.fa-arrow-right::before {\n  content: \"\\f061\"; }\n\n.fa-signs-post::before {\n  content: \"\\f277\"; }\n\n.fa-map-signs::before {\n  content: \"\\f277\"; }\n\n.fa-cash-register::before {\n  content: \"\\f788\"; }\n\n.fa-person-circle-question::before {\n  content: \"\\e542\"; }\n\n.fa-h::before {\n  content: \"\\48\"; }\n\n.fa-tarp::before {\n  content: \"\\e57b\"; }\n\n.fa-screwdriver-wrench::before {\n  content: \"\\f7d9\"; }\n\n.fa-tools::before {\n  content: \"\\f7d9\"; }\n\n.fa-arrows-to-eye::before {\n  content: \"\\e4bf\"; }\n\n.fa-plug-circle-bolt::before {\n  content: \"\\e55b\"; }\n\n.fa-heart::before {\n  content: \"\\f004\"; }\n\n.fa-mars-and-venus::before {\n  content: \"\\f224\"; }\n\n.fa-house-user::before {\n  content: \"\\e1b0\"; }\n\n.fa-home-user::before {\n  content: \"\\e1b0\"; }\n\n.fa-dumpster-fire::before {\n  content: \"\\f794\"; }\n\n.fa-house-crack::before {\n  content: \"\\e3b1\"; }\n\n.fa-martini-glass-citrus::before {\n  content: \"\\f561\"; }\n\n.fa-cocktail::before {\n  content: \"\\f561\"; }\n\n.fa-face-surprise::before {\n  content: \"\\f5c2\"; }\n\n.fa-surprise::before {\n  content: \"\\f5c2\"; }\n\n.fa-bottle-water::before {\n  content: \"\\e4c5\"; }\n\n.fa-circle-pause::before {\n  content: \"\\f28b\"; }\n\n.fa-pause-circle::before {\n  content: \"\\f28b\"; }\n\n.fa-toilet-paper-slash::before {\n  content: \"\\e072\"; }\n\n.fa-apple-whole::before {\n  content: \"\\f5d1\"; }\n\n.fa-apple-alt::before {\n  content: \"\\f5d1\"; }\n\n.fa-kitchen-set::before {\n  content: \"\\e51a\"; }\n\n.fa-r::before {\n  content: \"\\52\"; }\n\n.fa-temperature-quarter::before {\n  content: \"\\f2ca\"; }\n\n.fa-temperature-1::before {\n  content: \"\\f2ca\"; }\n\n.fa-thermometer-1::before {\n  content: \"\\f2ca\"; }\n\n.fa-thermometer-quarter::before {\n  content: \"\\f2ca\"; }\n\n.fa-cube::before {\n  content: \"\\f1b2\"; }\n\n.fa-bitcoin-sign::before {\n  content: \"\\e0b4\"; }\n\n.fa-shield-dog::before {\n  content: \"\\e573\"; }\n\n.fa-solar-panel::before {\n  content: \"\\f5ba\"; }\n\n.fa-lock-open::before {\n  content: \"\\f3c1\"; }\n\n.fa-elevator::before {\n  content: \"\\e16d\"; }\n\n.fa-money-bill-transfer::before {\n  content: \"\\e528\"; }\n\n.fa-money-bill-trend-up::before {\n  content: \"\\e529\"; }\n\n.fa-house-flood-water-circle-arrow-right::before {\n  content: \"\\e50f\"; }\n\n.fa-square-poll-horizontal::before {\n  content: \"\\f682\"; }\n\n.fa-poll-h::before {\n  content: \"\\f682\"; }\n\n.fa-circle::before {\n  content: \"\\f111\"; }\n\n.fa-backward-fast::before {\n  content: \"\\f049\"; }\n\n.fa-fast-backward::before {\n  content: \"\\f049\"; }\n\n.fa-recycle::before {\n  content: \"\\f1b8\"; }\n\n.fa-user-astronaut::before {\n  content: \"\\f4fb\"; }\n\n.fa-plane-slash::before {\n  content: \"\\e069\"; }\n\n.fa-trademark::before {\n  content: \"\\f25c\"; }\n\n.fa-basketball::before {\n  content: \"\\f434\"; }\n\n.fa-basketball-ball::before {\n  content: \"\\f434\"; }\n\n.fa-satellite-dish::before {\n  content: \"\\f7c0\"; }\n\n.fa-circle-up::before {\n  content: \"\\f35b\"; }\n\n.fa-arrow-alt-circle-up::before {\n  content: \"\\f35b\"; }\n\n.fa-mobile-screen-button::before {\n  content: \"\\f3cd\"; }\n\n.fa-mobile-alt::before {\n  content: \"\\f3cd\"; }\n\n.fa-volume-high::before {\n  content: \"\\f028\"; }\n\n.fa-volume-up::before {\n  content: \"\\f028\"; }\n\n.fa-users-rays::before {\n  content: \"\\e593\"; }\n\n.fa-wallet::before {\n  content: \"\\f555\"; }\n\n.fa-clipboard-check::before {\n  content: \"\\f46c\"; }\n\n.fa-file-audio::before {\n  content: \"\\f1c7\"; }\n\n.fa-burger::before {\n  content: \"\\f805\"; }\n\n.fa-hamburger::before {\n  content: \"\\f805\"; }\n\n.fa-wrench::before {\n  content: \"\\f0ad\"; }\n\n.fa-bugs::before {\n  content: \"\\e4d0\"; }\n\n.fa-rupee-sign::before {\n  content: \"\\f156\"; }\n\n.fa-rupee::before {\n  content: \"\\f156\"; }\n\n.fa-file-image::before {\n  content: \"\\f1c5\"; }\n\n.fa-circle-question::before {\n  content: \"\\f059\"; }\n\n.fa-question-circle::before {\n  content: \"\\f059\"; }\n\n.fa-plane-departure::before {\n  content: \"\\f5b0\"; }\n\n.fa-handshake-slash::before {\n  content: \"\\e060\"; }\n\n.fa-book-bookmark::before {\n  content: \"\\e0bb\"; }\n\n.fa-code-branch::before {\n  content: \"\\f126\"; }\n\n.fa-hat-cowboy::before {\n  content: \"\\f8c0\"; }\n\n.fa-bridge::before {\n  content: \"\\e4c8\"; }\n\n.fa-phone-flip::before {\n  content: \"\\f879\"; }\n\n.fa-phone-alt::before {\n  content: \"\\f879\"; }\n\n.fa-truck-front::before {\n  content: \"\\e2b7\"; }\n\n.fa-cat::before {\n  content: \"\\f6be\"; }\n\n.fa-anchor-circle-exclamation::before {\n  content: \"\\e4ab\"; }\n\n.fa-truck-field::before {\n  content: \"\\e58d\"; }\n\n.fa-route::before {\n  content: \"\\f4d7\"; }\n\n.fa-clipboard-question::before {\n  content: \"\\e4e3\"; }\n\n.fa-panorama::before {\n  content: \"\\e209\"; }\n\n.fa-comment-medical::before {\n  content: \"\\f7f5\"; }\n\n.fa-teeth-open::before {\n  content: \"\\f62f\"; }\n\n.fa-file-circle-minus::before {\n  content: \"\\e4ed\"; }\n\n.fa-tags::before {\n  content: \"\\f02c\"; }\n\n.fa-wine-glass::before {\n  content: \"\\f4e3\"; }\n\n.fa-forward-fast::before {\n  content: \"\\f050\"; }\n\n.fa-fast-forward::before {\n  content: \"\\f050\"; }\n\n.fa-face-meh-blank::before {\n  content: \"\\f5a4\"; }\n\n.fa-meh-blank::before {\n  content: \"\\f5a4\"; }\n\n.fa-square-parking::before {\n  content: \"\\f540\"; }\n\n.fa-parking::before {\n  content: \"\\f540\"; }\n\n.fa-house-signal::before {\n  content: \"\\e012\"; }\n\n.fa-bars-progress::before {\n  content: \"\\f828\"; }\n\n.fa-tasks-alt::before {\n  content: \"\\f828\"; }\n\n.fa-faucet-drip::before {\n  content: \"\\e006\"; }\n\n.fa-cart-flatbed::before {\n  content: \"\\f474\"; }\n\n.fa-dolly-flatbed::before {\n  content: \"\\f474\"; }\n\n.fa-ban-smoking::before {\n  content: \"\\f54d\"; }\n\n.fa-smoking-ban::before {\n  content: \"\\f54d\"; }\n\n.fa-terminal::before {\n  content: \"\\f120\"; }\n\n.fa-mobile-button::before {\n  content: \"\\f10b\"; }\n\n.fa-house-medical-flag::before {\n  content: \"\\e514\"; }\n\n.fa-basket-shopping::before {\n  content: \"\\f291\"; }\n\n.fa-shopping-basket::before {\n  content: \"\\f291\"; }\n\n.fa-tape::before {\n  content: \"\\f4db\"; }\n\n.fa-bus-simple::before {\n  content: \"\\f55e\"; }\n\n.fa-bus-alt::before {\n  content: \"\\f55e\"; }\n\n.fa-eye::before {\n  content: \"\\f06e\"; }\n\n.fa-face-sad-cry::before {\n  content: \"\\f5b3\"; }\n\n.fa-sad-cry::before {\n  content: \"\\f5b3\"; }\n\n.fa-audio-description::before {\n  content: \"\\f29e\"; }\n\n.fa-person-military-to-person::before {\n  content: \"\\e54c\"; }\n\n.fa-file-shield::before {\n  content: \"\\e4f0\"; }\n\n.fa-user-slash::before {\n  content: \"\\f506\"; }\n\n.fa-pen::before {\n  content: \"\\f304\"; }\n\n.fa-tower-observation::before {\n  content: \"\\e586\"; }\n\n.fa-file-code::before {\n  content: \"\\f1c9\"; }\n\n.fa-signal::before {\n  content: \"\\f012\"; }\n\n.fa-signal-5::before {\n  content: \"\\f012\"; }\n\n.fa-signal-perfect::before {\n  content: \"\\f012\"; }\n\n.fa-bus::before {\n  content: \"\\f207\"; }\n\n.fa-heart-circle-xmark::before {\n  content: \"\\e501\"; }\n\n.fa-house-chimney::before {\n  content: \"\\e3af\"; }\n\n.fa-home-lg::before {\n  content: \"\\e3af\"; }\n\n.fa-window-maximize::before {\n  content: \"\\f2d0\"; }\n\n.fa-face-frown::before {\n  content: \"\\f119\"; }\n\n.fa-frown::before {\n  content: \"\\f119\"; }\n\n.fa-prescription::before {\n  content: \"\\f5b1\"; }\n\n.fa-shop::before {\n  content: \"\\f54f\"; }\n\n.fa-store-alt::before {\n  content: \"\\f54f\"; }\n\n.fa-floppy-disk::before {\n  content: \"\\f0c7\"; }\n\n.fa-save::before {\n  content: \"\\f0c7\"; }\n\n.fa-vihara::before {\n  content: \"\\f6a7\"; }\n\n.fa-scale-unbalanced::before {\n  content: \"\\f515\"; }\n\n.fa-balance-scale-left::before {\n  content: \"\\f515\"; }\n\n.fa-sort-up::before {\n  content: \"\\f0de\"; }\n\n.fa-sort-asc::before {\n  content: \"\\f0de\"; }\n\n.fa-comment-dots::before {\n  content: \"\\f4ad\"; }\n\n.fa-commenting::before {\n  content: \"\\f4ad\"; }\n\n.fa-plant-wilt::before {\n  content: \"\\e5aa\"; }\n\n.fa-diamond::before {\n  content: \"\\f219\"; }\n\n.fa-face-grin-squint::before {\n  content: \"\\f585\"; }\n\n.fa-grin-squint::before {\n  content: \"\\f585\"; }\n\n.fa-hand-holding-dollar::before {\n  content: \"\\f4c0\"; }\n\n.fa-hand-holding-usd::before {\n  content: \"\\f4c0\"; }\n\n.fa-bacterium::before {\n  content: \"\\e05a\"; }\n\n.fa-hand-pointer::before {\n  content: \"\\f25a\"; }\n\n.fa-drum-steelpan::before {\n  content: \"\\f56a\"; }\n\n.fa-hand-scissors::before {\n  content: \"\\f257\"; }\n\n.fa-hands-praying::before {\n  content: \"\\f684\"; }\n\n.fa-praying-hands::before {\n  content: \"\\f684\"; }\n\n.fa-arrow-rotate-right::before {\n  content: \"\\f01e\"; }\n\n.fa-arrow-right-rotate::before {\n  content: \"\\f01e\"; }\n\n.fa-arrow-rotate-forward::before {\n  content: \"\\f01e\"; }\n\n.fa-redo::before {\n  content: \"\\f01e\"; }\n\n.fa-biohazard::before {\n  content: \"\\f780\"; }\n\n.fa-location-crosshairs::before {\n  content: \"\\f601\"; }\n\n.fa-location::before {\n  content: \"\\f601\"; }\n\n.fa-mars-double::before {\n  content: \"\\f227\"; }\n\n.fa-child-dress::before {\n  content: \"\\e59c\"; }\n\n.fa-users-between-lines::before {\n  content: \"\\e591\"; }\n\n.fa-lungs-virus::before {\n  content: \"\\e067\"; }\n\n.fa-face-grin-tears::before {\n  content: \"\\f588\"; }\n\n.fa-grin-tears::before {\n  content: \"\\f588\"; }\n\n.fa-phone::before {\n  content: \"\\f095\"; }\n\n.fa-calendar-xmark::before {\n  content: \"\\f273\"; }\n\n.fa-calendar-times::before {\n  content: \"\\f273\"; }\n\n.fa-child-reaching::before {\n  content: \"\\e59d\"; }\n\n.fa-head-side-virus::before {\n  content: \"\\e064\"; }\n\n.fa-user-gear::before {\n  content: \"\\f4fe\"; }\n\n.fa-user-cog::before {\n  content: \"\\f4fe\"; }\n\n.fa-arrow-up-1-9::before {\n  content: \"\\f163\"; }\n\n.fa-sort-numeric-up::before {\n  content: \"\\f163\"; }\n\n.fa-door-closed::before {\n  content: \"\\f52a\"; }\n\n.fa-shield-virus::before {\n  content: \"\\e06c\"; }\n\n.fa-dice-six::before {\n  content: \"\\f526\"; }\n\n.fa-mosquito-net::before {\n  content: \"\\e52c\"; }\n\n.fa-bridge-water::before {\n  content: \"\\e4ce\"; }\n\n.fa-person-booth::before {\n  content: \"\\f756\"; }\n\n.fa-text-width::before {\n  content: \"\\f035\"; }\n\n.fa-hat-wizard::before {\n  content: \"\\f6e8\"; }\n\n.fa-pen-fancy::before {\n  content: \"\\f5ac\"; }\n\n.fa-person-digging::before {\n  content: \"\\f85e\"; }\n\n.fa-digging::before {\n  content: \"\\f85e\"; }\n\n.fa-trash::before {\n  content: \"\\f1f8\"; }\n\n.fa-gauge-simple::before {\n  content: \"\\f629\"; }\n\n.fa-gauge-simple-med::before {\n  content: \"\\f629\"; }\n\n.fa-tachometer-average::before {\n  content: \"\\f629\"; }\n\n.fa-book-medical::before {\n  content: \"\\f7e6\"; }\n\n.fa-poo::before {\n  content: \"\\f2fe\"; }\n\n.fa-quote-right::before {\n  content: \"\\f10e\"; }\n\n.fa-quote-right-alt::before {\n  content: \"\\f10e\"; }\n\n.fa-shirt::before {\n  content: \"\\f553\"; }\n\n.fa-t-shirt::before {\n  content: \"\\f553\"; }\n\n.fa-tshirt::before {\n  content: \"\\f553\"; }\n\n.fa-cubes::before {\n  content: \"\\f1b3\"; }\n\n.fa-divide::before {\n  content: \"\\f529\"; }\n\n.fa-tenge-sign::before {\n  content: \"\\f7d7\"; }\n\n.fa-tenge::before {\n  content: \"\\f7d7\"; }\n\n.fa-headphones::before {\n  content: \"\\f025\"; }\n\n.fa-hands-holding::before {\n  content: \"\\f4c2\"; }\n\n.fa-hands-clapping::before {\n  content: \"\\e1a8\"; }\n\n.fa-republican::before {\n  content: \"\\f75e\"; }\n\n.fa-arrow-left::before {\n  content: \"\\f060\"; }\n\n.fa-person-circle-xmark::before {\n  content: \"\\e543\"; }\n\n.fa-ruler::before {\n  content: \"\\f545\"; }\n\n.fa-align-left::before {\n  content: \"\\f036\"; }\n\n.fa-dice-d6::before {\n  content: \"\\f6d1\"; }\n\n.fa-restroom::before {\n  content: \"\\f7bd\"; }\n\n.fa-j::before {\n  content: \"\\4a\"; }\n\n.fa-users-viewfinder::before {\n  content: \"\\e595\"; }\n\n.fa-file-video::before {\n  content: \"\\f1c8\"; }\n\n.fa-up-right-from-square::before {\n  content: \"\\f35d\"; }\n\n.fa-external-link-alt::before {\n  content: \"\\f35d\"; }\n\n.fa-table-cells::before {\n  content: \"\\f00a\"; }\n\n.fa-th::before {\n  content: \"\\f00a\"; }\n\n.fa-file-pdf::before {\n  content: \"\\f1c1\"; }\n\n.fa-book-bible::before {\n  content: \"\\f647\"; }\n\n.fa-bible::before {\n  content: \"\\f647\"; }\n\n.fa-o::before {\n  content: \"\\4f\"; }\n\n.fa-suitcase-medical::before {\n  content: \"\\f0fa\"; }\n\n.fa-medkit::before {\n  content: \"\\f0fa\"; }\n\n.fa-user-secret::before {\n  content: \"\\f21b\"; }\n\n.fa-otter::before {\n  content: \"\\f700\"; }\n\n.fa-person-dress::before {\n  content: \"\\f182\"; }\n\n.fa-female::before {\n  content: \"\\f182\"; }\n\n.fa-comment-dollar::before {\n  content: \"\\f651\"; }\n\n.fa-business-time::before {\n  content: \"\\f64a\"; }\n\n.fa-briefcase-clock::before {\n  content: \"\\f64a\"; }\n\n.fa-table-cells-large::before {\n  content: \"\\f009\"; }\n\n.fa-th-large::before {\n  content: \"\\f009\"; }\n\n.fa-book-tanakh::before {\n  content: \"\\f827\"; }\n\n.fa-tanakh::before {\n  content: \"\\f827\"; }\n\n.fa-phone-volume::before {\n  content: \"\\f2a0\"; }\n\n.fa-volume-control-phone::before {\n  content: \"\\f2a0\"; }\n\n.fa-hat-cowboy-side::before {\n  content: \"\\f8c1\"; }\n\n.fa-clipboard-user::before {\n  content: \"\\f7f3\"; }\n\n.fa-child::before {\n  content: \"\\f1ae\"; }\n\n.fa-lira-sign::before {\n  content: \"\\f195\"; }\n\n.fa-satellite::before {\n  content: \"\\f7bf\"; }\n\n.fa-plane-lock::before {\n  content: \"\\e558\"; }\n\n.fa-tag::before {\n  content: \"\\f02b\"; }\n\n.fa-comment::before {\n  content: \"\\f075\"; }\n\n.fa-cake-candles::before {\n  content: \"\\f1fd\"; }\n\n.fa-birthday-cake::before {\n  content: \"\\f1fd\"; }\n\n.fa-cake::before {\n  content: \"\\f1fd\"; }\n\n.fa-envelope::before {\n  content: \"\\f0e0\"; }\n\n.fa-angles-up::before {\n  content: \"\\f102\"; }\n\n.fa-angle-double-up::before {\n  content: \"\\f102\"; }\n\n.fa-paperclip::before {\n  content: \"\\f0c6\"; }\n\n.fa-arrow-right-to-city::before {\n  content: \"\\e4b3\"; }\n\n.fa-ribbon::before {\n  content: \"\\f4d6\"; }\n\n.fa-lungs::before {\n  content: \"\\f604\"; }\n\n.fa-arrow-up-9-1::before {\n  content: \"\\f887\"; }\n\n.fa-sort-numeric-up-alt::before {\n  content: \"\\f887\"; }\n\n.fa-litecoin-sign::before {\n  content: \"\\e1d3\"; }\n\n.fa-border-none::before {\n  content: \"\\f850\"; }\n\n.fa-circle-nodes::before {\n  content: \"\\e4e2\"; }\n\n.fa-parachute-box::before {\n  content: \"\\f4cd\"; }\n\n.fa-indent::before {\n  content: \"\\f03c\"; }\n\n.fa-truck-field-un::before {\n  content: \"\\e58e\"; }\n\n.fa-hourglass::before {\n  content: \"\\f254\"; }\n\n.fa-hourglass-empty::before {\n  content: \"\\f254\"; }\n\n.fa-mountain::before {\n  content: \"\\f6fc\"; }\n\n.fa-user-doctor::before {\n  content: \"\\f0f0\"; }\n\n.fa-user-md::before {\n  content: \"\\f0f0\"; }\n\n.fa-circle-info::before {\n  content: \"\\f05a\"; }\n\n.fa-info-circle::before {\n  content: \"\\f05a\"; }\n\n.fa-cloud-meatball::before {\n  content: \"\\f73b\"; }\n\n.fa-camera::before {\n  content: \"\\f030\"; }\n\n.fa-camera-alt::before {\n  content: \"\\f030\"; }\n\n.fa-square-virus::before {\n  content: \"\\e578\"; }\n\n.fa-meteor::before {\n  content: \"\\f753\"; }\n\n.fa-car-on::before {\n  content: \"\\e4dd\"; }\n\n.fa-sleigh::before {\n  content: \"\\f7cc\"; }\n\n.fa-arrow-down-1-9::before {\n  content: \"\\f162\"; }\n\n.fa-sort-numeric-asc::before {\n  content: \"\\f162\"; }\n\n.fa-sort-numeric-down::before {\n  content: \"\\f162\"; }\n\n.fa-hand-holding-droplet::before {\n  content: \"\\f4c1\"; }\n\n.fa-hand-holding-water::before {\n  content: \"\\f4c1\"; }\n\n.fa-water::before {\n  content: \"\\f773\"; }\n\n.fa-calendar-check::before {\n  content: \"\\f274\"; }\n\n.fa-braille::before {\n  content: \"\\f2a1\"; }\n\n.fa-prescription-bottle-medical::before {\n  content: \"\\f486\"; }\n\n.fa-prescription-bottle-alt::before {\n  content: \"\\f486\"; }\n\n.fa-landmark::before {\n  content: \"\\f66f\"; }\n\n.fa-truck::before {\n  content: \"\\f0d1\"; }\n\n.fa-crosshairs::before {\n  content: \"\\f05b\"; }\n\n.fa-person-cane::before {\n  content: \"\\e53c\"; }\n\n.fa-tent::before {\n  content: \"\\e57d\"; }\n\n.fa-vest-patches::before {\n  content: \"\\e086\"; }\n\n.fa-check-double::before {\n  content: \"\\f560\"; }\n\n.fa-arrow-down-a-z::before {\n  content: \"\\f15d\"; }\n\n.fa-sort-alpha-asc::before {\n  content: \"\\f15d\"; }\n\n.fa-sort-alpha-down::before {\n  content: \"\\f15d\"; }\n\n.fa-money-bill-wheat::before {\n  content: \"\\e52a\"; }\n\n.fa-cookie::before {\n  content: \"\\f563\"; }\n\n.fa-arrow-rotate-left::before {\n  content: \"\\f0e2\"; }\n\n.fa-arrow-left-rotate::before {\n  content: \"\\f0e2\"; }\n\n.fa-arrow-rotate-back::before {\n  content: \"\\f0e2\"; }\n\n.fa-arrow-rotate-backward::before {\n  content: \"\\f0e2\"; }\n\n.fa-undo::before {\n  content: \"\\f0e2\"; }\n\n.fa-hard-drive::before {\n  content: \"\\f0a0\"; }\n\n.fa-hdd::before {\n  content: \"\\f0a0\"; }\n\n.fa-face-grin-squint-tears::before {\n  content: \"\\f586\"; }\n\n.fa-grin-squint-tears::before {\n  content: \"\\f586\"; }\n\n.fa-dumbbell::before {\n  content: \"\\f44b\"; }\n\n.fa-rectangle-list::before {\n  content: \"\\f022\"; }\n\n.fa-list-alt::before {\n  content: \"\\f022\"; }\n\n.fa-tarp-droplet::before {\n  content: \"\\e57c\"; }\n\n.fa-house-medical-circle-check::before {\n  content: \"\\e511\"; }\n\n.fa-person-skiing-nordic::before {\n  content: \"\\f7ca\"; }\n\n.fa-skiing-nordic::before {\n  content: \"\\f7ca\"; }\n\n.fa-calendar-plus::before {\n  content: \"\\f271\"; }\n\n.fa-plane-arrival::before {\n  content: \"\\f5af\"; }\n\n.fa-circle-left::before {\n  content: \"\\f359\"; }\n\n.fa-arrow-alt-circle-left::before {\n  content: \"\\f359\"; }\n\n.fa-train-subway::before {\n  content: \"\\f239\"; }\n\n.fa-subway::before {\n  content: \"\\f239\"; }\n\n.fa-chart-gantt::before {\n  content: \"\\e0e4\"; }\n\n.fa-indian-rupee-sign::before {\n  content: \"\\e1bc\"; }\n\n.fa-indian-rupee::before {\n  content: \"\\e1bc\"; }\n\n.fa-inr::before {\n  content: \"\\e1bc\"; }\n\n.fa-crop-simple::before {\n  content: \"\\f565\"; }\n\n.fa-crop-alt::before {\n  content: \"\\f565\"; }\n\n.fa-money-bill-1::before {\n  content: \"\\f3d1\"; }\n\n.fa-money-bill-alt::before {\n  content: \"\\f3d1\"; }\n\n.fa-left-long::before {\n  content: \"\\f30a\"; }\n\n.fa-long-arrow-alt-left::before {\n  content: \"\\f30a\"; }\n\n.fa-dna::before {\n  content: \"\\f471\"; }\n\n.fa-virus-slash::before {\n  content: \"\\e075\"; }\n\n.fa-minus::before {\n  content: \"\\f068\"; }\n\n.fa-subtract::before {\n  content: \"\\f068\"; }\n\n.fa-chess::before {\n  content: \"\\f439\"; }\n\n.fa-arrow-left-long::before {\n  content: \"\\f177\"; }\n\n.fa-long-arrow-left::before {\n  content: \"\\f177\"; }\n\n.fa-plug-circle-check::before {\n  content: \"\\e55c\"; }\n\n.fa-street-view::before {\n  content: \"\\f21d\"; }\n\n.fa-franc-sign::before {\n  content: \"\\e18f\"; }\n\n.fa-volume-off::before {\n  content: \"\\f026\"; }\n\n.fa-hands-asl-interpreting::before {\n  content: \"\\f2a3\"; }\n\n.fa-american-sign-language-interpreting::before {\n  content: \"\\f2a3\"; }\n\n.fa-asl-interpreting::before {\n  content: \"\\f2a3\"; }\n\n.fa-hands-american-sign-language-interpreting::before {\n  content: \"\\f2a3\"; }\n\n.fa-gear::before {\n  content: \"\\f013\"; }\n\n.fa-cog::before {\n  content: \"\\f013\"; }\n\n.fa-droplet-slash::before {\n  content: \"\\f5c7\"; }\n\n.fa-tint-slash::before {\n  content: \"\\f5c7\"; }\n\n.fa-mosque::before {\n  content: \"\\f678\"; }\n\n.fa-mosquito::before {\n  content: \"\\e52b\"; }\n\n.fa-star-of-david::before {\n  content: \"\\f69a\"; }\n\n.fa-person-military-rifle::before {\n  content: \"\\e54b\"; }\n\n.fa-cart-shopping::before {\n  content: \"\\f07a\"; }\n\n.fa-shopping-cart::before {\n  content: \"\\f07a\"; }\n\n.fa-vials::before {\n  content: \"\\f493\"; }\n\n.fa-plug-circle-plus::before {\n  content: \"\\e55f\"; }\n\n.fa-place-of-worship::before {\n  content: \"\\f67f\"; }\n\n.fa-grip-vertical::before {\n  content: \"\\f58e\"; }\n\n.fa-arrow-turn-up::before {\n  content: \"\\f148\"; }\n\n.fa-level-up::before {\n  content: \"\\f148\"; }\n\n.fa-u::before {\n  content: \"\\55\"; }\n\n.fa-square-root-variable::before {\n  content: \"\\f698\"; }\n\n.fa-square-root-alt::before {\n  content: \"\\f698\"; }\n\n.fa-clock::before {\n  content: \"\\f017\"; }\n\n.fa-clock-four::before {\n  content: \"\\f017\"; }\n\n.fa-backward-step::before {\n  content: \"\\f048\"; }\n\n.fa-step-backward::before {\n  content: \"\\f048\"; }\n\n.fa-pallet::before {\n  content: \"\\f482\"; }\n\n.fa-faucet::before {\n  content: \"\\e005\"; }\n\n.fa-baseball-bat-ball::before {\n  content: \"\\f432\"; }\n\n.fa-s::before {\n  content: \"\\53\"; }\n\n.fa-timeline::before {\n  content: \"\\e29c\"; }\n\n.fa-keyboard::before {\n  content: \"\\f11c\"; }\n\n.fa-caret-down::before {\n  content: \"\\f0d7\"; }\n\n.fa-house-chimney-medical::before {\n  content: \"\\f7f2\"; }\n\n.fa-clinic-medical::before {\n  content: \"\\f7f2\"; }\n\n.fa-temperature-three-quarters::before {\n  content: \"\\f2c8\"; }\n\n.fa-temperature-3::before {\n  content: \"\\f2c8\"; }\n\n.fa-thermometer-3::before {\n  content: \"\\f2c8\"; }\n\n.fa-thermometer-three-quarters::before {\n  content: \"\\f2c8\"; }\n\n.fa-mobile-screen::before {\n  content: \"\\f3cf\"; }\n\n.fa-mobile-android-alt::before {\n  content: \"\\f3cf\"; }\n\n.fa-plane-up::before {\n  content: \"\\e22d\"; }\n\n.fa-piggy-bank::before {\n  content: \"\\f4d3\"; }\n\n.fa-battery-half::before {\n  content: \"\\f242\"; }\n\n.fa-battery-3::before {\n  content: \"\\f242\"; }\n\n.fa-mountain-city::before {\n  content: \"\\e52e\"; }\n\n.fa-coins::before {\n  content: \"\\f51e\"; }\n\n.fa-khanda::before {\n  content: \"\\f66d\"; }\n\n.fa-sliders::before {\n  content: \"\\f1de\"; }\n\n.fa-sliders-h::before {\n  content: \"\\f1de\"; }\n\n.fa-folder-tree::before {\n  content: \"\\f802\"; }\n\n.fa-network-wired::before {\n  content: \"\\f6ff\"; }\n\n.fa-map-pin::before {\n  content: \"\\f276\"; }\n\n.fa-hamsa::before {\n  content: \"\\f665\"; }\n\n.fa-cent-sign::before {\n  content: \"\\e3f5\"; }\n\n.fa-flask::before {\n  content: \"\\f0c3\"; }\n\n.fa-person-pregnant::before {\n  content: \"\\e31e\"; }\n\n.fa-wand-sparkles::before {\n  content: \"\\f72b\"; }\n\n.fa-ellipsis-vertical::before {\n  content: \"\\f142\"; }\n\n.fa-ellipsis-v::before {\n  content: \"\\f142\"; }\n\n.fa-ticket::before {\n  content: \"\\f145\"; }\n\n.fa-power-off::before {\n  content: \"\\f011\"; }\n\n.fa-right-long::before {\n  content: \"\\f30b\"; }\n\n.fa-long-arrow-alt-right::before {\n  content: \"\\f30b\"; }\n\n.fa-flag-usa::before {\n  content: \"\\f74d\"; }\n\n.fa-laptop-file::before {\n  content: \"\\e51d\"; }\n\n.fa-tty::before {\n  content: \"\\f1e4\"; }\n\n.fa-teletype::before {\n  content: \"\\f1e4\"; }\n\n.fa-diagram-next::before {\n  content: \"\\e476\"; }\n\n.fa-person-rifle::before {\n  content: \"\\e54e\"; }\n\n.fa-house-medical-circle-exclamation::before {\n  content: \"\\e512\"; }\n\n.fa-closed-captioning::before {\n  content: \"\\f20a\"; }\n\n.fa-person-hiking::before {\n  content: \"\\f6ec\"; }\n\n.fa-hiking::before {\n  content: \"\\f6ec\"; }\n\n.fa-venus-double::before {\n  content: \"\\f226\"; }\n\n.fa-images::before {\n  content: \"\\f302\"; }\n\n.fa-calculator::before {\n  content: \"\\f1ec\"; }\n\n.fa-people-pulling::before {\n  content: \"\\e535\"; }\n\n.fa-n::before {\n  content: \"\\4e\"; }\n\n.fa-cable-car::before {\n  content: \"\\f7da\"; }\n\n.fa-tram::before {\n  content: \"\\f7da\"; }\n\n.fa-cloud-rain::before {\n  content: \"\\f73d\"; }\n\n.fa-building-circle-xmark::before {\n  content: \"\\e4d4\"; }\n\n.fa-ship::before {\n  content: \"\\f21a\"; }\n\n.fa-arrows-down-to-line::before {\n  content: \"\\e4b8\"; }\n\n.fa-download::before {\n  content: \"\\f019\"; }\n\n.fa-face-grin::before {\n  content: \"\\f580\"; }\n\n.fa-grin::before {\n  content: \"\\f580\"; }\n\n.fa-delete-left::before {\n  content: \"\\f55a\"; }\n\n.fa-backspace::before {\n  content: \"\\f55a\"; }\n\n.fa-eye-dropper::before {\n  content: \"\\f1fb\"; }\n\n.fa-eye-dropper-empty::before {\n  content: \"\\f1fb\"; }\n\n.fa-eyedropper::before {\n  content: \"\\f1fb\"; }\n\n.fa-file-circle-check::before {\n  content: \"\\e5a0\"; }\n\n.fa-forward::before {\n  content: \"\\f04e\"; }\n\n.fa-mobile::before {\n  content: \"\\f3ce\"; }\n\n.fa-mobile-android::before {\n  content: \"\\f3ce\"; }\n\n.fa-mobile-phone::before {\n  content: \"\\f3ce\"; }\n\n.fa-face-meh::before {\n  content: \"\\f11a\"; }\n\n.fa-meh::before {\n  content: \"\\f11a\"; }\n\n.fa-align-center::before {\n  content: \"\\f037\"; }\n\n.fa-book-skull::before {\n  content: \"\\f6b7\"; }\n\n.fa-book-dead::before {\n  content: \"\\f6b7\"; }\n\n.fa-id-card::before {\n  content: \"\\f2c2\"; }\n\n.fa-drivers-license::before {\n  content: \"\\f2c2\"; }\n\n.fa-outdent::before {\n  content: \"\\f03b\"; }\n\n.fa-dedent::before {\n  content: \"\\f03b\"; }\n\n.fa-heart-circle-exclamation::before {\n  content: \"\\e4fe\"; }\n\n.fa-house::before {\n  content: \"\\f015\"; }\n\n.fa-home::before {\n  content: \"\\f015\"; }\n\n.fa-home-alt::before {\n  content: \"\\f015\"; }\n\n.fa-home-lg-alt::before {\n  content: \"\\f015\"; }\n\n.fa-calendar-week::before {\n  content: \"\\f784\"; }\n\n.fa-laptop-medical::before {\n  content: \"\\f812\"; }\n\n.fa-b::before {\n  content: \"\\42\"; }\n\n.fa-file-medical::before {\n  content: \"\\f477\"; }\n\n.fa-dice-one::before {\n  content: \"\\f525\"; }\n\n.fa-kiwi-bird::before {\n  content: \"\\f535\"; }\n\n.fa-arrow-right-arrow-left::before {\n  content: \"\\f0ec\"; }\n\n.fa-exchange::before {\n  content: \"\\f0ec\"; }\n\n.fa-rotate-right::before {\n  content: \"\\f2f9\"; }\n\n.fa-redo-alt::before {\n  content: \"\\f2f9\"; }\n\n.fa-rotate-forward::before {\n  content: \"\\f2f9\"; }\n\n.fa-utensils::before {\n  content: \"\\f2e7\"; }\n\n.fa-cutlery::before {\n  content: \"\\f2e7\"; }\n\n.fa-arrow-up-wide-short::before {\n  content: \"\\f161\"; }\n\n.fa-sort-amount-up::before {\n  content: \"\\f161\"; }\n\n.fa-mill-sign::before {\n  content: \"\\e1ed\"; }\n\n.fa-bowl-rice::before {\n  content: \"\\e2eb\"; }\n\n.fa-skull::before {\n  content: \"\\f54c\"; }\n\n.fa-tower-broadcast::before {\n  content: \"\\f519\"; }\n\n.fa-broadcast-tower::before {\n  content: \"\\f519\"; }\n\n.fa-truck-pickup::before {\n  content: \"\\f63c\"; }\n\n.fa-up-long::before {\n  content: \"\\f30c\"; }\n\n.fa-long-arrow-alt-up::before {\n  content: \"\\f30c\"; }\n\n.fa-stop::before {\n  content: \"\\f04d\"; }\n\n.fa-code-merge::before {\n  content: \"\\f387\"; }\n\n.fa-upload::before {\n  content: \"\\f093\"; }\n\n.fa-hurricane::before {\n  content: \"\\f751\"; }\n\n.fa-mound::before {\n  content: \"\\e52d\"; }\n\n.fa-toilet-portable::before {\n  content: \"\\e583\"; }\n\n.fa-compact-disc::before {\n  content: \"\\f51f\"; }\n\n.fa-file-arrow-down::before {\n  content: \"\\f56d\"; }\n\n.fa-file-download::before {\n  content: \"\\f56d\"; }\n\n.fa-caravan::before {\n  content: \"\\f8ff\"; }\n\n.fa-shield-cat::before {\n  content: \"\\e572\"; }\n\n.fa-bolt::before {\n  content: \"\\f0e7\"; }\n\n.fa-zap::before {\n  content: \"\\f0e7\"; }\n\n.fa-glass-water::before {\n  content: \"\\e4f4\"; }\n\n.fa-oil-well::before {\n  content: \"\\e532\"; }\n\n.fa-vault::before {\n  content: \"\\e2c5\"; }\n\n.fa-mars::before {\n  content: \"\\f222\"; }\n\n.fa-toilet::before {\n  content: \"\\f7d8\"; }\n\n.fa-plane-circle-xmark::before {\n  content: \"\\e557\"; }\n\n.fa-yen-sign::before {\n  content: \"\\f157\"; }\n\n.fa-cny::before {\n  content: \"\\f157\"; }\n\n.fa-jpy::before {\n  content: \"\\f157\"; }\n\n.fa-rmb::before {\n  content: \"\\f157\"; }\n\n.fa-yen::before {\n  content: \"\\f157\"; }\n\n.fa-ruble-sign::before {\n  content: \"\\f158\"; }\n\n.fa-rouble::before {\n  content: \"\\f158\"; }\n\n.fa-rub::before {\n  content: \"\\f158\"; }\n\n.fa-ruble::before {\n  content: \"\\f158\"; }\n\n.fa-sun::before {\n  content: \"\\f185\"; }\n\n.fa-guitar::before {\n  content: \"\\f7a6\"; }\n\n.fa-face-laugh-wink::before {\n  content: \"\\f59c\"; }\n\n.fa-laugh-wink::before {\n  content: \"\\f59c\"; }\n\n.fa-horse-head::before {\n  content: \"\\f7ab\"; }\n\n.fa-bore-hole::before {\n  content: \"\\e4c3\"; }\n\n.fa-industry::before {\n  content: \"\\f275\"; }\n\n.fa-circle-down::before {\n  content: \"\\f358\"; }\n\n.fa-arrow-alt-circle-down::before {\n  content: \"\\f358\"; }\n\n.fa-arrows-turn-to-dots::before {\n  content: \"\\e4c1\"; }\n\n.fa-florin-sign::before {\n  content: \"\\e184\"; }\n\n.fa-arrow-down-short-wide::before {\n  content: \"\\f884\"; }\n\n.fa-sort-amount-desc::before {\n  content: \"\\f884\"; }\n\n.fa-sort-amount-down-alt::before {\n  content: \"\\f884\"; }\n\n.fa-less-than::before {\n  content: \"\\3c\"; }\n\n.fa-angle-down::before {\n  content: \"\\f107\"; }\n\n.fa-car-tunnel::before {\n  content: \"\\e4de\"; }\n\n.fa-head-side-cough::before {\n  content: \"\\e061\"; }\n\n.fa-grip-lines::before {\n  content: \"\\f7a4\"; }\n\n.fa-thumbs-down::before {\n  content: \"\\f165\"; }\n\n.fa-user-lock::before {\n  content: \"\\f502\"; }\n\n.fa-arrow-right-long::before {\n  content: \"\\f178\"; }\n\n.fa-long-arrow-right::before {\n  content: \"\\f178\"; }\n\n.fa-anchor-circle-xmark::before {\n  content: \"\\e4ac\"; }\n\n.fa-ellipsis::before {\n  content: \"\\f141\"; }\n\n.fa-ellipsis-h::before {\n  content: \"\\f141\"; }\n\n.fa-chess-pawn::before {\n  content: \"\\f443\"; }\n\n.fa-kit-medical::before {\n  content: \"\\f479\"; }\n\n.fa-first-aid::before {\n  content: \"\\f479\"; }\n\n.fa-person-through-window::before {\n  content: \"\\e5a9\"; }\n\n.fa-toolbox::before {\n  content: \"\\f552\"; }\n\n.fa-hands-holding-circle::before {\n  content: \"\\e4fb\"; }\n\n.fa-bug::before {\n  content: \"\\f188\"; }\n\n.fa-credit-card::before {\n  content: \"\\f09d\"; }\n\n.fa-credit-card-alt::before {\n  content: \"\\f09d\"; }\n\n.fa-car::before {\n  content: \"\\f1b9\"; }\n\n.fa-automobile::before {\n  content: \"\\f1b9\"; }\n\n.fa-hand-holding-hand::before {\n  content: \"\\e4f7\"; }\n\n.fa-book-open-reader::before {\n  content: \"\\f5da\"; }\n\n.fa-book-reader::before {\n  content: \"\\f5da\"; }\n\n.fa-mountain-sun::before {\n  content: \"\\e52f\"; }\n\n.fa-arrows-left-right-to-line::before {\n  content: \"\\e4ba\"; }\n\n.fa-dice-d20::before {\n  content: \"\\f6cf\"; }\n\n.fa-truck-droplet::before {\n  content: \"\\e58c\"; }\n\n.fa-file-circle-xmark::before {\n  content: \"\\e5a1\"; }\n\n.fa-temperature-arrow-up::before {\n  content: \"\\e040\"; }\n\n.fa-temperature-up::before {\n  content: \"\\e040\"; }\n\n.fa-medal::before {\n  content: \"\\f5a2\"; }\n\n.fa-bed::before {\n  content: \"\\f236\"; }\n\n.fa-square-h::before {\n  content: \"\\f0fd\"; }\n\n.fa-h-square::before {\n  content: \"\\f0fd\"; }\n\n.fa-podcast::before {\n  content: \"\\f2ce\"; }\n\n.fa-temperature-full::before {\n  content: \"\\f2c7\"; }\n\n.fa-temperature-4::before {\n  content: \"\\f2c7\"; }\n\n.fa-thermometer-4::before {\n  content: \"\\f2c7\"; }\n\n.fa-thermometer-full::before {\n  content: \"\\f2c7\"; }\n\n.fa-bell::before {\n  content: \"\\f0f3\"; }\n\n.fa-superscript::before {\n  content: \"\\f12b\"; }\n\n.fa-plug-circle-xmark::before {\n  content: \"\\e560\"; }\n\n.fa-star-of-life::before {\n  content: \"\\f621\"; }\n\n.fa-phone-slash::before {\n  content: \"\\f3dd\"; }\n\n.fa-paint-roller::before {\n  content: \"\\f5aa\"; }\n\n.fa-handshake-angle::before {\n  content: \"\\f4c4\"; }\n\n.fa-hands-helping::before {\n  content: \"\\f4c4\"; }\n\n.fa-location-dot::before {\n  content: \"\\f3c5\"; }\n\n.fa-map-marker-alt::before {\n  content: \"\\f3c5\"; }\n\n.fa-file::before {\n  content: \"\\f15b\"; }\n\n.fa-greater-than::before {\n  content: \"\\3e\"; }\n\n.fa-person-swimming::before {\n  content: \"\\f5c4\"; }\n\n.fa-swimmer::before {\n  content: \"\\f5c4\"; }\n\n.fa-arrow-down::before {\n  content: \"\\f063\"; }\n\n.fa-droplet::before {\n  content: \"\\f043\"; }\n\n.fa-tint::before {\n  content: \"\\f043\"; }\n\n.fa-eraser::before {\n  content: \"\\f12d\"; }\n\n.fa-earth-americas::before {\n  content: \"\\f57d\"; }\n\n.fa-earth::before {\n  content: \"\\f57d\"; }\n\n.fa-earth-america::before {\n  content: \"\\f57d\"; }\n\n.fa-globe-americas::before {\n  content: \"\\f57d\"; }\n\n.fa-person-burst::before {\n  content: \"\\e53b\"; }\n\n.fa-dove::before {\n  content: \"\\f4ba\"; }\n\n.fa-battery-empty::before {\n  content: \"\\f244\"; }\n\n.fa-battery-0::before {\n  content: \"\\f244\"; }\n\n.fa-socks::before {\n  content: \"\\f696\"; }\n\n.fa-inbox::before {\n  content: \"\\f01c\"; }\n\n.fa-section::before {\n  content: \"\\e447\"; }\n\n.fa-gauge-high::before {\n  content: \"\\f625\"; }\n\n.fa-tachometer-alt::before {\n  content: \"\\f625\"; }\n\n.fa-tachometer-alt-fast::before {\n  content: \"\\f625\"; }\n\n.fa-envelope-open-text::before {\n  content: \"\\f658\"; }\n\n.fa-hospital::before {\n  content: \"\\f0f8\"; }\n\n.fa-hospital-alt::before {\n  content: \"\\f0f8\"; }\n\n.fa-hospital-wide::before {\n  content: \"\\f0f8\"; }\n\n.fa-wine-bottle::before {\n  content: \"\\f72f\"; }\n\n.fa-chess-rook::before {\n  content: \"\\f447\"; }\n\n.fa-bars-staggered::before {\n  content: \"\\f550\"; }\n\n.fa-reorder::before {\n  content: \"\\f550\"; }\n\n.fa-stream::before {\n  content: \"\\f550\"; }\n\n.fa-dharmachakra::before {\n  content: \"\\f655\"; }\n\n.fa-hotdog::before {\n  content: \"\\f80f\"; }\n\n.fa-person-walking-with-cane::before {\n  content: \"\\f29d\"; }\n\n.fa-blind::before {\n  content: \"\\f29d\"; }\n\n.fa-drum::before {\n  content: \"\\f569\"; }\n\n.fa-ice-cream::before {\n  content: \"\\f810\"; }\n\n.fa-heart-circle-bolt::before {\n  content: \"\\e4fc\"; }\n\n.fa-fax::before {\n  content: \"\\f1ac\"; }\n\n.fa-paragraph::before {\n  content: \"\\f1dd\"; }\n\n.fa-check-to-slot::before {\n  content: \"\\f772\"; }\n\n.fa-vote-yea::before {\n  content: \"\\f772\"; }\n\n.fa-star-half::before {\n  content: \"\\f089\"; }\n\n.fa-boxes-stacked::before {\n  content: \"\\f468\"; }\n\n.fa-boxes::before {\n  content: \"\\f468\"; }\n\n.fa-boxes-alt::before {\n  content: \"\\f468\"; }\n\n.fa-link::before {\n  content: \"\\f0c1\"; }\n\n.fa-chain::before {\n  content: \"\\f0c1\"; }\n\n.fa-ear-listen::before {\n  content: \"\\f2a2\"; }\n\n.fa-assistive-listening-systems::before {\n  content: \"\\f2a2\"; }\n\n.fa-tree-city::before {\n  content: \"\\e587\"; }\n\n.fa-play::before {\n  content: \"\\f04b\"; }\n\n.fa-font::before {\n  content: \"\\f031\"; }\n\n.fa-rupiah-sign::before {\n  content: \"\\e23d\"; }\n\n.fa-magnifying-glass::before {\n  content: \"\\f002\"; }\n\n.fa-search::before {\n  content: \"\\f002\"; }\n\n.fa-table-tennis-paddle-ball::before {\n  content: \"\\f45d\"; }\n\n.fa-ping-pong-paddle-ball::before {\n  content: \"\\f45d\"; }\n\n.fa-table-tennis::before {\n  content: \"\\f45d\"; }\n\n.fa-person-dots-from-line::before {\n  content: \"\\f470\"; }\n\n.fa-diagnoses::before {\n  content: \"\\f470\"; }\n\n.fa-trash-can-arrow-up::before {\n  content: \"\\f82a\"; }\n\n.fa-trash-restore-alt::before {\n  content: \"\\f82a\"; }\n\n.fa-naira-sign::before {\n  content: \"\\e1f6\"; }\n\n.fa-cart-arrow-down::before {\n  content: \"\\f218\"; }\n\n.fa-walkie-talkie::before {\n  content: \"\\f8ef\"; }\n\n.fa-file-pen::before {\n  content: \"\\f31c\"; }\n\n.fa-file-edit::before {\n  content: \"\\f31c\"; }\n\n.fa-receipt::before {\n  content: \"\\f543\"; }\n\n.fa-square-pen::before {\n  content: \"\\f14b\"; }\n\n.fa-pen-square::before {\n  content: \"\\f14b\"; }\n\n.fa-pencil-square::before {\n  content: \"\\f14b\"; }\n\n.fa-suitcase-rolling::before {\n  content: \"\\f5c1\"; }\n\n.fa-person-circle-exclamation::before {\n  content: \"\\e53f\"; }\n\n.fa-chevron-down::before {\n  content: \"\\f078\"; }\n\n.fa-battery-full::before {\n  content: \"\\f240\"; }\n\n.fa-battery::before {\n  content: \"\\f240\"; }\n\n.fa-battery-5::before {\n  content: \"\\f240\"; }\n\n.fa-skull-crossbones::before {\n  content: \"\\f714\"; }\n\n.fa-code-compare::before {\n  content: \"\\e13a\"; }\n\n.fa-list-ul::before {\n  content: \"\\f0ca\"; }\n\n.fa-list-dots::before {\n  content: \"\\f0ca\"; }\n\n.fa-school-lock::before {\n  content: \"\\e56f\"; }\n\n.fa-tower-cell::before {\n  content: \"\\e585\"; }\n\n.fa-down-long::before {\n  content: \"\\f309\"; }\n\n.fa-long-arrow-alt-down::before {\n  content: \"\\f309\"; }\n\n.fa-ranking-star::before {\n  content: \"\\e561\"; }\n\n.fa-chess-king::before {\n  content: \"\\f43f\"; }\n\n.fa-person-harassing::before {\n  content: \"\\e549\"; }\n\n.fa-brazilian-real-sign::before {\n  content: \"\\e46c\"; }\n\n.fa-landmark-dome::before {\n  content: \"\\f752\"; }\n\n.fa-landmark-alt::before {\n  content: \"\\f752\"; }\n\n.fa-arrow-up::before {\n  content: \"\\f062\"; }\n\n.fa-tv::before {\n  content: \"\\f26c\"; }\n\n.fa-television::before {\n  content: \"\\f26c\"; }\n\n.fa-tv-alt::before {\n  content: \"\\f26c\"; }\n\n.fa-shrimp::before {\n  content: \"\\e448\"; }\n\n.fa-list-check::before {\n  content: \"\\f0ae\"; }\n\n.fa-tasks::before {\n  content: \"\\f0ae\"; }\n\n.fa-jug-detergent::before {\n  content: \"\\e519\"; }\n\n.fa-circle-user::before {\n  content: \"\\f2bd\"; }\n\n.fa-user-circle::before {\n  content: \"\\f2bd\"; }\n\n.fa-user-shield::before {\n  content: \"\\f505\"; }\n\n.fa-wind::before {\n  content: \"\\f72e\"; }\n\n.fa-car-burst::before {\n  content: \"\\f5e1\"; }\n\n.fa-car-crash::before {\n  content: \"\\f5e1\"; }\n\n.fa-y::before {\n  content: \"\\59\"; }\n\n.fa-person-snowboarding::before {\n  content: \"\\f7ce\"; }\n\n.fa-snowboarding::before {\n  content: \"\\f7ce\"; }\n\n.fa-truck-fast::before {\n  content: \"\\f48b\"; }\n\n.fa-shipping-fast::before {\n  content: \"\\f48b\"; }\n\n.fa-fish::before {\n  content: \"\\f578\"; }\n\n.fa-user-graduate::before {\n  content: \"\\f501\"; }\n\n.fa-circle-half-stroke::before {\n  content: \"\\f042\"; }\n\n.fa-adjust::before {\n  content: \"\\f042\"; }\n\n.fa-clapperboard::before {\n  content: \"\\e131\"; }\n\n.fa-circle-radiation::before {\n  content: \"\\f7ba\"; }\n\n.fa-radiation-alt::before {\n  content: \"\\f7ba\"; }\n\n.fa-baseball::before {\n  content: \"\\f433\"; }\n\n.fa-baseball-ball::before {\n  content: \"\\f433\"; }\n\n.fa-jet-fighter-up::before {\n  content: \"\\e518\"; }\n\n.fa-diagram-project::before {\n  content: \"\\f542\"; }\n\n.fa-project-diagram::before {\n  content: \"\\f542\"; }\n\n.fa-copy::before {\n  content: \"\\f0c5\"; }\n\n.fa-volume-xmark::before {\n  content: \"\\f6a9\"; }\n\n.fa-volume-mute::before {\n  content: \"\\f6a9\"; }\n\n.fa-volume-times::before {\n  content: \"\\f6a9\"; }\n\n.fa-hand-sparkles::before {\n  content: \"\\e05d\"; }\n\n.fa-grip::before {\n  content: \"\\f58d\"; }\n\n.fa-grip-horizontal::before {\n  content: \"\\f58d\"; }\n\n.fa-share-from-square::before {\n  content: \"\\f14d\"; }\n\n.fa-share-square::before {\n  content: \"\\f14d\"; }\n\n.fa-child-combatant::before {\n  content: \"\\e4e0\"; }\n\n.fa-child-rifle::before {\n  content: \"\\e4e0\"; }\n\n.fa-gun::before {\n  content: \"\\e19b\"; }\n\n.fa-square-phone::before {\n  content: \"\\f098\"; }\n\n.fa-phone-square::before {\n  content: \"\\f098\"; }\n\n.fa-plus::before {\n  content: \"\\2b\"; }\n\n.fa-add::before {\n  content: \"\\2b\"; }\n\n.fa-expand::before {\n  content: \"\\f065\"; }\n\n.fa-computer::before {\n  content: \"\\e4e5\"; }\n\n.fa-xmark::before {\n  content: \"\\f00d\"; }\n\n.fa-close::before {\n  content: \"\\f00d\"; }\n\n.fa-multiply::before {\n  content: \"\\f00d\"; }\n\n.fa-remove::before {\n  content: \"\\f00d\"; }\n\n.fa-times::before {\n  content: \"\\f00d\"; }\n\n.fa-arrows-up-down-left-right::before {\n  content: \"\\f047\"; }\n\n.fa-arrows::before {\n  content: \"\\f047\"; }\n\n.fa-chalkboard-user::before {\n  content: \"\\f51c\"; }\n\n.fa-chalkboard-teacher::before {\n  content: \"\\f51c\"; }\n\n.fa-peso-sign::before {\n  content: \"\\e222\"; }\n\n.fa-building-shield::before {\n  content: \"\\e4d8\"; }\n\n.fa-baby::before {\n  content: \"\\f77c\"; }\n\n.fa-users-line::before {\n  content: \"\\e592\"; }\n\n.fa-quote-left::before {\n  content: \"\\f10d\"; }\n\n.fa-quote-left-alt::before {\n  content: \"\\f10d\"; }\n\n.fa-tractor::before {\n  content: \"\\f722\"; }\n\n.fa-trash-arrow-up::before {\n  content: \"\\f829\"; }\n\n.fa-trash-restore::before {\n  content: \"\\f829\"; }\n\n.fa-arrow-down-up-lock::before {\n  content: \"\\e4b0\"; }\n\n.fa-lines-leaning::before {\n  content: \"\\e51e\"; }\n\n.fa-ruler-combined::before {\n  content: \"\\f546\"; }\n\n.fa-copyright::before {\n  content: \"\\f1f9\"; }\n\n.fa-equals::before {\n  content: \"\\3d\"; }\n\n.fa-blender::before {\n  content: \"\\f517\"; }\n\n.fa-teeth::before {\n  content: \"\\f62e\"; }\n\n.fa-shekel-sign::before {\n  content: \"\\f20b\"; }\n\n.fa-ils::before {\n  content: \"\\f20b\"; }\n\n.fa-shekel::before {\n  content: \"\\f20b\"; }\n\n.fa-sheqel::before {\n  content: \"\\f20b\"; }\n\n.fa-sheqel-sign::before {\n  content: \"\\f20b\"; }\n\n.fa-map::before {\n  content: \"\\f279\"; }\n\n.fa-rocket::before {\n  content: \"\\f135\"; }\n\n.fa-photo-film::before {\n  content: \"\\f87c\"; }\n\n.fa-photo-video::before {\n  content: \"\\f87c\"; }\n\n.fa-folder-minus::before {\n  content: \"\\f65d\"; }\n\n.fa-store::before {\n  content: \"\\f54e\"; }\n\n.fa-arrow-trend-up::before {\n  content: \"\\e098\"; }\n\n.fa-plug-circle-minus::before {\n  content: \"\\e55e\"; }\n\n.fa-sign-hanging::before {\n  content: \"\\f4d9\"; }\n\n.fa-sign::before {\n  content: \"\\f4d9\"; }\n\n.fa-bezier-curve::before {\n  content: \"\\f55b\"; }\n\n.fa-bell-slash::before {\n  content: \"\\f1f6\"; }\n\n.fa-tablet::before {\n  content: \"\\f3fb\"; }\n\n.fa-tablet-android::before {\n  content: \"\\f3fb\"; }\n\n.fa-school-flag::before {\n  content: \"\\e56e\"; }\n\n.fa-fill::before {\n  content: \"\\f575\"; }\n\n.fa-angle-up::before {\n  content: \"\\f106\"; }\n\n.fa-drumstick-bite::before {\n  content: \"\\f6d7\"; }\n\n.fa-holly-berry::before {\n  content: \"\\f7aa\"; }\n\n.fa-chevron-left::before {\n  content: \"\\f053\"; }\n\n.fa-bacteria::before {\n  content: \"\\e059\"; }\n\n.fa-hand-lizard::before {\n  content: \"\\f258\"; }\n\n.fa-notdef::before {\n  content: \"\\e1fe\"; }\n\n.fa-disease::before {\n  content: \"\\f7fa\"; }\n\n.fa-briefcase-medical::before {\n  content: \"\\f469\"; }\n\n.fa-genderless::before {\n  content: \"\\f22d\"; }\n\n.fa-chevron-right::before {\n  content: \"\\f054\"; }\n\n.fa-retweet::before {\n  content: \"\\f079\"; }\n\n.fa-car-rear::before {\n  content: \"\\f5de\"; }\n\n.fa-car-alt::before {\n  content: \"\\f5de\"; }\n\n.fa-pump-soap::before {\n  content: \"\\e06b\"; }\n\n.fa-video-slash::before {\n  content: \"\\f4e2\"; }\n\n.fa-battery-quarter::before {\n  content: \"\\f243\"; }\n\n.fa-battery-2::before {\n  content: \"\\f243\"; }\n\n.fa-radio::before {\n  content: \"\\f8d7\"; }\n\n.fa-baby-carriage::before {\n  content: \"\\f77d\"; }\n\n.fa-carriage-baby::before {\n  content: \"\\f77d\"; }\n\n.fa-traffic-light::before {\n  content: \"\\f637\"; }\n\n.fa-thermometer::before {\n  content: \"\\f491\"; }\n\n.fa-vr-cardboard::before {\n  content: \"\\f729\"; }\n\n.fa-hand-middle-finger::before {\n  content: \"\\f806\"; }\n\n.fa-percent::before {\n  content: \"\\25\"; }\n\n.fa-percentage::before {\n  content: \"\\25\"; }\n\n.fa-truck-moving::before {\n  content: \"\\f4df\"; }\n\n.fa-glass-water-droplet::before {\n  content: \"\\e4f5\"; }\n\n.fa-display::before {\n  content: \"\\e163\"; }\n\n.fa-face-smile::before {\n  content: \"\\f118\"; }\n\n.fa-smile::before {\n  content: \"\\f118\"; }\n\n.fa-thumbtack::before {\n  content: \"\\f08d\"; }\n\n.fa-thumb-tack::before {\n  content: \"\\f08d\"; }\n\n.fa-trophy::before {\n  content: \"\\f091\"; }\n\n.fa-person-praying::before {\n  content: \"\\f683\"; }\n\n.fa-pray::before {\n  content: \"\\f683\"; }\n\n.fa-hammer::before {\n  content: \"\\f6e3\"; }\n\n.fa-hand-peace::before {\n  content: \"\\f25b\"; }\n\n.fa-rotate::before {\n  content: \"\\f2f1\"; }\n\n.fa-sync-alt::before {\n  content: \"\\f2f1\"; }\n\n.fa-spinner::before {\n  content: \"\\f110\"; }\n\n.fa-robot::before {\n  content: \"\\f544\"; }\n\n.fa-peace::before {\n  content: \"\\f67c\"; }\n\n.fa-gears::before {\n  content: \"\\f085\"; }\n\n.fa-cogs::before {\n  content: \"\\f085\"; }\n\n.fa-warehouse::before {\n  content: \"\\f494\"; }\n\n.fa-arrow-up-right-dots::before {\n  content: \"\\e4b7\"; }\n\n.fa-splotch::before {\n  content: \"\\f5bc\"; }\n\n.fa-face-grin-hearts::before {\n  content: \"\\f584\"; }\n\n.fa-grin-hearts::before {\n  content: \"\\f584\"; }\n\n.fa-dice-four::before {\n  content: \"\\f524\"; }\n\n.fa-sim-card::before {\n  content: \"\\f7c4\"; }\n\n.fa-transgender::before {\n  content: \"\\f225\"; }\n\n.fa-transgender-alt::before {\n  content: \"\\f225\"; }\n\n.fa-mercury::before {\n  content: \"\\f223\"; }\n\n.fa-arrow-turn-down::before {\n  content: \"\\f149\"; }\n\n.fa-level-down::before {\n  content: \"\\f149\"; }\n\n.fa-person-falling-burst::before {\n  content: \"\\e547\"; }\n\n.fa-award::before {\n  content: \"\\f559\"; }\n\n.fa-ticket-simple::before {\n  content: \"\\f3ff\"; }\n\n.fa-ticket-alt::before {\n  content: \"\\f3ff\"; }\n\n.fa-building::before {\n  content: \"\\f1ad\"; }\n\n.fa-angles-left::before {\n  content: \"\\f100\"; }\n\n.fa-angle-double-left::before {\n  content: \"\\f100\"; }\n\n.fa-qrcode::before {\n  content: \"\\f029\"; }\n\n.fa-clock-rotate-left::before {\n  content: \"\\f1da\"; }\n\n.fa-history::before {\n  content: \"\\f1da\"; }\n\n.fa-face-grin-beam-sweat::before {\n  content: \"\\f583\"; }\n\n.fa-grin-beam-sweat::before {\n  content: \"\\f583\"; }\n\n.fa-file-export::before {\n  content: \"\\f56e\"; }\n\n.fa-arrow-right-from-file::before {\n  content: \"\\f56e\"; }\n\n.fa-shield::before {\n  content: \"\\f132\"; }\n\n.fa-shield-blank::before {\n  content: \"\\f132\"; }\n\n.fa-arrow-up-short-wide::before {\n  content: \"\\f885\"; }\n\n.fa-sort-amount-up-alt::before {\n  content: \"\\f885\"; }\n\n.fa-house-medical::before {\n  content: \"\\e3b2\"; }\n\n.fa-golf-ball-tee::before {\n  content: \"\\f450\"; }\n\n.fa-golf-ball::before {\n  content: \"\\f450\"; }\n\n.fa-circle-chevron-left::before {\n  content: \"\\f137\"; }\n\n.fa-chevron-circle-left::before {\n  content: \"\\f137\"; }\n\n.fa-house-chimney-window::before {\n  content: \"\\e00d\"; }\n\n.fa-pen-nib::before {\n  content: \"\\f5ad\"; }\n\n.fa-tent-arrow-turn-left::before {\n  content: \"\\e580\"; }\n\n.fa-tents::before {\n  content: \"\\e582\"; }\n\n.fa-wand-magic::before {\n  content: \"\\f0d0\"; }\n\n.fa-magic::before {\n  content: \"\\f0d0\"; }\n\n.fa-dog::before {\n  content: \"\\f6d3\"; }\n\n.fa-carrot::before {\n  content: \"\\f787\"; }\n\n.fa-moon::before {\n  content: \"\\f186\"; }\n\n.fa-wine-glass-empty::before {\n  content: \"\\f5ce\"; }\n\n.fa-wine-glass-alt::before {\n  content: \"\\f5ce\"; }\n\n.fa-cheese::before {\n  content: \"\\f7ef\"; }\n\n.fa-yin-yang::before {\n  content: \"\\f6ad\"; }\n\n.fa-music::before {\n  content: \"\\f001\"; }\n\n.fa-code-commit::before {\n  content: \"\\f386\"; }\n\n.fa-temperature-low::before {\n  content: \"\\f76b\"; }\n\n.fa-person-biking::before {\n  content: \"\\f84a\"; }\n\n.fa-biking::before {\n  content: \"\\f84a\"; }\n\n.fa-broom::before {\n  content: \"\\f51a\"; }\n\n.fa-shield-heart::before {\n  content: \"\\e574\"; }\n\n.fa-gopuram::before {\n  content: \"\\f664\"; }\n\n.fa-earth-oceania::before {\n  content: \"\\e47b\"; }\n\n.fa-globe-oceania::before {\n  content: \"\\e47b\"; }\n\n.fa-square-xmark::before {\n  content: \"\\f2d3\"; }\n\n.fa-times-square::before {\n  content: \"\\f2d3\"; }\n\n.fa-xmark-square::before {\n  content: \"\\f2d3\"; }\n\n.fa-hashtag::before {\n  content: \"\\23\"; }\n\n.fa-up-right-and-down-left-from-center::before {\n  content: \"\\f424\"; }\n\n.fa-expand-alt::before {\n  content: \"\\f424\"; }\n\n.fa-oil-can::before {\n  content: \"\\f613\"; }\n\n.fa-t::before {\n  content: \"\\54\"; }\n\n.fa-hippo::before {\n  content: \"\\f6ed\"; }\n\n.fa-chart-column::before {\n  content: \"\\e0e3\"; }\n\n.fa-infinity::before {\n  content: \"\\f534\"; }\n\n.fa-vial-circle-check::before {\n  content: \"\\e596\"; }\n\n.fa-person-arrow-down-to-line::before {\n  content: \"\\e538\"; }\n\n.fa-voicemail::before {\n  content: \"\\f897\"; }\n\n.fa-fan::before {\n  content: \"\\f863\"; }\n\n.fa-person-walking-luggage::before {\n  content: \"\\e554\"; }\n\n.fa-up-down::before {\n  content: \"\\f338\"; }\n\n.fa-arrows-alt-v::before {\n  content: \"\\f338\"; }\n\n.fa-cloud-moon-rain::before {\n  content: \"\\f73c\"; }\n\n.fa-calendar::before {\n  content: \"\\f133\"; }\n\n.fa-trailer::before {\n  content: \"\\e041\"; }\n\n.fa-bahai::before {\n  content: \"\\f666\"; }\n\n.fa-haykal::before {\n  content: \"\\f666\"; }\n\n.fa-sd-card::before {\n  content: \"\\f7c2\"; }\n\n.fa-dragon::before {\n  content: \"\\f6d5\"; }\n\n.fa-shoe-prints::before {\n  content: \"\\f54b\"; }\n\n.fa-circle-plus::before {\n  content: \"\\f055\"; }\n\n.fa-plus-circle::before {\n  content: \"\\f055\"; }\n\n.fa-face-grin-tongue-wink::before {\n  content: \"\\f58b\"; }\n\n.fa-grin-tongue-wink::before {\n  content: \"\\f58b\"; }\n\n.fa-hand-holding::before {\n  content: \"\\f4bd\"; }\n\n.fa-plug-circle-exclamation::before {\n  content: \"\\e55d\"; }\n\n.fa-link-slash::before {\n  content: \"\\f127\"; }\n\n.fa-chain-broken::before {\n  content: \"\\f127\"; }\n\n.fa-chain-slash::before {\n  content: \"\\f127\"; }\n\n.fa-unlink::before {\n  content: \"\\f127\"; }\n\n.fa-clone::before {\n  content: \"\\f24d\"; }\n\n.fa-person-walking-arrow-loop-left::before {\n  content: \"\\e551\"; }\n\n.fa-arrow-up-z-a::before {\n  content: \"\\f882\"; }\n\n.fa-sort-alpha-up-alt::before {\n  content: \"\\f882\"; }\n\n.fa-fire-flame-curved::before {\n  content: \"\\f7e4\"; }\n\n.fa-fire-alt::before {\n  content: \"\\f7e4\"; }\n\n.fa-tornado::before {\n  content: \"\\f76f\"; }\n\n.fa-file-circle-plus::before {\n  content: \"\\e494\"; }\n\n.fa-book-quran::before {\n  content: \"\\f687\"; }\n\n.fa-quran::before {\n  content: \"\\f687\"; }\n\n.fa-anchor::before {\n  content: \"\\f13d\"; }\n\n.fa-border-all::before {\n  content: \"\\f84c\"; }\n\n.fa-face-angry::before {\n  content: \"\\f556\"; }\n\n.fa-angry::before {\n  content: \"\\f556\"; }\n\n.fa-cookie-bite::before {\n  content: \"\\f564\"; }\n\n.fa-arrow-trend-down::before {\n  content: \"\\e097\"; }\n\n.fa-rss::before {\n  content: \"\\f09e\"; }\n\n.fa-feed::before {\n  content: \"\\f09e\"; }\n\n.fa-draw-polygon::before {\n  content: \"\\f5ee\"; }\n\n.fa-scale-balanced::before {\n  content: \"\\f24e\"; }\n\n.fa-balance-scale::before {\n  content: \"\\f24e\"; }\n\n.fa-gauge-simple-high::before {\n  content: \"\\f62a\"; }\n\n.fa-tachometer::before {\n  content: \"\\f62a\"; }\n\n.fa-tachometer-fast::before {\n  content: \"\\f62a\"; }\n\n.fa-shower::before {\n  content: \"\\f2cc\"; }\n\n.fa-desktop::before {\n  content: \"\\f390\"; }\n\n.fa-desktop-alt::before {\n  content: \"\\f390\"; }\n\n.fa-m::before {\n  content: \"\\4d\"; }\n\n.fa-table-list::before {\n  content: \"\\f00b\"; }\n\n.fa-th-list::before {\n  content: \"\\f00b\"; }\n\n.fa-comment-sms::before {\n  content: \"\\f7cd\"; }\n\n.fa-sms::before {\n  content: \"\\f7cd\"; }\n\n.fa-book::before {\n  content: \"\\f02d\"; }\n\n.fa-user-plus::before {\n  content: \"\\f234\"; }\n\n.fa-check::before {\n  content: \"\\f00c\"; }\n\n.fa-battery-three-quarters::before {\n  content: \"\\f241\"; }\n\n.fa-battery-4::before {\n  content: \"\\f241\"; }\n\n.fa-house-circle-check::before {\n  content: \"\\e509\"; }\n\n.fa-angle-left::before {\n  content: \"\\f104\"; }\n\n.fa-diagram-successor::before {\n  content: \"\\e47a\"; }\n\n.fa-truck-arrow-right::before {\n  content: \"\\e58b\"; }\n\n.fa-arrows-split-up-and-left::before {\n  content: \"\\e4bc\"; }\n\n.fa-hand-fist::before {\n  content: \"\\f6de\"; }\n\n.fa-fist-raised::before {\n  content: \"\\f6de\"; }\n\n.fa-cloud-moon::before {\n  content: \"\\f6c3\"; }\n\n.fa-briefcase::before {\n  content: \"\\f0b1\"; }\n\n.fa-person-falling::before {\n  content: \"\\e546\"; }\n\n.fa-image-portrait::before {\n  content: \"\\f3e0\"; }\n\n.fa-portrait::before {\n  content: \"\\f3e0\"; }\n\n.fa-user-tag::before {\n  content: \"\\f507\"; }\n\n.fa-rug::before {\n  content: \"\\e569\"; }\n\n.fa-earth-europe::before {\n  content: \"\\f7a2\"; }\n\n.fa-globe-europe::before {\n  content: \"\\f7a2\"; }\n\n.fa-cart-flatbed-suitcase::before {\n  content: \"\\f59d\"; }\n\n.fa-luggage-cart::before {\n  content: \"\\f59d\"; }\n\n.fa-rectangle-xmark::before {\n  content: \"\\f410\"; }\n\n.fa-rectangle-times::before {\n  content: \"\\f410\"; }\n\n.fa-times-rectangle::before {\n  content: \"\\f410\"; }\n\n.fa-window-close::before {\n  content: \"\\f410\"; }\n\n.fa-baht-sign::before {\n  content: \"\\e0ac\"; }\n\n.fa-book-open::before {\n  content: \"\\f518\"; }\n\n.fa-book-journal-whills::before {\n  content: \"\\f66a\"; }\n\n.fa-journal-whills::before {\n  content: \"\\f66a\"; }\n\n.fa-handcuffs::before {\n  content: \"\\e4f8\"; }\n\n.fa-triangle-exclamation::before {\n  content: \"\\f071\"; }\n\n.fa-exclamation-triangle::before {\n  content: \"\\f071\"; }\n\n.fa-warning::before {\n  content: \"\\f071\"; }\n\n.fa-database::before {\n  content: \"\\f1c0\"; }\n\n.fa-share::before {\n  content: \"\\f064\"; }\n\n.fa-arrow-turn-right::before {\n  content: \"\\f064\"; }\n\n.fa-mail-forward::before {\n  content: \"\\f064\"; }\n\n.fa-bottle-droplet::before {\n  content: \"\\e4c4\"; }\n\n.fa-mask-face::before {\n  content: \"\\e1d7\"; }\n\n.fa-hill-rockslide::before {\n  content: \"\\e508\"; }\n\n.fa-right-left::before {\n  content: \"\\f362\"; }\n\n.fa-exchange-alt::before {\n  content: \"\\f362\"; }\n\n.fa-paper-plane::before {\n  content: \"\\f1d8\"; }\n\n.fa-road-circle-exclamation::before {\n  content: \"\\e565\"; }\n\n.fa-dungeon::before {\n  content: \"\\f6d9\"; }\n\n.fa-align-right::before {\n  content: \"\\f038\"; }\n\n.fa-money-bill-1-wave::before {\n  content: \"\\f53b\"; }\n\n.fa-money-bill-wave-alt::before {\n  content: \"\\f53b\"; }\n\n.fa-life-ring::before {\n  content: \"\\f1cd\"; }\n\n.fa-hands::before {\n  content: \"\\f2a7\"; }\n\n.fa-sign-language::before {\n  content: \"\\f2a7\"; }\n\n.fa-signing::before {\n  content: \"\\f2a7\"; }\n\n.fa-calendar-day::before {\n  content: \"\\f783\"; }\n\n.fa-water-ladder::before {\n  content: \"\\f5c5\"; }\n\n.fa-ladder-water::before {\n  content: \"\\f5c5\"; }\n\n.fa-swimming-pool::before {\n  content: \"\\f5c5\"; }\n\n.fa-arrows-up-down::before {\n  content: \"\\f07d\"; }\n\n.fa-arrows-v::before {\n  content: \"\\f07d\"; }\n\n.fa-face-grimace::before {\n  content: \"\\f57f\"; }\n\n.fa-grimace::before {\n  content: \"\\f57f\"; }\n\n.fa-wheelchair-move::before {\n  content: \"\\e2ce\"; }\n\n.fa-wheelchair-alt::before {\n  content: \"\\e2ce\"; }\n\n.fa-turn-down::before {\n  content: \"\\f3be\"; }\n\n.fa-level-down-alt::before {\n  content: \"\\f3be\"; }\n\n.fa-person-walking-arrow-right::before {\n  content: \"\\e552\"; }\n\n.fa-square-envelope::before {\n  content: \"\\f199\"; }\n\n.fa-envelope-square::before {\n  content: \"\\f199\"; }\n\n.fa-dice::before {\n  content: \"\\f522\"; }\n\n.fa-bowling-ball::before {\n  content: \"\\f436\"; }\n\n.fa-brain::before {\n  content: \"\\f5dc\"; }\n\n.fa-bandage::before {\n  content: \"\\f462\"; }\n\n.fa-band-aid::before {\n  content: \"\\f462\"; }\n\n.fa-calendar-minus::before {\n  content: \"\\f272\"; }\n\n.fa-circle-xmark::before {\n  content: \"\\f057\"; }\n\n.fa-times-circle::before {\n  content: \"\\f057\"; }\n\n.fa-xmark-circle::before {\n  content: \"\\f057\"; }\n\n.fa-gifts::before {\n  content: \"\\f79c\"; }\n\n.fa-hotel::before {\n  content: \"\\f594\"; }\n\n.fa-earth-asia::before {\n  content: \"\\f57e\"; }\n\n.fa-globe-asia::before {\n  content: \"\\f57e\"; }\n\n.fa-id-card-clip::before {\n  content: \"\\f47f\"; }\n\n.fa-id-card-alt::before {\n  content: \"\\f47f\"; }\n\n.fa-magnifying-glass-plus::before {\n  content: \"\\f00e\"; }\n\n.fa-search-plus::before {\n  content: \"\\f00e\"; }\n\n.fa-thumbs-up::before {\n  content: \"\\f164\"; }\n\n.fa-user-clock::before {\n  content: \"\\f4fd\"; }\n\n.fa-hand-dots::before {\n  content: \"\\f461\"; }\n\n.fa-allergies::before {\n  content: \"\\f461\"; }\n\n.fa-file-invoice::before {\n  content: \"\\f570\"; }\n\n.fa-window-minimize::before {\n  content: \"\\f2d1\"; }\n\n.fa-mug-saucer::before {\n  content: \"\\f0f4\"; }\n\n.fa-coffee::before {\n  content: \"\\f0f4\"; }\n\n.fa-brush::before {\n  content: \"\\f55d\"; }\n\n.fa-mask::before {\n  content: \"\\f6fa\"; }\n\n.fa-magnifying-glass-minus::before {\n  content: \"\\f010\"; }\n\n.fa-search-minus::before {\n  content: \"\\f010\"; }\n\n.fa-ruler-vertical::before {\n  content: \"\\f548\"; }\n\n.fa-user-large::before {\n  content: \"\\f406\"; }\n\n.fa-user-alt::before {\n  content: \"\\f406\"; }\n\n.fa-train-tram::before {\n  content: \"\\e5b4\"; }\n\n.fa-user-nurse::before {\n  content: \"\\f82f\"; }\n\n.fa-syringe::before {\n  content: \"\\f48e\"; }\n\n.fa-cloud-sun::before {\n  content: \"\\f6c4\"; }\n\n.fa-stopwatch-20::before {\n  content: \"\\e06f\"; }\n\n.fa-square-full::before {\n  content: \"\\f45c\"; }\n\n.fa-magnet::before {\n  content: \"\\f076\"; }\n\n.fa-jar::before {\n  content: \"\\e516\"; }\n\n.fa-note-sticky::before {\n  content: \"\\f249\"; }\n\n.fa-sticky-note::before {\n  content: \"\\f249\"; }\n\n.fa-bug-slash::before {\n  content: \"\\e490\"; }\n\n.fa-arrow-up-from-water-pump::before {\n  content: \"\\e4b6\"; }\n\n.fa-bone::before {\n  content: \"\\f5d7\"; }\n\n.fa-user-injured::before {\n  content: \"\\f728\"; }\n\n.fa-face-sad-tear::before {\n  content: \"\\f5b4\"; }\n\n.fa-sad-tear::before {\n  content: \"\\f5b4\"; }\n\n.fa-plane::before {\n  content: \"\\f072\"; }\n\n.fa-tent-arrows-down::before {\n  content: \"\\e581\"; }\n\n.fa-exclamation::before {\n  content: \"\\21\"; }\n\n.fa-arrows-spin::before {\n  content: \"\\e4bb\"; }\n\n.fa-print::before {\n  content: \"\\f02f\"; }\n\n.fa-turkish-lira-sign::before {\n  content: \"\\e2bb\"; }\n\n.fa-try::before {\n  content: \"\\e2bb\"; }\n\n.fa-turkish-lira::before {\n  content: \"\\e2bb\"; }\n\n.fa-dollar-sign::before {\n  content: \"\\24\"; }\n\n.fa-dollar::before {\n  content: \"\\24\"; }\n\n.fa-usd::before {\n  content: \"\\24\"; }\n\n.fa-x::before {\n  content: \"\\58\"; }\n\n.fa-magnifying-glass-dollar::before {\n  content: \"\\f688\"; }\n\n.fa-search-dollar::before {\n  content: \"\\f688\"; }\n\n.fa-users-gear::before {\n  content: \"\\f509\"; }\n\n.fa-users-cog::before {\n  content: \"\\f509\"; }\n\n.fa-person-military-pointing::before {\n  content: \"\\e54a\"; }\n\n.fa-building-columns::before {\n  content: \"\\f19c\"; }\n\n.fa-bank::before {\n  content: \"\\f19c\"; }\n\n.fa-institution::before {\n  content: \"\\f19c\"; }\n\n.fa-museum::before {\n  content: \"\\f19c\"; }\n\n.fa-university::before {\n  content: \"\\f19c\"; }\n\n.fa-umbrella::before {\n  content: \"\\f0e9\"; }\n\n.fa-trowel::before {\n  content: \"\\e589\"; }\n\n.fa-d::before {\n  content: \"\\44\"; }\n\n.fa-stapler::before {\n  content: \"\\e5af\"; }\n\n.fa-masks-theater::before {\n  content: \"\\f630\"; }\n\n.fa-theater-masks::before {\n  content: \"\\f630\"; }\n\n.fa-kip-sign::before {\n  content: \"\\e1c4\"; }\n\n.fa-hand-point-left::before {\n  content: \"\\f0a5\"; }\n\n.fa-handshake-simple::before {\n  content: \"\\f4c6\"; }\n\n.fa-handshake-alt::before {\n  content: \"\\f4c6\"; }\n\n.fa-jet-fighter::before {\n  content: \"\\f0fb\"; }\n\n.fa-fighter-jet::before {\n  content: \"\\f0fb\"; }\n\n.fa-square-share-nodes::before {\n  content: \"\\f1e1\"; }\n\n.fa-share-alt-square::before {\n  content: \"\\f1e1\"; }\n\n.fa-barcode::before {\n  content: \"\\f02a\"; }\n\n.fa-plus-minus::before {\n  content: \"\\e43c\"; }\n\n.fa-video::before {\n  content: \"\\f03d\"; }\n\n.fa-video-camera::before {\n  content: \"\\f03d\"; }\n\n.fa-graduation-cap::before {\n  content: \"\\f19d\"; }\n\n.fa-mortar-board::before {\n  content: \"\\f19d\"; }\n\n.fa-hand-holding-medical::before {\n  content: \"\\e05c\"; }\n\n.fa-person-circle-check::before {\n  content: \"\\e53e\"; }\n\n.fa-turn-up::before {\n  content: \"\\f3bf\"; }\n\n.fa-level-up-alt::before {\n  content: \"\\f3bf\"; }\n\n.sr-only,\n.fa-sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  white-space: nowrap;\n  border-width: 0; }\n\n.sr-only-focusable:not(:focus),\n.fa-sr-only-focusable:not(:focus) {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  white-space: nowrap;\n  border-width: 0; }\n:root, :host {\n  --fa-style-family-brands: 'Font Awesome 6 Brands';\n  --fa-font-brands: normal 400 1em/1 'Font Awesome 6 Brands'; }\n\n@font-face {\n  font-family: 'Font Awesome 6 Brands';\n  font-style: normal;\n  font-weight: 400;\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ") format(\"truetype\"); }\n\n.fab,\n.fa-brands {\n  font-weight: 400; }\n\n.fa-monero:before {\n  content: \"\\f3d0\"; }\n\n.fa-hooli:before {\n  content: \"\\f427\"; }\n\n.fa-yelp:before {\n  content: \"\\f1e9\"; }\n\n.fa-cc-visa:before {\n  content: \"\\f1f0\"; }\n\n.fa-lastfm:before {\n  content: \"\\f202\"; }\n\n.fa-shopware:before {\n  content: \"\\f5b5\"; }\n\n.fa-creative-commons-nc:before {\n  content: \"\\f4e8\"; }\n\n.fa-aws:before {\n  content: \"\\f375\"; }\n\n.fa-redhat:before {\n  content: \"\\f7bc\"; }\n\n.fa-yoast:before {\n  content: \"\\f2b1\"; }\n\n.fa-cloudflare:before {\n  content: \"\\e07d\"; }\n\n.fa-ups:before {\n  content: \"\\f7e0\"; }\n\n.fa-wpexplorer:before {\n  content: \"\\f2de\"; }\n\n.fa-dyalog:before {\n  content: \"\\f399\"; }\n\n.fa-bity:before {\n  content: \"\\f37a\"; }\n\n.fa-stackpath:before {\n  content: \"\\f842\"; }\n\n.fa-buysellads:before {\n  content: \"\\f20d\"; }\n\n.fa-first-order:before {\n  content: \"\\f2b0\"; }\n\n.fa-modx:before {\n  content: \"\\f285\"; }\n\n.fa-guilded:before {\n  content: \"\\e07e\"; }\n\n.fa-vnv:before {\n  content: \"\\f40b\"; }\n\n.fa-square-js:before {\n  content: \"\\f3b9\"; }\n\n.fa-js-square:before {\n  content: \"\\f3b9\"; }\n\n.fa-microsoft:before {\n  content: \"\\f3ca\"; }\n\n.fa-qq:before {\n  content: \"\\f1d6\"; }\n\n.fa-orcid:before {\n  content: \"\\f8d2\"; }\n\n.fa-java:before {\n  content: \"\\f4e4\"; }\n\n.fa-invision:before {\n  content: \"\\f7b0\"; }\n\n.fa-creative-commons-pd-alt:before {\n  content: \"\\f4ed\"; }\n\n.fa-centercode:before {\n  content: \"\\f380\"; }\n\n.fa-glide-g:before {\n  content: \"\\f2a6\"; }\n\n.fa-drupal:before {\n  content: \"\\f1a9\"; }\n\n.fa-hire-a-helper:before {\n  content: \"\\f3b0\"; }\n\n.fa-creative-commons-by:before {\n  content: \"\\f4e7\"; }\n\n.fa-unity:before {\n  content: \"\\e049\"; }\n\n.fa-whmcs:before {\n  content: \"\\f40d\"; }\n\n.fa-rocketchat:before {\n  content: \"\\f3e8\"; }\n\n.fa-vk:before {\n  content: \"\\f189\"; }\n\n.fa-untappd:before {\n  content: \"\\f405\"; }\n\n.fa-mailchimp:before {\n  content: \"\\f59e\"; }\n\n.fa-css3-alt:before {\n  content: \"\\f38b\"; }\n\n.fa-square-reddit:before {\n  content: \"\\f1a2\"; }\n\n.fa-reddit-square:before {\n  content: \"\\f1a2\"; }\n\n.fa-vimeo-v:before {\n  content: \"\\f27d\"; }\n\n.fa-contao:before {\n  content: \"\\f26d\"; }\n\n.fa-square-font-awesome:before {\n  content: \"\\e5ad\"; }\n\n.fa-deskpro:before {\n  content: \"\\f38f\"; }\n\n.fa-sistrix:before {\n  content: \"\\f3ee\"; }\n\n.fa-square-instagram:before {\n  content: \"\\e055\"; }\n\n.fa-instagram-square:before {\n  content: \"\\e055\"; }\n\n.fa-battle-net:before {\n  content: \"\\f835\"; }\n\n.fa-the-red-yeti:before {\n  content: \"\\f69d\"; }\n\n.fa-square-hacker-news:before {\n  content: \"\\f3af\"; }\n\n.fa-hacker-news-square:before {\n  content: \"\\f3af\"; }\n\n.fa-edge:before {\n  content: \"\\f282\"; }\n\n.fa-napster:before {\n  content: \"\\f3d2\"; }\n\n.fa-square-snapchat:before {\n  content: \"\\f2ad\"; }\n\n.fa-snapchat-square:before {\n  content: \"\\f2ad\"; }\n\n.fa-google-plus-g:before {\n  content: \"\\f0d5\"; }\n\n.fa-artstation:before {\n  content: \"\\f77a\"; }\n\n.fa-markdown:before {\n  content: \"\\f60f\"; }\n\n.fa-sourcetree:before {\n  content: \"\\f7d3\"; }\n\n.fa-google-plus:before {\n  content: \"\\f2b3\"; }\n\n.fa-diaspora:before {\n  content: \"\\f791\"; }\n\n.fa-foursquare:before {\n  content: \"\\f180\"; }\n\n.fa-stack-overflow:before {\n  content: \"\\f16c\"; }\n\n.fa-github-alt:before {\n  content: \"\\f113\"; }\n\n.fa-phoenix-squadron:before {\n  content: \"\\f511\"; }\n\n.fa-pagelines:before {\n  content: \"\\f18c\"; }\n\n.fa-algolia:before {\n  content: \"\\f36c\"; }\n\n.fa-red-river:before {\n  content: \"\\f3e3\"; }\n\n.fa-creative-commons-sa:before {\n  content: \"\\f4ef\"; }\n\n.fa-safari:before {\n  content: \"\\f267\"; }\n\n.fa-google:before {\n  content: \"\\f1a0\"; }\n\n.fa-square-font-awesome-stroke:before {\n  content: \"\\f35c\"; }\n\n.fa-font-awesome-alt:before {\n  content: \"\\f35c\"; }\n\n.fa-atlassian:before {\n  content: \"\\f77b\"; }\n\n.fa-linkedin-in:before {\n  content: \"\\f0e1\"; }\n\n.fa-digital-ocean:before {\n  content: \"\\f391\"; }\n\n.fa-nimblr:before {\n  content: \"\\f5a8\"; }\n\n.fa-chromecast:before {\n  content: \"\\f838\"; }\n\n.fa-evernote:before {\n  content: \"\\f839\"; }\n\n.fa-hacker-news:before {\n  content: \"\\f1d4\"; }\n\n.fa-creative-commons-sampling:before {\n  content: \"\\f4f0\"; }\n\n.fa-adversal:before {\n  content: \"\\f36a\"; }\n\n.fa-creative-commons:before {\n  content: \"\\f25e\"; }\n\n.fa-watchman-monitoring:before {\n  content: \"\\e087\"; }\n\n.fa-fonticons:before {\n  content: \"\\f280\"; }\n\n.fa-weixin:before {\n  content: \"\\f1d7\"; }\n\n.fa-shirtsinbulk:before {\n  content: \"\\f214\"; }\n\n.fa-codepen:before {\n  content: \"\\f1cb\"; }\n\n.fa-git-alt:before {\n  content: \"\\f841\"; }\n\n.fa-lyft:before {\n  content: \"\\f3c3\"; }\n\n.fa-rev:before {\n  content: \"\\f5b2\"; }\n\n.fa-windows:before {\n  content: \"\\f17a\"; }\n\n.fa-wizards-of-the-coast:before {\n  content: \"\\f730\"; }\n\n.fa-square-viadeo:before {\n  content: \"\\f2aa\"; }\n\n.fa-viadeo-square:before {\n  content: \"\\f2aa\"; }\n\n.fa-meetup:before {\n  content: \"\\f2e0\"; }\n\n.fa-centos:before {\n  content: \"\\f789\"; }\n\n.fa-adn:before {\n  content: \"\\f170\"; }\n\n.fa-cloudsmith:before {\n  content: \"\\f384\"; }\n\n.fa-pied-piper-alt:before {\n  content: \"\\f1a8\"; }\n\n.fa-square-dribbble:before {\n  content: \"\\f397\"; }\n\n.fa-dribbble-square:before {\n  content: \"\\f397\"; }\n\n.fa-codiepie:before {\n  content: \"\\f284\"; }\n\n.fa-node:before {\n  content: \"\\f419\"; }\n\n.fa-mix:before {\n  content: \"\\f3cb\"; }\n\n.fa-steam:before {\n  content: \"\\f1b6\"; }\n\n.fa-cc-apple-pay:before {\n  content: \"\\f416\"; }\n\n.fa-scribd:before {\n  content: \"\\f28a\"; }\n\n.fa-openid:before {\n  content: \"\\f19b\"; }\n\n.fa-instalod:before {\n  content: \"\\e081\"; }\n\n.fa-expeditedssl:before {\n  content: \"\\f23e\"; }\n\n.fa-sellcast:before {\n  content: \"\\f2da\"; }\n\n.fa-square-twitter:before {\n  content: \"\\f081\"; }\n\n.fa-twitter-square:before {\n  content: \"\\f081\"; }\n\n.fa-r-project:before {\n  content: \"\\f4f7\"; }\n\n.fa-delicious:before {\n  content: \"\\f1a5\"; }\n\n.fa-freebsd:before {\n  content: \"\\f3a4\"; }\n\n.fa-vuejs:before {\n  content: \"\\f41f\"; }\n\n.fa-accusoft:before {\n  content: \"\\f369\"; }\n\n.fa-ioxhost:before {\n  content: \"\\f208\"; }\n\n.fa-fonticons-fi:before {\n  content: \"\\f3a2\"; }\n\n.fa-app-store:before {\n  content: \"\\f36f\"; }\n\n.fa-cc-mastercard:before {\n  content: \"\\f1f1\"; }\n\n.fa-itunes-note:before {\n  content: \"\\f3b5\"; }\n\n.fa-golang:before {\n  content: \"\\e40f\"; }\n\n.fa-kickstarter:before {\n  content: \"\\f3bb\"; }\n\n.fa-grav:before {\n  content: \"\\f2d6\"; }\n\n.fa-weibo:before {\n  content: \"\\f18a\"; }\n\n.fa-uncharted:before {\n  content: \"\\e084\"; }\n\n.fa-firstdraft:before {\n  content: \"\\f3a1\"; }\n\n.fa-square-youtube:before {\n  content: \"\\f431\"; }\n\n.fa-youtube-square:before {\n  content: \"\\f431\"; }\n\n.fa-wikipedia-w:before {\n  content: \"\\f266\"; }\n\n.fa-wpressr:before {\n  content: \"\\f3e4\"; }\n\n.fa-rendact:before {\n  content: \"\\f3e4\"; }\n\n.fa-angellist:before {\n  content: \"\\f209\"; }\n\n.fa-galactic-republic:before {\n  content: \"\\f50c\"; }\n\n.fa-nfc-directional:before {\n  content: \"\\e530\"; }\n\n.fa-skype:before {\n  content: \"\\f17e\"; }\n\n.fa-joget:before {\n  content: \"\\f3b7\"; }\n\n.fa-fedora:before {\n  content: \"\\f798\"; }\n\n.fa-stripe-s:before {\n  content: \"\\f42a\"; }\n\n.fa-meta:before {\n  content: \"\\e49b\"; }\n\n.fa-laravel:before {\n  content: \"\\f3bd\"; }\n\n.fa-hotjar:before {\n  content: \"\\f3b1\"; }\n\n.fa-bluetooth-b:before {\n  content: \"\\f294\"; }\n\n.fa-sticker-mule:before {\n  content: \"\\f3f7\"; }\n\n.fa-creative-commons-zero:before {\n  content: \"\\f4f3\"; }\n\n.fa-hips:before {\n  content: \"\\f452\"; }\n\n.fa-behance:before {\n  content: \"\\f1b4\"; }\n\n.fa-reddit:before {\n  content: \"\\f1a1\"; }\n\n.fa-discord:before {\n  content: \"\\f392\"; }\n\n.fa-chrome:before {\n  content: \"\\f268\"; }\n\n.fa-app-store-ios:before {\n  content: \"\\f370\"; }\n\n.fa-cc-discover:before {\n  content: \"\\f1f2\"; }\n\n.fa-wpbeginner:before {\n  content: \"\\f297\"; }\n\n.fa-confluence:before {\n  content: \"\\f78d\"; }\n\n.fa-mdb:before {\n  content: \"\\f8ca\"; }\n\n.fa-dochub:before {\n  content: \"\\f394\"; }\n\n.fa-accessible-icon:before {\n  content: \"\\f368\"; }\n\n.fa-ebay:before {\n  content: \"\\f4f4\"; }\n\n.fa-amazon:before {\n  content: \"\\f270\"; }\n\n.fa-unsplash:before {\n  content: \"\\e07c\"; }\n\n.fa-yarn:before {\n  content: \"\\f7e3\"; }\n\n.fa-square-steam:before {\n  content: \"\\f1b7\"; }\n\n.fa-steam-square:before {\n  content: \"\\f1b7\"; }\n\n.fa-500px:before {\n  content: \"\\f26e\"; }\n\n.fa-square-vimeo:before {\n  content: \"\\f194\"; }\n\n.fa-vimeo-square:before {\n  content: \"\\f194\"; }\n\n.fa-asymmetrik:before {\n  content: \"\\f372\"; }\n\n.fa-font-awesome:before {\n  content: \"\\f2b4\"; }\n\n.fa-font-awesome-flag:before {\n  content: \"\\f2b4\"; }\n\n.fa-font-awesome-logo-full:before {\n  content: \"\\f2b4\"; }\n\n.fa-gratipay:before {\n  content: \"\\f184\"; }\n\n.fa-apple:before {\n  content: \"\\f179\"; }\n\n.fa-hive:before {\n  content: \"\\e07f\"; }\n\n.fa-gitkraken:before {\n  content: \"\\f3a6\"; }\n\n.fa-keybase:before {\n  content: \"\\f4f5\"; }\n\n.fa-apple-pay:before {\n  content: \"\\f415\"; }\n\n.fa-padlet:before {\n  content: \"\\e4a0\"; }\n\n.fa-amazon-pay:before {\n  content: \"\\f42c\"; }\n\n.fa-square-github:before {\n  content: \"\\f092\"; }\n\n.fa-github-square:before {\n  content: \"\\f092\"; }\n\n.fa-stumbleupon:before {\n  content: \"\\f1a4\"; }\n\n.fa-fedex:before {\n  content: \"\\f797\"; }\n\n.fa-phoenix-framework:before {\n  content: \"\\f3dc\"; }\n\n.fa-shopify:before {\n  content: \"\\e057\"; }\n\n.fa-neos:before {\n  content: \"\\f612\"; }\n\n.fa-hackerrank:before {\n  content: \"\\f5f7\"; }\n\n.fa-researchgate:before {\n  content: \"\\f4f8\"; }\n\n.fa-swift:before {\n  content: \"\\f8e1\"; }\n\n.fa-angular:before {\n  content: \"\\f420\"; }\n\n.fa-speakap:before {\n  content: \"\\f3f3\"; }\n\n.fa-angrycreative:before {\n  content: \"\\f36e\"; }\n\n.fa-y-combinator:before {\n  content: \"\\f23b\"; }\n\n.fa-empire:before {\n  content: \"\\f1d1\"; }\n\n.fa-envira:before {\n  content: \"\\f299\"; }\n\n.fa-square-gitlab:before {\n  content: \"\\e5ae\"; }\n\n.fa-gitlab-square:before {\n  content: \"\\e5ae\"; }\n\n.fa-studiovinari:before {\n  content: \"\\f3f8\"; }\n\n.fa-pied-piper:before {\n  content: \"\\f2ae\"; }\n\n.fa-wordpress:before {\n  content: \"\\f19a\"; }\n\n.fa-product-hunt:before {\n  content: \"\\f288\"; }\n\n.fa-firefox:before {\n  content: \"\\f269\"; }\n\n.fa-linode:before {\n  content: \"\\f2b8\"; }\n\n.fa-goodreads:before {\n  content: \"\\f3a8\"; }\n\n.fa-square-odnoklassniki:before {\n  content: \"\\f264\"; }\n\n.fa-odnoklassniki-square:before {\n  content: \"\\f264\"; }\n\n.fa-jsfiddle:before {\n  content: \"\\f1cc\"; }\n\n.fa-sith:before {\n  content: \"\\f512\"; }\n\n.fa-themeisle:before {\n  content: \"\\f2b2\"; }\n\n.fa-page4:before {\n  content: \"\\f3d7\"; }\n\n.fa-hashnode:before {\n  content: \"\\e499\"; }\n\n.fa-react:before {\n  content: \"\\f41b\"; }\n\n.fa-cc-paypal:before {\n  content: \"\\f1f4\"; }\n\n.fa-squarespace:before {\n  content: \"\\f5be\"; }\n\n.fa-cc-stripe:before {\n  content: \"\\f1f5\"; }\n\n.fa-creative-commons-share:before {\n  content: \"\\f4f2\"; }\n\n.fa-bitcoin:before {\n  content: \"\\f379\"; }\n\n.fa-keycdn:before {\n  content: \"\\f3ba\"; }\n\n.fa-opera:before {\n  content: \"\\f26a\"; }\n\n.fa-itch-io:before {\n  content: \"\\f83a\"; }\n\n.fa-umbraco:before {\n  content: \"\\f8e8\"; }\n\n.fa-galactic-senate:before {\n  content: \"\\f50d\"; }\n\n.fa-ubuntu:before {\n  content: \"\\f7df\"; }\n\n.fa-draft2digital:before {\n  content: \"\\f396\"; }\n\n.fa-stripe:before {\n  content: \"\\f429\"; }\n\n.fa-houzz:before {\n  content: \"\\f27c\"; }\n\n.fa-gg:before {\n  content: \"\\f260\"; }\n\n.fa-dhl:before {\n  content: \"\\f790\"; }\n\n.fa-square-pinterest:before {\n  content: \"\\f0d3\"; }\n\n.fa-pinterest-square:before {\n  content: \"\\f0d3\"; }\n\n.fa-xing:before {\n  content: \"\\f168\"; }\n\n.fa-blackberry:before {\n  content: \"\\f37b\"; }\n\n.fa-creative-commons-pd:before {\n  content: \"\\f4ec\"; }\n\n.fa-playstation:before {\n  content: \"\\f3df\"; }\n\n.fa-quinscape:before {\n  content: \"\\f459\"; }\n\n.fa-less:before {\n  content: \"\\f41d\"; }\n\n.fa-blogger-b:before {\n  content: \"\\f37d\"; }\n\n.fa-opencart:before {\n  content: \"\\f23d\"; }\n\n.fa-vine:before {\n  content: \"\\f1ca\"; }\n\n.fa-paypal:before {\n  content: \"\\f1ed\"; }\n\n.fa-gitlab:before {\n  content: \"\\f296\"; }\n\n.fa-typo3:before {\n  content: \"\\f42b\"; }\n\n.fa-reddit-alien:before {\n  content: \"\\f281\"; }\n\n.fa-yahoo:before {\n  content: \"\\f19e\"; }\n\n.fa-dailymotion:before {\n  content: \"\\e052\"; }\n\n.fa-affiliatetheme:before {\n  content: \"\\f36b\"; }\n\n.fa-pied-piper-pp:before {\n  content: \"\\f1a7\"; }\n\n.fa-bootstrap:before {\n  content: \"\\f836\"; }\n\n.fa-odnoklassniki:before {\n  content: \"\\f263\"; }\n\n.fa-nfc-symbol:before {\n  content: \"\\e531\"; }\n\n.fa-ethereum:before {\n  content: \"\\f42e\"; }\n\n.fa-speaker-deck:before {\n  content: \"\\f83c\"; }\n\n.fa-creative-commons-nc-eu:before {\n  content: \"\\f4e9\"; }\n\n.fa-patreon:before {\n  content: \"\\f3d9\"; }\n\n.fa-avianex:before {\n  content: \"\\f374\"; }\n\n.fa-ello:before {\n  content: \"\\f5f1\"; }\n\n.fa-gofore:before {\n  content: \"\\f3a7\"; }\n\n.fa-bimobject:before {\n  content: \"\\f378\"; }\n\n.fa-facebook-f:before {\n  content: \"\\f39e\"; }\n\n.fa-square-google-plus:before {\n  content: \"\\f0d4\"; }\n\n.fa-google-plus-square:before {\n  content: \"\\f0d4\"; }\n\n.fa-mandalorian:before {\n  content: \"\\f50f\"; }\n\n.fa-first-order-alt:before {\n  content: \"\\f50a\"; }\n\n.fa-osi:before {\n  content: \"\\f41a\"; }\n\n.fa-google-wallet:before {\n  content: \"\\f1ee\"; }\n\n.fa-d-and-d-beyond:before {\n  content: \"\\f6ca\"; }\n\n.fa-periscope:before {\n  content: \"\\f3da\"; }\n\n.fa-fulcrum:before {\n  content: \"\\f50b\"; }\n\n.fa-cloudscale:before {\n  content: \"\\f383\"; }\n\n.fa-forumbee:before {\n  content: \"\\f211\"; }\n\n.fa-mizuni:before {\n  content: \"\\f3cc\"; }\n\n.fa-schlix:before {\n  content: \"\\f3ea\"; }\n\n.fa-square-xing:before {\n  content: \"\\f169\"; }\n\n.fa-xing-square:before {\n  content: \"\\f169\"; }\n\n.fa-bandcamp:before {\n  content: \"\\f2d5\"; }\n\n.fa-wpforms:before {\n  content: \"\\f298\"; }\n\n.fa-cloudversify:before {\n  content: \"\\f385\"; }\n\n.fa-usps:before {\n  content: \"\\f7e1\"; }\n\n.fa-megaport:before {\n  content: \"\\f5a3\"; }\n\n.fa-magento:before {\n  content: \"\\f3c4\"; }\n\n.fa-spotify:before {\n  content: \"\\f1bc\"; }\n\n.fa-optin-monster:before {\n  content: \"\\f23c\"; }\n\n.fa-fly:before {\n  content: \"\\f417\"; }\n\n.fa-aviato:before {\n  content: \"\\f421\"; }\n\n.fa-itunes:before {\n  content: \"\\f3b4\"; }\n\n.fa-cuttlefish:before {\n  content: \"\\f38c\"; }\n\n.fa-blogger:before {\n  content: \"\\f37c\"; }\n\n.fa-flickr:before {\n  content: \"\\f16e\"; }\n\n.fa-viber:before {\n  content: \"\\f409\"; }\n\n.fa-soundcloud:before {\n  content: \"\\f1be\"; }\n\n.fa-digg:before {\n  content: \"\\f1a6\"; }\n\n.fa-tencent-weibo:before {\n  content: \"\\f1d5\"; }\n\n.fa-symfony:before {\n  content: \"\\f83d\"; }\n\n.fa-maxcdn:before {\n  content: \"\\f136\"; }\n\n.fa-etsy:before {\n  content: \"\\f2d7\"; }\n\n.fa-facebook-messenger:before {\n  content: \"\\f39f\"; }\n\n.fa-audible:before {\n  content: \"\\f373\"; }\n\n.fa-think-peaks:before {\n  content: \"\\f731\"; }\n\n.fa-bilibili:before {\n  content: \"\\e3d9\"; }\n\n.fa-erlang:before {\n  content: \"\\f39d\"; }\n\n.fa-cotton-bureau:before {\n  content: \"\\f89e\"; }\n\n.fa-dashcube:before {\n  content: \"\\f210\"; }\n\n.fa-42-group:before {\n  content: \"\\e080\"; }\n\n.fa-innosoft:before {\n  content: \"\\e080\"; }\n\n.fa-stack-exchange:before {\n  content: \"\\f18d\"; }\n\n.fa-elementor:before {\n  content: \"\\f430\"; }\n\n.fa-square-pied-piper:before {\n  content: \"\\e01e\"; }\n\n.fa-pied-piper-square:before {\n  content: \"\\e01e\"; }\n\n.fa-creative-commons-nd:before {\n  content: \"\\f4eb\"; }\n\n.fa-palfed:before {\n  content: \"\\f3d8\"; }\n\n.fa-superpowers:before {\n  content: \"\\f2dd\"; }\n\n.fa-resolving:before {\n  content: \"\\f3e7\"; }\n\n.fa-xbox:before {\n  content: \"\\f412\"; }\n\n.fa-searchengin:before {\n  content: \"\\f3eb\"; }\n\n.fa-tiktok:before {\n  content: \"\\e07b\"; }\n\n.fa-square-facebook:before {\n  content: \"\\f082\"; }\n\n.fa-facebook-square:before {\n  content: \"\\f082\"; }\n\n.fa-renren:before {\n  content: \"\\f18b\"; }\n\n.fa-linux:before {\n  content: \"\\f17c\"; }\n\n.fa-glide:before {\n  content: \"\\f2a5\"; }\n\n.fa-linkedin:before {\n  content: \"\\f08c\"; }\n\n.fa-hubspot:before {\n  content: \"\\f3b2\"; }\n\n.fa-deploydog:before {\n  content: \"\\f38e\"; }\n\n.fa-twitch:before {\n  content: \"\\f1e8\"; }\n\n.fa-ravelry:before {\n  content: \"\\f2d9\"; }\n\n.fa-mixer:before {\n  content: \"\\e056\"; }\n\n.fa-square-lastfm:before {\n  content: \"\\f203\"; }\n\n.fa-lastfm-square:before {\n  content: \"\\f203\"; }\n\n.fa-vimeo:before {\n  content: \"\\f40a\"; }\n\n.fa-mendeley:before {\n  content: \"\\f7b3\"; }\n\n.fa-uniregistry:before {\n  content: \"\\f404\"; }\n\n.fa-figma:before {\n  content: \"\\f799\"; }\n\n.fa-creative-commons-remix:before {\n  content: \"\\f4ee\"; }\n\n.fa-cc-amazon-pay:before {\n  content: \"\\f42d\"; }\n\n.fa-dropbox:before {\n  content: \"\\f16b\"; }\n\n.fa-instagram:before {\n  content: \"\\f16d\"; }\n\n.fa-cmplid:before {\n  content: \"\\e360\"; }\n\n.fa-facebook:before {\n  content: \"\\f09a\"; }\n\n.fa-gripfire:before {\n  content: \"\\f3ac\"; }\n\n.fa-jedi-order:before {\n  content: \"\\f50e\"; }\n\n.fa-uikit:before {\n  content: \"\\f403\"; }\n\n.fa-fort-awesome-alt:before {\n  content: \"\\f3a3\"; }\n\n.fa-phabricator:before {\n  content: \"\\f3db\"; }\n\n.fa-ussunnah:before {\n  content: \"\\f407\"; }\n\n.fa-earlybirds:before {\n  content: \"\\f39a\"; }\n\n.fa-trade-federation:before {\n  content: \"\\f513\"; }\n\n.fa-autoprefixer:before {\n  content: \"\\f41c\"; }\n\n.fa-whatsapp:before {\n  content: \"\\f232\"; }\n\n.fa-slideshare:before {\n  content: \"\\f1e7\"; }\n\n.fa-google-play:before {\n  content: \"\\f3ab\"; }\n\n.fa-viadeo:before {\n  content: \"\\f2a9\"; }\n\n.fa-line:before {\n  content: \"\\f3c0\"; }\n\n.fa-google-drive:before {\n  content: \"\\f3aa\"; }\n\n.fa-servicestack:before {\n  content: \"\\f3ec\"; }\n\n.fa-simplybuilt:before {\n  content: \"\\f215\"; }\n\n.fa-bitbucket:before {\n  content: \"\\f171\"; }\n\n.fa-imdb:before {\n  content: \"\\f2d8\"; }\n\n.fa-deezer:before {\n  content: \"\\e077\"; }\n\n.fa-raspberry-pi:before {\n  content: \"\\f7bb\"; }\n\n.fa-jira:before {\n  content: \"\\f7b1\"; }\n\n.fa-docker:before {\n  content: \"\\f395\"; }\n\n.fa-screenpal:before {\n  content: \"\\e570\"; }\n\n.fa-bluetooth:before {\n  content: \"\\f293\"; }\n\n.fa-gitter:before {\n  content: \"\\f426\"; }\n\n.fa-d-and-d:before {\n  content: \"\\f38d\"; }\n\n.fa-microblog:before {\n  content: \"\\e01a\"; }\n\n.fa-cc-diners-club:before {\n  content: \"\\f24c\"; }\n\n.fa-gg-circle:before {\n  content: \"\\f261\"; }\n\n.fa-pied-piper-hat:before {\n  content: \"\\f4e5\"; }\n\n.fa-kickstarter-k:before {\n  content: \"\\f3bc\"; }\n\n.fa-yandex:before {\n  content: \"\\f413\"; }\n\n.fa-readme:before {\n  content: \"\\f4d5\"; }\n\n.fa-html5:before {\n  content: \"\\f13b\"; }\n\n.fa-sellsy:before {\n  content: \"\\f213\"; }\n\n.fa-sass:before {\n  content: \"\\f41e\"; }\n\n.fa-wirsindhandwerk:before {\n  content: \"\\e2d0\"; }\n\n.fa-wsh:before {\n  content: \"\\e2d0\"; }\n\n.fa-buromobelexperte:before {\n  content: \"\\f37f\"; }\n\n.fa-salesforce:before {\n  content: \"\\f83b\"; }\n\n.fa-octopus-deploy:before {\n  content: \"\\e082\"; }\n\n.fa-medapps:before {\n  content: \"\\f3c6\"; }\n\n.fa-ns8:before {\n  content: \"\\f3d5\"; }\n\n.fa-pinterest-p:before {\n  content: \"\\f231\"; }\n\n.fa-apper:before {\n  content: \"\\f371\"; }\n\n.fa-fort-awesome:before {\n  content: \"\\f286\"; }\n\n.fa-waze:before {\n  content: \"\\f83f\"; }\n\n.fa-cc-jcb:before {\n  content: \"\\f24b\"; }\n\n.fa-snapchat:before {\n  content: \"\\f2ab\"; }\n\n.fa-snapchat-ghost:before {\n  content: \"\\f2ab\"; }\n\n.fa-fantasy-flight-games:before {\n  content: \"\\f6dc\"; }\n\n.fa-rust:before {\n  content: \"\\e07a\"; }\n\n.fa-wix:before {\n  content: \"\\f5cf\"; }\n\n.fa-square-behance:before {\n  content: \"\\f1b5\"; }\n\n.fa-behance-square:before {\n  content: \"\\f1b5\"; }\n\n.fa-supple:before {\n  content: \"\\f3f9\"; }\n\n.fa-rebel:before {\n  content: \"\\f1d0\"; }\n\n.fa-css3:before {\n  content: \"\\f13c\"; }\n\n.fa-staylinked:before {\n  content: \"\\f3f5\"; }\n\n.fa-kaggle:before {\n  content: \"\\f5fa\"; }\n\n.fa-space-awesome:before {\n  content: \"\\e5ac\"; }\n\n.fa-deviantart:before {\n  content: \"\\f1bd\"; }\n\n.fa-cpanel:before {\n  content: \"\\f388\"; }\n\n.fa-goodreads-g:before {\n  content: \"\\f3a9\"; }\n\n.fa-square-git:before {\n  content: \"\\f1d2\"; }\n\n.fa-git-square:before {\n  content: \"\\f1d2\"; }\n\n.fa-square-tumblr:before {\n  content: \"\\f174\"; }\n\n.fa-tumblr-square:before {\n  content: \"\\f174\"; }\n\n.fa-trello:before {\n  content: \"\\f181\"; }\n\n.fa-creative-commons-nc-jp:before {\n  content: \"\\f4ea\"; }\n\n.fa-get-pocket:before {\n  content: \"\\f265\"; }\n\n.fa-perbyte:before {\n  content: \"\\e083\"; }\n\n.fa-grunt:before {\n  content: \"\\f3ad\"; }\n\n.fa-weebly:before {\n  content: \"\\f5cc\"; }\n\n.fa-connectdevelop:before {\n  content: \"\\f20e\"; }\n\n.fa-leanpub:before {\n  content: \"\\f212\"; }\n\n.fa-black-tie:before {\n  content: \"\\f27e\"; }\n\n.fa-themeco:before {\n  content: \"\\f5c6\"; }\n\n.fa-python:before {\n  content: \"\\f3e2\"; }\n\n.fa-android:before {\n  content: \"\\f17b\"; }\n\n.fa-bots:before {\n  content: \"\\e340\"; }\n\n.fa-free-code-camp:before {\n  content: \"\\f2c5\"; }\n\n.fa-hornbill:before {\n  content: \"\\f592\"; }\n\n.fa-js:before {\n  content: \"\\f3b8\"; }\n\n.fa-ideal:before {\n  content: \"\\e013\"; }\n\n.fa-git:before {\n  content: \"\\f1d3\"; }\n\n.fa-dev:before {\n  content: \"\\f6cc\"; }\n\n.fa-sketch:before {\n  content: \"\\f7c6\"; }\n\n.fa-yandex-international:before {\n  content: \"\\f414\"; }\n\n.fa-cc-amex:before {\n  content: \"\\f1f3\"; }\n\n.fa-uber:before {\n  content: \"\\f402\"; }\n\n.fa-github:before {\n  content: \"\\f09b\"; }\n\n.fa-php:before {\n  content: \"\\f457\"; }\n\n.fa-alipay:before {\n  content: \"\\f642\"; }\n\n.fa-youtube:before {\n  content: \"\\f167\"; }\n\n.fa-skyatlas:before {\n  content: \"\\f216\"; }\n\n.fa-firefox-browser:before {\n  content: \"\\e007\"; }\n\n.fa-replyd:before {\n  content: \"\\f3e6\"; }\n\n.fa-suse:before {\n  content: \"\\f7d6\"; }\n\n.fa-jenkins:before {\n  content: \"\\f3b6\"; }\n\n.fa-twitter:before {\n  content: \"\\f099\"; }\n\n.fa-rockrms:before {\n  content: \"\\f3e9\"; }\n\n.fa-pinterest:before {\n  content: \"\\f0d2\"; }\n\n.fa-buffer:before {\n  content: \"\\f837\"; }\n\n.fa-npm:before {\n  content: \"\\f3d4\"; }\n\n.fa-yammer:before {\n  content: \"\\f840\"; }\n\n.fa-btc:before {\n  content: \"\\f15a\"; }\n\n.fa-dribbble:before {\n  content: \"\\f17d\"; }\n\n.fa-stumbleupon-circle:before {\n  content: \"\\f1a3\"; }\n\n.fa-internet-explorer:before {\n  content: \"\\f26b\"; }\n\n.fa-stubber:before {\n  content: \"\\e5c7\"; }\n\n.fa-telegram:before {\n  content: \"\\f2c6\"; }\n\n.fa-telegram-plane:before {\n  content: \"\\f2c6\"; }\n\n.fa-old-republic:before {\n  content: \"\\f510\"; }\n\n.fa-odysee:before {\n  content: \"\\e5c6\"; }\n\n.fa-square-whatsapp:before {\n  content: \"\\f40c\"; }\n\n.fa-whatsapp-square:before {\n  content: \"\\f40c\"; }\n\n.fa-node-js:before {\n  content: \"\\f3d3\"; }\n\n.fa-edge-legacy:before {\n  content: \"\\e078\"; }\n\n.fa-slack:before {\n  content: \"\\f198\"; }\n\n.fa-slack-hash:before {\n  content: \"\\f198\"; }\n\n.fa-medrt:before {\n  content: \"\\f3c8\"; }\n\n.fa-usb:before {\n  content: \"\\f287\"; }\n\n.fa-tumblr:before {\n  content: \"\\f173\"; }\n\n.fa-vaadin:before {\n  content: \"\\f408\"; }\n\n.fa-quora:before {\n  content: \"\\f2c4\"; }\n\n.fa-reacteurope:before {\n  content: \"\\f75d\"; }\n\n.fa-medium:before {\n  content: \"\\f23a\"; }\n\n.fa-medium-m:before {\n  content: \"\\f23a\"; }\n\n.fa-amilia:before {\n  content: \"\\f36d\"; }\n\n.fa-mixcloud:before {\n  content: \"\\f289\"; }\n\n.fa-flipboard:before {\n  content: \"\\f44d\"; }\n\n.fa-viacoin:before {\n  content: \"\\f237\"; }\n\n.fa-critical-role:before {\n  content: \"\\f6c9\"; }\n\n.fa-sitrox:before {\n  content: \"\\e44a\"; }\n\n.fa-discourse:before {\n  content: \"\\f393\"; }\n\n.fa-joomla:before {\n  content: \"\\f1aa\"; }\n\n.fa-mastodon:before {\n  content: \"\\f4f6\"; }\n\n.fa-airbnb:before {\n  content: \"\\f834\"; }\n\n.fa-wolf-pack-battalion:before {\n  content: \"\\f514\"; }\n\n.fa-buy-n-large:before {\n  content: \"\\f8a6\"; }\n\n.fa-gulp:before {\n  content: \"\\f3ae\"; }\n\n.fa-creative-commons-sampling-plus:before {\n  content: \"\\f4f1\"; }\n\n.fa-strava:before {\n  content: \"\\f428\"; }\n\n.fa-ember:before {\n  content: \"\\f423\"; }\n\n.fa-canadian-maple-leaf:before {\n  content: \"\\f785\"; }\n\n.fa-teamspeak:before {\n  content: \"\\f4f9\"; }\n\n.fa-pushed:before {\n  content: \"\\f3e1\"; }\n\n.fa-wordpress-simple:before {\n  content: \"\\f411\"; }\n\n.fa-nutritionix:before {\n  content: \"\\f3d6\"; }\n\n.fa-wodu:before {\n  content: \"\\e088\"; }\n\n.fa-google-pay:before {\n  content: \"\\e079\"; }\n\n.fa-intercom:before {\n  content: \"\\f7af\"; }\n\n.fa-zhihu:before {\n  content: \"\\f63f\"; }\n\n.fa-korvue:before {\n  content: \"\\f42f\"; }\n\n.fa-pix:before {\n  content: \"\\e43a\"; }\n\n.fa-steam-symbol:before {\n  content: \"\\f3f6\"; }\n:root, :host {\n  --fa-style-family-classic: 'Font Awesome 6 Free';\n  --fa-font-regular: normal 400 1em/1 'Font Awesome 6 Free'; }\n\n@font-face {\n  font-family: 'Font Awesome 6 Free';\n  font-style: normal;\n  font-weight: 400;\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"truetype\"); }\n\n.far,\n.fa-regular {\n  font-weight: 400; }\n:root, :host {\n  --fa-style-family-classic: 'Font Awesome 6 Free';\n  --fa-font-solid: normal 900 1em/1 'Font Awesome 6 Free'; }\n\n@font-face {\n  font-family: 'Font Awesome 6 Free';\n  font-style: normal;\n  font-weight: 900;\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"); }\n\n.fas,\n.fa-solid {\n  font-weight: 900; }\n@font-face {\n  font-family: 'Font Awesome 5 Brands';\n  font-display: block;\n  font-weight: 400;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ") format(\"truetype\"); }\n\n@font-face {\n  font-family: 'Font Awesome 5 Free';\n  font-display: block;\n  font-weight: 900;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"); }\n\n@font-face {\n  font-family: 'Font Awesome 5 Free';\n  font-display: block;\n  font-weight: 400;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"truetype\"); }\n@font-face {\n  font-family: 'FontAwesome';\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"); }\n\n@font-face {\n  font-family: 'FontAwesome';\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ") format(\"truetype\"); }\n\n@font-face {\n  font-family: 'FontAwesome';\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"truetype\");\n  unicode-range: U+F003,U+F006,U+F014,U+F016-F017,U+F01A-F01B,U+F01D,U+F022,U+F03E,U+F044,U+F046,U+F05C-F05D,U+F06E,U+F070,U+F087-F088,U+F08A,U+F094,U+F096-F097,U+F09D,U+F0A0,U+F0A2,U+F0A4-F0A7,U+F0C5,U+F0C7,U+F0E5-F0E6,U+F0EB,U+F0F6-F0F8,U+F10C,U+F114-F115,U+F118-F11A,U+F11C-F11D,U+F133,U+F147,U+F14E,U+F150-F152,U+F185-F186,U+F18E,U+F190-F192,U+F196,U+F1C1-F1C9,U+F1D9,U+F1DB,U+F1E3,U+F1EA,U+F1F7,U+F1F9,U+F20A,U+F247-F248,U+F24A,U+F24D,U+F255-F25B,U+F25D,U+F271-F274,U+F278,U+F27B,U+F28C,U+F28E,U+F29C,U+F2B5,U+F2B7,U+F2BA,U+F2BC,U+F2BE,U+F2C0-F2C1,U+F2C3,U+F2D0,U+F2D2,U+F2D4,U+F2DC; }\n\n@font-face {\n  font-family: 'FontAwesome';\n  font-display: block;\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_6___ + ") format(\"woff2\"), url(" + ___CSS_LOADER_URL_REPLACEMENT_7___ + ") format(\"truetype\");\n  unicode-range: U+F041,U+F047,U+F065-F066,U+F07D-F07E,U+F080,U+F08B,U+F08E,U+F090,U+F09A,U+F0AC,U+F0AE,U+F0B2,U+F0D0,U+F0D6,U+F0E4,U+F0EC,U+F10A-F10B,U+F123,U+F13E,U+F148-F149,U+F14C,U+F156,U+F15E,U+F160-F161,U+F163,U+F175-F178,U+F195,U+F1F8,U+F219,U+F27A; }\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "/*!\n * FilePond 4.30.4\n * Licensed under MIT, https://opensource.org/licenses/MIT/\n * Please visit https://pqina.nl/filepond/ for details.\n */\n\n/* eslint-disable */\n.filepond--assistant{position:absolute;overflow:hidden;height:1px;width:1px;padding:0;border:0;clip:rect(1px,1px,1px,1px);-webkit-clip-path:inset(50%);clip-path:inset(50%);white-space:nowrap}.filepond--browser.filepond--browser{position:absolute;margin:0;padding:0;left:1em;top:1.75em;width:calc(100% - 2em);opacity:0;font-size:0}.filepond--data{position:absolute;width:0;height:0;padding:0;margin:0;border:none;visibility:hidden;pointer-events:none;contain:strict}.filepond--drip{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;opacity:.1;pointer-events:none;border-radius:.5em;background:rgba(0,0,0,.01)}.filepond--drip-blob{-webkit-transform-origin:center center;transform-origin:center center;width:8em;height:8em;margin-left:-4em;margin-top:-4em;background:#292625;border-radius:50%}.filepond--drip-blob,.filepond--drop-label{position:absolute;top:0;left:0;will-change:transform,opacity}.filepond--drop-label{right:0;margin:0;color:#4f4f4f;display:flex;justify-content:center;align-items:center;height:0;-webkit-user-select:none;-ms-user-select:none;user-select:none}.filepond--drop-label.filepond--drop-label label{display:block;margin:0;padding:.5em}.filepond--drop-label label{cursor:default;font-size:.875em;font-weight:400;text-align:center;line-height:1.5}.filepond--label-action{text-decoration:underline;-webkit-text-decoration-skip:ink;text-decoration-skip-ink:auto;-webkit-text-decoration-color:#a7a4a4;text-decoration-color:#a7a4a4;cursor:pointer}.filepond--root[data-disabled] .filepond--drop-label label{opacity:.5}.filepond--file-action-button.filepond--file-action-button{font-size:1em;width:1.625em;height:1.625em;font-family:inherit;line-height:inherit;margin:0;padding:0;border:none;outline:none;will-change:transform,opacity}.filepond--file-action-button.filepond--file-action-button span{position:absolute;overflow:hidden;height:1px;width:1px;padding:0;border:0;clip:rect(1px,1px,1px,1px);-webkit-clip-path:inset(50%);clip-path:inset(50%);white-space:nowrap}.filepond--file-action-button.filepond--file-action-button svg{width:100%;height:100%}.filepond--file-action-button.filepond--file-action-button:after{position:absolute;left:-.75em;right:-.75em;top:-.75em;bottom:-.75em;content:\"\"}.filepond--file-action-button{cursor:auto;color:#fff;border-radius:50%;background-color:rgba(0,0,0,.5);background-image:none;box-shadow:0 0 0 0 hsla(0,0%,100%,0);transition:box-shadow .25s ease-in}.filepond--file-action-button:focus,.filepond--file-action-button:hover{box-shadow:0 0 0 .125em hsla(0,0%,100%,.9)}.filepond--file-action-button[disabled]{color:hsla(0,0%,100%,.5);background-color:rgba(0,0,0,.25)}.filepond--file-action-button[hidden]{display:none}.filepond--action-edit-item.filepond--action-edit-item{width:2em;height:2em;padding:.1875em}.filepond--action-edit-item.filepond--action-edit-item[data-align*=center]{margin-left:-.1875em}.filepond--action-edit-item.filepond--action-edit-item[data-align*=bottom]{margin-bottom:-.1875em}.filepond--action-edit-item-alt{border:none;line-height:inherit;background:transparent;font-family:inherit;color:inherit;outline:none;padding:0;margin:0 0 0 .25em;pointer-events:all;position:absolute}.filepond--action-edit-item-alt svg{width:1.3125em;height:1.3125em}.filepond--action-edit-item-alt span{font-size:0;opacity:0}.filepond--file-info{position:static;display:flex;flex-direction:column;align-items:flex-start;flex:1;margin:0 .5em 0 0;min-width:0;will-change:transform,opacity;pointer-events:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}.filepond--file-info *{margin:0}.filepond--file-info .filepond--file-info-main{font-size:.75em;line-height:1.2;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;width:100%}.filepond--file-info .filepond--file-info-sub{font-size:.625em;opacity:.5;transition:opacity .25s ease-in-out;white-space:nowrap}.filepond--file-info .filepond--file-info-sub:empty{display:none}.filepond--file-status{position:static;display:flex;flex-direction:column;align-items:flex-end;flex-grow:0;flex-shrink:0;margin:0;min-width:2.25em;text-align:right;will-change:transform,opacity;pointer-events:none;-webkit-user-select:none;-ms-user-select:none;user-select:none}.filepond--file-status *{margin:0;white-space:nowrap}.filepond--file-status .filepond--file-status-main{font-size:.75em;line-height:1.2}.filepond--file-status .filepond--file-status-sub{font-size:.625em;opacity:.5;transition:opacity .25s ease-in-out}.filepond--file-wrapper.filepond--file-wrapper{border:none;margin:0;padding:0;min-width:0;height:100%}.filepond--file-wrapper.filepond--file-wrapper>legend{position:absolute;overflow:hidden;height:1px;width:1px;padding:0;border:0;clip:rect(1px,1px,1px,1px);-webkit-clip-path:inset(50%);clip-path:inset(50%);white-space:nowrap}.filepond--file{position:static;display:flex;height:100%;align-items:flex-start;padding:.5625em;color:#fff;border-radius:.5em}.filepond--file .filepond--file-status{margin-left:auto;margin-right:2.25em}.filepond--file .filepond--processing-complete-indicator{pointer-events:none;-webkit-user-select:none;-ms-user-select:none;user-select:none;z-index:3}.filepond--file .filepond--file-action-button,.filepond--file .filepond--processing-complete-indicator,.filepond--file .filepond--progress-indicator{position:absolute}.filepond--file [data-align*=left]{left:.5625em}.filepond--file [data-align*=right]{right:.5625em}.filepond--file [data-align*=center]{left:calc(50% - .8125em)}.filepond--file [data-align*=bottom]{bottom:1.125em}.filepond--file [data-align=center]{top:calc(50% - .8125em)}.filepond--file .filepond--progress-indicator{margin-top:.1875em}.filepond--file .filepond--progress-indicator[data-align*=right]{margin-right:.1875em}.filepond--file .filepond--progress-indicator[data-align*=left]{margin-left:.1875em}[data-filepond-item-state*=error] .filepond--file-info,[data-filepond-item-state*=invalid] .filepond--file-info,[data-filepond-item-state=cancelled] .filepond--file-info{margin-right:2.25em}[data-filepond-item-state~=processing] .filepond--file-status-sub{opacity:0}[data-filepond-item-state~=processing] .filepond--action-abort-item-processing~.filepond--file-status .filepond--file-status-sub{opacity:.5}[data-filepond-item-state=processing-error] .filepond--file-status-sub{opacity:0}[data-filepond-item-state=processing-error] .filepond--action-retry-item-processing~.filepond--file-status .filepond--file-status-sub{opacity:.5}[data-filepond-item-state=processing-complete] .filepond--action-revert-item-processing svg{-webkit-animation:fall .5s linear .125s both;animation:fall .5s linear .125s both}[data-filepond-item-state=processing-complete] .filepond--file-status-sub{opacity:.5}[data-filepond-item-state=processing-complete] .filepond--file-info-sub,[data-filepond-item-state=processing-complete] .filepond--processing-complete-indicator:not([style*=hidden])~.filepond--file-status .filepond--file-status-sub{opacity:0}[data-filepond-item-state=processing-complete] .filepond--action-revert-item-processing~.filepond--file-info .filepond--file-info-sub{opacity:.5}[data-filepond-item-state*=error] .filepond--file-wrapper,[data-filepond-item-state*=error] .filepond--panel,[data-filepond-item-state*=invalid] .filepond--file-wrapper,[data-filepond-item-state*=invalid] .filepond--panel{-webkit-animation:shake .65s linear both;animation:shake .65s linear both}[data-filepond-item-state*=busy] .filepond--progress-indicator svg{-webkit-animation:spin 1s linear infinite;animation:spin 1s linear infinite}@-webkit-keyframes spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@keyframes spin{0%{-webkit-transform:rotate(0deg);transform:rotate(0deg)}to{-webkit-transform:rotate(1turn);transform:rotate(1turn)}}@-webkit-keyframes shake{10%,90%{-webkit-transform:translateX(-.0625em);transform:translateX(-.0625em)}20%,80%{-webkit-transform:translateX(.125em);transform:translateX(.125em)}30%,50%,70%{-webkit-transform:translateX(-.25em);transform:translateX(-.25em)}40%,60%{-webkit-transform:translateX(.25em);transform:translateX(.25em)}}@keyframes shake{10%,90%{-webkit-transform:translateX(-.0625em);transform:translateX(-.0625em)}20%,80%{-webkit-transform:translateX(.125em);transform:translateX(.125em)}30%,50%,70%{-webkit-transform:translateX(-.25em);transform:translateX(-.25em)}40%,60%{-webkit-transform:translateX(.25em);transform:translateX(.25em)}}@-webkit-keyframes fall{0%{opacity:0;-webkit-transform:scale(.5);transform:scale(.5);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out}70%{opacity:1;-webkit-transform:scale(1.1);transform:scale(1.1);-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out}to{-webkit-transform:scale(1);transform:scale(1);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out}}@keyframes fall{0%{opacity:0;-webkit-transform:scale(.5);transform:scale(.5);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out}70%{opacity:1;-webkit-transform:scale(1.1);transform:scale(1.1);-webkit-animation-timing-function:ease-in-out;animation-timing-function:ease-in-out}to{-webkit-transform:scale(1);transform:scale(1);-webkit-animation-timing-function:ease-out;animation-timing-function:ease-out}}.filepond--hopper[data-hopper-state=drag-over]>*{pointer-events:none}.filepond--hopper[data-hopper-state=drag-over]:after{content:\"\";position:absolute;left:0;top:0;right:0;bottom:0;z-index:100}.filepond--progress-indicator{z-index:103}.filepond--file-action-button{z-index:102}.filepond--file-status{z-index:101}.filepond--file-info{z-index:100}.filepond--item{position:absolute;top:0;left:0;right:0;z-index:1;padding:0;margin:.25em;will-change:transform,opacity}.filepond--item>.filepond--panel{z-index:-1}.filepond--item>.filepond--panel .filepond--panel-bottom{box-shadow:0 .0625em .125em -.0625em rgba(0,0,0,.25)}.filepond--item>.filepond--file-wrapper,.filepond--item>.filepond--panel{transition:opacity .15s ease-out}.filepond--item[data-drag-state]{cursor:-webkit-grab;cursor:grab}.filepond--item[data-drag-state]>.filepond--panel{transition:box-shadow .125s ease-in-out;box-shadow:0 0 0 transparent}.filepond--item[data-drag-state=drag]{cursor:-webkit-grabbing;cursor:grabbing}.filepond--item[data-drag-state=drag]>.filepond--panel{box-shadow:0 .125em .3125em rgba(0,0,0,.325)}.filepond--item[data-drag-state]:not([data-drag-state=idle]){z-index:2}.filepond--item-panel{background-color:#64605e}[data-filepond-item-state=processing-complete] .filepond--item-panel{background-color:#369763}[data-filepond-item-state*=error] .filepond--item-panel,[data-filepond-item-state*=invalid] .filepond--item-panel{background-color:#c44e47}.filepond--item-panel{border-radius:.5em;transition:background-color .25s}.filepond--list-scroller{position:absolute;top:0;left:0;right:0;margin:0;will-change:transform}.filepond--list-scroller[data-state=overflow] .filepond--list{bottom:0;right:0}.filepond--list-scroller[data-state=overflow]{overflow-y:scroll;overflow-x:hidden;-webkit-overflow-scrolling:touch;-webkit-mask:linear-gradient(180deg,#000 calc(100% - .5em),transparent);mask:linear-gradient(180deg,#000 calc(100% - .5em),transparent)}.filepond--list-scroller::-webkit-scrollbar{background:transparent}.filepond--list-scroller::-webkit-scrollbar:vertical{width:1em}.filepond--list-scroller::-webkit-scrollbar:horizontal{height:0}.filepond--list-scroller::-webkit-scrollbar-thumb{background-color:rgba(0,0,0,.3);border-radius:99999px;border:.3125em solid transparent;background-clip:content-box}.filepond--list.filepond--list{position:absolute;top:0;margin:0;padding:0;list-style-type:none;will-change:transform}.filepond--list{left:.75em;right:.75em}.filepond--root[data-style-panel-layout~=integrated]{width:100%;height:100%;max-width:none;margin:0}.filepond--root[data-style-panel-layout~=circle] .filepond--panel-root,.filepond--root[data-style-panel-layout~=integrated] .filepond--panel-root{border-radius:0}.filepond--root[data-style-panel-layout~=circle] .filepond--panel-root>*,.filepond--root[data-style-panel-layout~=integrated] .filepond--panel-root>*{display:none}.filepond--root[data-style-panel-layout~=circle] .filepond--drop-label,.filepond--root[data-style-panel-layout~=integrated] .filepond--drop-label{bottom:0;height:auto;display:flex;justify-content:center;align-items:center;z-index:7}.filepond--root[data-style-panel-layout~=circle] .filepond--item-panel,.filepond--root[data-style-panel-layout~=integrated] .filepond--item-panel{display:none}.filepond--root[data-style-panel-layout~=compact] .filepond--list-scroller,.filepond--root[data-style-panel-layout~=integrated] .filepond--list-scroller{overflow:hidden;height:100%;margin-top:0;margin-bottom:0}.filepond--root[data-style-panel-layout~=compact] .filepond--list,.filepond--root[data-style-panel-layout~=integrated] .filepond--list{left:0;right:0;height:100%}.filepond--root[data-style-panel-layout~=compact] .filepond--item,.filepond--root[data-style-panel-layout~=integrated] .filepond--item{margin:0}.filepond--root[data-style-panel-layout~=compact] .filepond--file-wrapper,.filepond--root[data-style-panel-layout~=integrated] .filepond--file-wrapper{height:100%}.filepond--root[data-style-panel-layout~=compact] .filepond--drop-label,.filepond--root[data-style-panel-layout~=integrated] .filepond--drop-label{z-index:7}.filepond--root[data-style-panel-layout~=circle]{border-radius:99999rem;overflow:hidden}.filepond--root[data-style-panel-layout~=circle]>.filepond--panel{border-radius:inherit}.filepond--root[data-style-panel-layout~=circle]>.filepond--panel>*{display:none}.filepond--root[data-style-panel-layout~=circle] .filepond--file-info,.filepond--root[data-style-panel-layout~=circle] .filepond--file-status{display:none}.filepond--root[data-style-panel-layout~=circle] .filepond--action-edit-item{opacity:1!important;visibility:visible!important}@media not all and (-webkit-min-device-pixel-ratio:0), not all and (min-resolution:0.001dpcm){@supports (-webkit-appearance:none) and (stroke-color:transparent){.filepond--root[data-style-panel-layout~=circle]{will-change:transform}}}.filepond--panel-root{border-radius:.5em;background-color:#f1f0ef}.filepond--panel{position:absolute;left:0;top:0;right:0;margin:0;height:100%!important;pointer-events:none}.filepond-panel:not([data-scalable=false]){height:auto!important}.filepond--panel[data-scalable=false]>div{display:none}.filepond--panel[data-scalable=true]{-webkit-transform-style:preserve-3d;transform-style:preserve-3d;background-color:transparent!important;border:none!important}.filepond--panel-bottom,.filepond--panel-center,.filepond--panel-top{position:absolute;left:0;top:0;right:0;margin:0;padding:0}.filepond--panel-bottom,.filepond--panel-top{height:.5em}.filepond--panel-top{border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;border-bottom:none!important}.filepond--panel-top:after{content:\"\";position:absolute;height:2px;left:0;right:0;bottom:-1px;background-color:inherit}.filepond--panel-bottom,.filepond--panel-center{will-change:transform;-webkit-backface-visibility:hidden;backface-visibility:hidden;-webkit-transform-origin:left top;transform-origin:left top;-webkit-transform:translate3d(0,.5em,0);transform:translate3d(0,.5em,0)}.filepond--panel-bottom{border-top-left-radius:0!important;border-top-right-radius:0!important;border-top:none!important}.filepond--panel-bottom:before{content:\"\";position:absolute;height:2px;left:0;right:0;top:-1px;background-color:inherit}.filepond--panel-center{height:100px!important;border-top:none!important;border-bottom:none!important;border-radius:0!important}.filepond--panel-center:not([style]){visibility:hidden}.filepond--progress-indicator{position:static;width:1.25em;height:1.25em;color:#fff;margin:0;pointer-events:none;will-change:transform,opacity}.filepond--progress-indicator svg{width:100%;height:100%;vertical-align:top;transform-box:fill-box}.filepond--progress-indicator path{fill:none;stroke:currentColor}.filepond--list-scroller{z-index:6}.filepond--drop-label{z-index:5}.filepond--drip{z-index:3}.filepond--root>.filepond--panel{z-index:2}.filepond--browser{z-index:1}.filepond--root{box-sizing:border-box;position:relative;margin-bottom:1em;font-size:1rem;line-height:normal;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol;font-weight:450;text-align:left;text-rendering:optimizeLegibility;direction:ltr;contain:layout style size}.filepond--root *{box-sizing:inherit;line-height:inherit}.filepond--root :not(text){font-size:inherit}.filepond--root[data-disabled]{pointer-events:none}.filepond--root[data-disabled] .filepond--list-scroller{pointer-events:all}.filepond--root[data-disabled] .filepond--list{pointer-events:none}.filepond--root .filepond--drop-label{min-height:4.75em}.filepond--root .filepond--list-scroller{margin-top:1em;margin-bottom:1em}.filepond--root .filepond--credits{position:absolute;right:0;opacity:.175;line-height:.85;font-size:11px;color:inherit;text-decoration:none;z-index:3;bottom:-14px}.filepond--root .filepond--credits[style]{top:0;bottom:auto;margin-top:14px}", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.filepond--root[data-v-aa48f8de] {\r\n    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,\r\n        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';\n}\n.modal-content[data-v-aa48f8de] {\r\n    width: 500px;\r\n    left: 0px;\r\n    right: 0px;\r\n    margin: 0 auto;\n}\n.btn-close[data-v-aa48f8de]{\r\n    border: 1px solid rgb(35, 35, 35) !important;\r\n    font-weight: bold;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27986,7 +28594,31 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-23cd4275] {\r\n    position: fixed;\r\n    display: flex;\r\n    flex-direction: column;\r\n    width: 350px;\r\n    max-height: 600px;\r\n    bottom: 0;\r\n    right: 20px;\r\n    pointer-events: auto;\r\n    background-color: #fff;\r\n    background-clip: padding-box;\r\n    border: 1px solid rgba(0,0,0,.2);\r\n    border-radius: 0.3rem 0.3rem 0 0;\r\n    outline: 0;\n}\n.modal-header[data-v-23cd4275] {\r\n    display: flex;\r\n    align-items: center ;\r\n    justify-content: space-between;\r\n    padding: 1rem;\r\n    border-bottom: 1px solid #e9ecef;\r\n    border-top-left-radius: 0.3rem;\r\n    border-top-right-radius: 0.3rem;\n}\ni[data-v-23cd4275]{\r\n    font-size: 25px;\n}\nbutton.btn-default[data-v-23cd4275]{\r\n    border: none;\r\n    background: rgba(130, 130, 130, 0.219);\r\n    border-radius: 15px;\r\n    padding: 5px 12px;\r\n    color:rgba(9, 84, 183, 0.847) ;\r\n    font-size: 14px;\r\n    font-weight: bold;\n}\n.progress[data-v-23cd4275]{\r\n    height: 13px !important;\r\n    border-radius: 0px !important;\n}\n.progress-bar[data-v-23cd4275]{\r\n    border-radius: 0px !important;\r\n    background-color: green !important;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-23cd4275] {\r\n    position: fixed;\r\n    display: flex;\r\n    flex-direction: column;\r\n    width: 350px;\r\n    max-height: 600px;\r\n    bottom: 0;\r\n    right: 20px;\r\n    pointer-events: auto;\r\n    background-color: #fff;\r\n    background-clip: padding-box;\r\n    border: 1px solid rgba(0,0,0,.2);\r\n    border-radius: 0.3rem 0.3rem 0 0;\r\n    outline: 0;\n}\n.modal-header[data-v-23cd4275] {\r\n    display: flex;\r\n    align-items: center ;\r\n    justify-content: space-between;\r\n    padding: 1rem;\r\n    border-bottom: 1px solid #e9ecef;\r\n    border-top-left-radius: 0.3rem;\r\n    border-top-right-radius: 0.3rem;\n}\ni[data-v-23cd4275]{\r\n    font-size: 22px;\r\n    margin-top: 3px;\n}\n.progress[data-v-23cd4275]{\r\n    height: 15px !important;\r\n    border-radius: 0px !important;\n}\n.progress-bar[data-v-23cd4275]{\r\n    border-radius: 0px !important;\r\n    background-color: green !important;\r\n    font-size: 12px !important;\r\n    padding-left: 5px;\n}\n.folder-image[data-v-23cd4275]{\r\n    width: 20px;\n}\n.modal-header .bi-x[data-v-23cd4275]{\r\n    font-weight: bold !important;\n}\n.modal-body .bi-x[data-v-23cd4275]{\r\n    padding: 3px 5px;\r\n    background-color: rgba(224, 224, 224, 0.34);\r\n    border-radius: 50%;\r\n    font-size: 18px;\r\n    margin-bottom: 5px;\n}\n.modal-body .bi-check2[data-v-23cd4275]{\r\n    padding: 3px 5px;\r\n    background-color: rgba(11, 151, 63, 0.756);\r\n    border-radius: 50%;\r\n    font-size: 16px;\r\n    color: white;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.btn-theme[data-v-602a0e61]{\r\n    background-color:white ;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: space-between !important;\r\n    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;\r\n    border-radius: 10px !important;\r\n    padding: 13px 15px;\n}\n.btn-theme[data-v-602a0e61]:hover{\r\n    background-color: rgba(212, 217, 242, 0.235);\n}\n.btn-theme span[data-v-602a0e61]{\r\n    display: inline-block;\r\n    font-size: 16px;\n}\n.btn-theme i[data-v-602a0e61]{\r\n    font-size: 25px;\r\n    font-weight: bold;\r\n    margin-right: 5px;\n}\n.image[data-v-602a0e61]{\r\n    width: 18px;\r\n    margin-right: 12px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -28011,6 +28643,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.upload-header[data-v-527b7863]{\r\n    margin-bottom: 20px;\n}\ninput[data-v-527b7863]{\r\n    margin: 10px 0px;\r\n    padding: 18.7px 15px !important;\r\n    height: 0px;\r\n    border-radius: 3px;\n}\nselect[data-v-527b7863]{\r\n    margin: 10px 0px;\r\n    border-radius: 3px;\r\n    cursor: pointer;\r\n    color: #808181 !important;\n}\nselect[data-v-527b7863]:focus{\r\n    outline: none !important;\r\n    box-shadow: none !important;\n}\nbutton[data-v-527b7863]{\r\n    margin: 10px;\r\n    border-radius: 3px !important;\r\n    padding: 11.6px;\n}\r\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.modal-content[data-v-4d7ab2ec] {\r\n    width: 500px;\r\n    left: 0px !important;\r\n    right: 0px !important;\r\n    margin: 0 auto !important;\r\n    border: none !important;\n}\n.btn-default[data-v-4d7ab2ec]{\r\n    color: #4B49AC;\n}\n.btn-default[data-v-4d7ab2ec]:hover{\r\n    background-color: rgba(177, 177, 177, 0.425);\n}\nbutton[data-v-4d7ab2ec]{\r\n    font-size: 14px !important;\r\n    padding: 11px 20px;\r\n    font-weight: 600px;\r\n    border-radius: 25px !important;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -28093,167 +28749,12739 @@ module.exports = function (cssWithMappingToString) {
 
 /***/ }),
 
-/***/ "./node_modules/css-loader/dist/runtime/getUrl.js":
-/*!********************************************************!*\
-  !*** ./node_modules/css-loader/dist/runtime/getUrl.js ***!
-  \********************************************************/
-/***/ ((module) => {
+/***/ "./node_modules/filepond/dist/filepond.js":
+/*!************************************************!*\
+  !*** ./node_modules/filepond/dist/filepond.js ***!
+  \************************************************/
+/***/ (function(__unused_webpack_module, exports) {
 
-"use strict";
+/*!
+ * FilePond 4.30.4
+ * Licensed under MIT, https://opensource.org/licenses/MIT/
+ * Please visit https://pqina.nl/filepond/ for details.
+ */
 
+/* eslint-disable */
 
-module.exports = function (url, options) {
-  if (!options) {
-    // eslint-disable-next-line no-param-reassign
-    options = {};
-  } // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+(function(global, factory) {
+     true
+        ? factory(exports)
+        : 0;
+})(this, function(exports) {
+    'use strict';
 
+    var isNode = function isNode(value) {
+        return value instanceof HTMLElement;
+    };
 
-  url = url && url.__esModule ? url.default : url;
+    var createStore = function createStore(initialState) {
+        var queries = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+        var actions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+        // internal state
+        var state = Object.assign({}, initialState);
 
-  if (typeof url !== "string") {
-    return url;
-  } // If url is already wrapped in quotes, remove them
+        // contains all actions for next frame, is clear when actions are requested
+        var actionQueue = [];
+        var dispatchQueue = [];
 
+        // returns a duplicate of the current state
+        var getState = function getState() {
+            return Object.assign({}, state);
+        };
 
-  if (/^['"].*['"]$/.test(url)) {
-    // eslint-disable-next-line no-param-reassign
-    url = url.slice(1, -1);
-  }
+        // returns a duplicate of the actions array and clears the actions array
+        var processActionQueue = function processActionQueue() {
+            // create copy of actions queue
+            var queue = [].concat(actionQueue);
 
-  if (options.hash) {
-    // eslint-disable-next-line no-param-reassign
-    url += options.hash;
-  } // Should url be wrapped?
-  // See https://drafts.csswg.org/css-values-3/#urls
+            // clear actions queue (we don't want no double actions)
+            actionQueue.length = 0;
 
+            return queue;
+        };
 
-  if (/["'() \t\n]/.test(url) || options.needQuotes) {
-    return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, "\\n"), "\"");
-  }
+        // processes actions that might block the main UI thread
+        var processDispatchQueue = function processDispatchQueue() {
+            // create copy of actions queue
+            var queue = [].concat(dispatchQueue);
 
-  return url;
-};
+            // clear actions queue (we don't want no double actions)
+            dispatchQueue.length = 0;
 
-/***/ }),
+            // now dispatch these actions
+            queue.forEach(function(_ref) {
+                var type = _ref.type,
+                    data = _ref.data;
+                dispatch(type, data);
+            });
+        };
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf":
-/*!*******************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf ***!
-  \*******************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+        // adds a new action, calls its handler and
+        var dispatch = function dispatch(type, data, isBlocking) {
+            // is blocking action (should never block if document is hidden)
+            if (isBlocking && !document.hidden) {
+                dispatchQueue.push({ type: type, data: data });
+                return;
+            }
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.ttf?150de8eaa454d669c405d810c8dbbf14");
+            // if this action has a handler, handle the action
+            if (actionHandlers[type]) {
+                actionHandlers[type](data);
+            }
 
-/***/ }),
+            // now add action
+            actionQueue.push({
+                type: type,
+                data: data,
+            });
+        };
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2":
-/*!*********************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2 ***!
-  \*********************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+        var query = function query(str) {
+            var _queryHandles;
+            for (
+                var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1;
+                _key < _len;
+                _key++
+            ) {
+                args[_key - 1] = arguments[_key];
+            }
+            return queryHandles[str]
+                ? (_queryHandles = queryHandles)[str].apply(_queryHandles, args)
+                : null;
+        };
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-brands-400.woff2?e033a13ee751afc1860c3bc31ede1065");
+        var api = {
+            getState: getState,
+            processActionQueue: processActionQueue,
+            processDispatchQueue: processDispatchQueue,
+            dispatch: dispatch,
+            query: query,
+        };
 
-/***/ }),
+        var queryHandles = {};
+        queries.forEach(function(query) {
+            queryHandles = Object.assign({}, query(state), {}, queryHandles);
+        });
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf":
-/*!********************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf ***!
-  \********************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+        var actionHandlers = {};
+        actions.forEach(function(action) {
+            actionHandlers = Object.assign({}, action(dispatch, query, state), {}, actionHandlers);
+        });
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-regular-400.ttf?d87474231f419288480274125e0e9767");
+        return api;
+    };
 
-/***/ }),
+    var defineProperty = function defineProperty(obj, property, definition) {
+        if (typeof definition === 'function') {
+            obj[property] = definition;
+            return;
+        }
+        Object.defineProperty(obj, property, Object.assign({}, definition));
+    };
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2":
-/*!**********************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2 ***!
-  \**********************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    var forin = function forin(obj, cb) {
+        for (var key in obj) {
+            if (!obj.hasOwnProperty(key)) {
+                continue;
+            }
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-regular-400.woff2?3223dc79c1adee56370b19dca985aa17");
+            cb(key, obj[key]);
+        }
+    };
 
-/***/ }),
+    var createObject = function createObject(definition) {
+        var obj = {};
+        forin(definition, function(property) {
+            defineProperty(obj, property, definition[property]);
+        });
+        return obj;
+    };
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf":
-/*!******************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf ***!
-  \******************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    var attr = function attr(node, name) {
+        var value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        if (value === null) {
+            return node.getAttribute(name) || node.hasAttribute(name);
+        }
+        node.setAttribute(name, value);
+    };
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-solid-900.ttf?4a2cd718d7031b732e7610fba99ecf74");
+    var ns = 'http://www.w3.org/2000/svg';
+    var svgElements = ['svg', 'path']; // only svg elements used
 
-/***/ }),
+    var isSVGElement = function isSVGElement(tag) {
+        return svgElements.includes(tag);
+    };
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2":
-/*!********************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2 ***!
-  \********************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+    var createElement = function createElement(tag, className) {
+        var attributes = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+        if (typeof className === 'object') {
+            attributes = className;
+            className = null;
+        }
+        var element = isSVGElement(tag)
+            ? document.createElementNS(ns, tag)
+            : document.createElement(tag);
+        if (className) {
+            if (isSVGElement(tag)) {
+                attr(element, 'class', className);
+            } else {
+                element.className = className;
+            }
+        }
+        forin(attributes, function(name, value) {
+            attr(element, name, value);
+        });
+        return element;
+    };
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-solid-900.woff2?bb975c966c37455a1bc3c7e29971386c");
+    var appendChild = function appendChild(parent) {
+        return function(child, index) {
+            if (typeof index !== 'undefined' && parent.children[index]) {
+                parent.insertBefore(child, parent.children[index]);
+            } else {
+                parent.appendChild(child);
+            }
+        };
+    };
 
-/***/ }),
+    var appendChildView = function appendChildView(parent, childViews) {
+        return function(view, index) {
+            if (typeof index !== 'undefined') {
+                childViews.splice(index, 0, view);
+            } else {
+                childViews.push(view);
+            }
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf":
-/*!************************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.ttf ***!
-  \************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+            return view;
+        };
+    };
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-v4compatibility.ttf?0e3a648be390bd8cb094342019b720cf");
+    var removeChildView = function removeChildView(parent, childViews) {
+        return function(view) {
+            // remove from child views
+            childViews.splice(childViews.indexOf(view), 1);
 
-/***/ }),
+            // remove the element
+            if (view.element.parentNode) {
+                parent.removeChild(view.element);
+            }
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2":
-/*!**************************************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/webfonts/fa-v4compatibility.woff2 ***!
-  \**************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+            return view;
+        };
+    };
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("/fonts/vendor/@fortawesome/fontawesome-free/webfa-v4compatibility.woff2?68577e40f3e70067b5da5b556bc896f6");
+    var IS_BROWSER = (function() {
+        return typeof window !== 'undefined' && typeof window.document !== 'undefined';
+    })();
+    var isBrowser = function isBrowser() {
+        return IS_BROWSER;
+    };
+
+    var testElement = isBrowser() ? createElement('svg') : {};
+    var getChildCount =
+        'children' in testElement
+            ? function(el) {
+                  return el.children.length;
+              }
+            : function(el) {
+                  return el.childNodes.length;
+              };
+
+    var getViewRect = function getViewRect(elementRect, childViews, offset, scale) {
+        var left = offset[0] || elementRect.left;
+        var top = offset[1] || elementRect.top;
+        var right = left + elementRect.width;
+        var bottom = top + elementRect.height * (scale[1] || 1);
+
+        var rect = {
+            // the rectangle of the element itself
+            element: Object.assign({}, elementRect),
+
+            // the rectangle of the element expanded to contain its children, does not include any margins
+            inner: {
+                left: elementRect.left,
+                top: elementRect.top,
+                right: elementRect.right,
+                bottom: elementRect.bottom,
+            },
+
+            // the rectangle of the element expanded to contain its children including own margin and child margins
+            // margins will be added after we've recalculated the size
+            outer: {
+                left: left,
+                top: top,
+                right: right,
+                bottom: bottom,
+            },
+        };
+
+        // expand rect to fit all child rectangles
+        childViews
+            .filter(function(childView) {
+                return !childView.isRectIgnored();
+            })
+            .map(function(childView) {
+                return childView.rect;
+            })
+            .forEach(function(childViewRect) {
+                expandRect(rect.inner, Object.assign({}, childViewRect.inner));
+                expandRect(rect.outer, Object.assign({}, childViewRect.outer));
+            });
+
+        // calculate inner width and height
+        calculateRectSize(rect.inner);
+
+        // append additional margin (top and left margins are included in top and left automatically)
+        rect.outer.bottom += rect.element.marginBottom;
+        rect.outer.right += rect.element.marginRight;
+
+        // calculate outer width and height
+        calculateRectSize(rect.outer);
+
+        return rect;
+    };
+
+    var expandRect = function expandRect(parent, child) {
+        // adjust for parent offset
+        child.top += parent.top;
+        child.right += parent.left;
+        child.bottom += parent.top;
+        child.left += parent.left;
+
+        if (child.bottom > parent.bottom) {
+            parent.bottom = child.bottom;
+        }
+
+        if (child.right > parent.right) {
+            parent.right = child.right;
+        }
+    };
+
+    var calculateRectSize = function calculateRectSize(rect) {
+        rect.width = rect.right - rect.left;
+        rect.height = rect.bottom - rect.top;
+    };
+
+    var isNumber = function isNumber(value) {
+        return typeof value === 'number';
+    };
+
+    /**
+     * Determines if position is at destination
+     * @param position
+     * @param destination
+     * @param velocity
+     * @param errorMargin
+     * @returns {boolean}
+     */
+    var thereYet = function thereYet(position, destination, velocity) {
+        var errorMargin = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.001;
+        return Math.abs(position - destination) < errorMargin && Math.abs(velocity) < errorMargin;
+    };
+
+    /**
+     * Spring animation
+     */
+    var spring =
+        // default options
+        function spring() // method definition
+        {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref$stiffness = _ref.stiffness,
+                stiffness = _ref$stiffness === void 0 ? 0.5 : _ref$stiffness,
+                _ref$damping = _ref.damping,
+                damping = _ref$damping === void 0 ? 0.75 : _ref$damping,
+                _ref$mass = _ref.mass,
+                mass = _ref$mass === void 0 ? 10 : _ref$mass;
+            var target = null;
+            var position = null;
+            var velocity = 0;
+            var resting = false;
+
+            // updates spring state
+            var interpolate = function interpolate(ts, skipToEndState) {
+                // in rest, don't animate
+                if (resting) return;
+
+                // need at least a target or position to do springy things
+                if (!(isNumber(target) && isNumber(position))) {
+                    resting = true;
+                    velocity = 0;
+                    return;
+                }
+
+                // calculate spring force
+                var f = -(position - target) * stiffness;
+
+                // update velocity by adding force based on mass
+                velocity += f / mass;
+
+                // update position by adding velocity
+                position += velocity;
+
+                // slow down based on amount of damping
+                velocity *= damping;
+
+                // we've arrived if we're near target and our velocity is near zero
+                if (thereYet(position, target, velocity) || skipToEndState) {
+                    position = target;
+                    velocity = 0;
+                    resting = true;
+
+                    // we done
+                    api.onupdate(position);
+                    api.oncomplete(position);
+                } else {
+                    // progress update
+                    api.onupdate(position);
+                }
+            };
+
+            /**
+             * Set new target value
+             * @param value
+             */
+            var setTarget = function setTarget(value) {
+                // if currently has no position, set target and position to this value
+                if (isNumber(value) && !isNumber(position)) {
+                    position = value;
+                }
+
+                // next target value will not be animated to
+                if (target === null) {
+                    target = value;
+                    position = value;
+                }
+
+                // let start moving to target
+                target = value;
+
+                // already at target
+                if (position === target || typeof target === 'undefined') {
+                    // now resting as target is current position, stop moving
+                    resting = true;
+                    velocity = 0;
+
+                    // done!
+                    api.onupdate(position);
+                    api.oncomplete(position);
+
+                    return;
+                }
+
+                resting = false;
+            };
+
+            // need 'api' to call onupdate callback
+            var api = createObject({
+                interpolate: interpolate,
+                target: {
+                    set: setTarget,
+                    get: function get() {
+                        return target;
+                    },
+                },
+
+                resting: {
+                    get: function get() {
+                        return resting;
+                    },
+                },
+
+                onupdate: function onupdate(value) {},
+                oncomplete: function oncomplete(value) {},
+            });
+
+            return api;
+        };
+
+    var easeLinear = function easeLinear(t) {
+        return t;
+    };
+    var easeInOutQuad = function easeInOutQuad(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    };
+
+    var tween =
+        // default values
+        function tween() // method definition
+        {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref$duration = _ref.duration,
+                duration = _ref$duration === void 0 ? 500 : _ref$duration,
+                _ref$easing = _ref.easing,
+                easing = _ref$easing === void 0 ? easeInOutQuad : _ref$easing,
+                _ref$delay = _ref.delay,
+                delay = _ref$delay === void 0 ? 0 : _ref$delay;
+            var start = null;
+            var t;
+            var p;
+            var resting = true;
+            var reverse = false;
+            var target = null;
+
+            var interpolate = function interpolate(ts, skipToEndState) {
+                if (resting || target === null) return;
+
+                if (start === null) {
+                    start = ts;
+                }
+
+                if (ts - start < delay) return;
+
+                t = ts - start - delay;
+
+                if (t >= duration || skipToEndState) {
+                    t = 1;
+                    p = reverse ? 0 : 1;
+                    api.onupdate(p * target);
+                    api.oncomplete(p * target);
+                    resting = true;
+                } else {
+                    p = t / duration;
+                    api.onupdate((t >= 0 ? easing(reverse ? 1 - p : p) : 0) * target);
+                }
+            };
+
+            // need 'api' to call onupdate callback
+            var api = createObject({
+                interpolate: interpolate,
+                target: {
+                    get: function get() {
+                        return reverse ? 0 : target;
+                    },
+                    set: function set(value) {
+                        // is initial value
+                        if (target === null) {
+                            target = value;
+                            api.onupdate(value);
+                            api.oncomplete(value);
+                            return;
+                        }
+
+                        // want to tween to a smaller value and have a current value
+                        if (value < target) {
+                            target = 1;
+                            reverse = true;
+                        } else {
+                            // not tweening to a smaller value
+                            reverse = false;
+                            target = value;
+                        }
+
+                        // let's go!
+                        resting = false;
+                        start = null;
+                    },
+                },
+
+                resting: {
+                    get: function get() {
+                        return resting;
+                    },
+                },
+
+                onupdate: function onupdate(value) {},
+                oncomplete: function oncomplete(value) {},
+            });
+
+            return api;
+        };
+
+    var animator = {
+        spring: spring,
+        tween: tween,
+    };
+
+    /*
+                       { type: 'spring', stiffness: .5, damping: .75, mass: 10 };
+                       { translation: { type: 'spring', ... }, ... }
+                       { translation: { x: { type: 'spring', ... } } }
+                      */
+    var createAnimator = function createAnimator(definition, category, property) {
+        // default is single definition
+        // we check if transform is set, if so, we check if property is set
+        var def =
+            definition[category] && typeof definition[category][property] === 'object'
+                ? definition[category][property]
+                : definition[category] || definition;
+
+        var type = typeof def === 'string' ? def : def.type;
+        var props = typeof def === 'object' ? Object.assign({}, def) : {};
+
+        return animator[type] ? animator[type](props) : null;
+    };
+
+    var addGetSet = function addGetSet(keys, obj, props) {
+        var overwrite = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+        obj = Array.isArray(obj) ? obj : [obj];
+        obj.forEach(function(o) {
+            keys.forEach(function(key) {
+                var name = key;
+                var getter = function getter() {
+                    return props[key];
+                };
+                var setter = function setter(value) {
+                    return (props[key] = value);
+                };
+
+                if (typeof key === 'object') {
+                    name = key.key;
+                    getter = key.getter || getter;
+                    setter = key.setter || setter;
+                }
+
+                if (o[name] && !overwrite) {
+                    return;
+                }
+
+                o[name] = {
+                    get: getter,
+                    set: setter,
+                };
+            });
+        });
+    };
+
+    // add to state,
+    // add getters and setters to internal and external api (if not set)
+    // setup animators
+
+    var animations = function animations(_ref) {
+        var mixinConfig = _ref.mixinConfig,
+            viewProps = _ref.viewProps,
+            viewInternalAPI = _ref.viewInternalAPI,
+            viewExternalAPI = _ref.viewExternalAPI;
+        // initial properties
+        var initialProps = Object.assign({}, viewProps);
+
+        // list of all active animations
+        var animations = [];
+
+        // setup animators
+        forin(mixinConfig, function(property, animation) {
+            var animator = createAnimator(animation);
+            if (!animator) {
+                return;
+            }
+
+            // when the animator updates, update the view state value
+            animator.onupdate = function(value) {
+                viewProps[property] = value;
+            };
+
+            // set animator target
+            animator.target = initialProps[property];
+
+            // when value is set, set the animator target value
+            var prop = {
+                key: property,
+                setter: function setter(value) {
+                    // if already at target, we done!
+                    if (animator.target === value) {
+                        return;
+                    }
+
+                    animator.target = value;
+                },
+                getter: function getter() {
+                    return viewProps[property];
+                },
+            };
+
+            // add getters and setters
+            addGetSet([prop], [viewInternalAPI, viewExternalAPI], viewProps, true);
+
+            // add it to the list for easy updating from the _write method
+            animations.push(animator);
+        });
+
+        // expose internal write api
+        return {
+            write: function write(ts) {
+                var skipToEndState = document.hidden;
+                var resting = true;
+                animations.forEach(function(animation) {
+                    if (!animation.resting) resting = false;
+                    animation.interpolate(ts, skipToEndState);
+                });
+                return resting;
+            },
+            destroy: function destroy() {},
+        };
+    };
+
+    var addEvent = function addEvent(element) {
+        return function(type, fn) {
+            element.addEventListener(type, fn);
+        };
+    };
+
+    var removeEvent = function removeEvent(element) {
+        return function(type, fn) {
+            element.removeEventListener(type, fn);
+        };
+    };
+
+    // mixin
+    var listeners = function listeners(_ref) {
+        var mixinConfig = _ref.mixinConfig,
+            viewProps = _ref.viewProps,
+            viewInternalAPI = _ref.viewInternalAPI,
+            viewExternalAPI = _ref.viewExternalAPI,
+            viewState = _ref.viewState,
+            view = _ref.view;
+        var events = [];
+
+        var add = addEvent(view.element);
+        var remove = removeEvent(view.element);
+
+        viewExternalAPI.on = function(type, fn) {
+            events.push({
+                type: type,
+                fn: fn,
+            });
+
+            add(type, fn);
+        };
+
+        viewExternalAPI.off = function(type, fn) {
+            events.splice(
+                events.findIndex(function(event) {
+                    return event.type === type && event.fn === fn;
+                }),
+                1
+            );
+
+            remove(type, fn);
+        };
+
+        return {
+            write: function write() {
+                // not busy
+                return true;
+            },
+            destroy: function destroy() {
+                events.forEach(function(event) {
+                    remove(event.type, event.fn);
+                });
+            },
+        };
+    };
+
+    // add to external api and link to props
+
+    var apis = function apis(_ref) {
+        var mixinConfig = _ref.mixinConfig,
+            viewProps = _ref.viewProps,
+            viewExternalAPI = _ref.viewExternalAPI;
+        addGetSet(mixinConfig, viewExternalAPI, viewProps);
+    };
+
+    var isDefined = function isDefined(value) {
+        return value != null;
+    };
+
+    // add to state,
+    // add getters and setters to internal and external api (if not set)
+    // set initial state based on props in viewProps
+    // apply as transforms each frame
+
+    var defaults = {
+        opacity: 1,
+        scaleX: 1,
+        scaleY: 1,
+        translateX: 0,
+        translateY: 0,
+        rotateX: 0,
+        rotateY: 0,
+        rotateZ: 0,
+        originX: 0,
+        originY: 0,
+    };
+
+    var styles = function styles(_ref) {
+        var mixinConfig = _ref.mixinConfig,
+            viewProps = _ref.viewProps,
+            viewInternalAPI = _ref.viewInternalAPI,
+            viewExternalAPI = _ref.viewExternalAPI,
+            view = _ref.view;
+        // initial props
+        var initialProps = Object.assign({}, viewProps);
+
+        // current props
+        var currentProps = {};
+
+        // we will add those properties to the external API and link them to the viewState
+        addGetSet(mixinConfig, [viewInternalAPI, viewExternalAPI], viewProps);
+
+        // override rect on internal and external rect getter so it takes in account transforms
+        var getOffset = function getOffset() {
+            return [viewProps['translateX'] || 0, viewProps['translateY'] || 0];
+        };
+
+        var getScale = function getScale() {
+            return [viewProps['scaleX'] || 0, viewProps['scaleY'] || 0];
+        };
+        var getRect = function getRect() {
+            return view.rect
+                ? getViewRect(view.rect, view.childViews, getOffset(), getScale())
+                : null;
+        };
+        viewInternalAPI.rect = { get: getRect };
+        viewExternalAPI.rect = { get: getRect };
+
+        // apply view props
+        mixinConfig.forEach(function(key) {
+            viewProps[key] =
+                typeof initialProps[key] === 'undefined' ? defaults[key] : initialProps[key];
+        });
+
+        // expose api
+        return {
+            write: function write() {
+                // see if props have changed
+                if (!propsHaveChanged(currentProps, viewProps)) {
+                    return;
+                }
+
+                // moves element to correct position on screen
+                applyStyles(view.element, viewProps);
+
+                // store new transforms
+                Object.assign(currentProps, Object.assign({}, viewProps));
+
+                // no longer busy
+                return true;
+            },
+            destroy: function destroy() {},
+        };
+    };
+
+    var propsHaveChanged = function propsHaveChanged(currentProps, newProps) {
+        // different amount of keys
+        if (Object.keys(currentProps).length !== Object.keys(newProps).length) {
+            return true;
+        }
+
+        // lets analyze the individual props
+        for (var prop in newProps) {
+            if (newProps[prop] !== currentProps[prop]) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    var applyStyles = function applyStyles(element, _ref2) {
+        var opacity = _ref2.opacity,
+            perspective = _ref2.perspective,
+            translateX = _ref2.translateX,
+            translateY = _ref2.translateY,
+            scaleX = _ref2.scaleX,
+            scaleY = _ref2.scaleY,
+            rotateX = _ref2.rotateX,
+            rotateY = _ref2.rotateY,
+            rotateZ = _ref2.rotateZ,
+            originX = _ref2.originX,
+            originY = _ref2.originY,
+            width = _ref2.width,
+            height = _ref2.height;
+
+        var transforms = '';
+        var styles = '';
+
+        // handle transform origin
+        if (isDefined(originX) || isDefined(originY)) {
+            styles += 'transform-origin: ' + (originX || 0) + 'px ' + (originY || 0) + 'px;';
+        }
+
+        // transform order is relevant
+        // 0. perspective
+        if (isDefined(perspective)) {
+            transforms += 'perspective(' + perspective + 'px) ';
+        }
+
+        // 1. translate
+        if (isDefined(translateX) || isDefined(translateY)) {
+            transforms +=
+                'translate3d(' + (translateX || 0) + 'px, ' + (translateY || 0) + 'px, 0) ';
+        }
+
+        // 2. scale
+        if (isDefined(scaleX) || isDefined(scaleY)) {
+            transforms +=
+                'scale3d(' +
+                (isDefined(scaleX) ? scaleX : 1) +
+                ', ' +
+                (isDefined(scaleY) ? scaleY : 1) +
+                ', 1) ';
+        }
+
+        // 3. rotate
+        if (isDefined(rotateZ)) {
+            transforms += 'rotateZ(' + rotateZ + 'rad) ';
+        }
+
+        if (isDefined(rotateX)) {
+            transforms += 'rotateX(' + rotateX + 'rad) ';
+        }
+
+        if (isDefined(rotateY)) {
+            transforms += 'rotateY(' + rotateY + 'rad) ';
+        }
+
+        // add transforms
+        if (transforms.length) {
+            styles += 'transform:' + transforms + ';';
+        }
+
+        // add opacity
+        if (isDefined(opacity)) {
+            styles += 'opacity:' + opacity + ';';
+
+            // if we reach zero, we make the element inaccessible
+            if (opacity === 0) {
+                styles += 'visibility:hidden;';
+            }
+
+            // if we're below 100% opacity this element can't be clicked
+            if (opacity < 1) {
+                styles += 'pointer-events:none;';
+            }
+        }
+
+        // add height
+        if (isDefined(height)) {
+            styles += 'height:' + height + 'px;';
+        }
+
+        // add width
+        if (isDefined(width)) {
+            styles += 'width:' + width + 'px;';
+        }
+
+        // apply styles
+        var elementCurrentStyle = element.elementCurrentStyle || '';
+
+        // if new styles does not match current styles, lets update!
+        if (styles.length !== elementCurrentStyle.length || styles !== elementCurrentStyle) {
+            element.style.cssText = styles;
+            // store current styles so we can compare them to new styles later on
+            // _not_ getting the style value is faster
+            element.elementCurrentStyle = styles;
+        }
+    };
+
+    var Mixins = {
+        styles: styles,
+        listeners: listeners,
+        animations: animations,
+        apis: apis,
+    };
+
+    var updateRect = function updateRect() {
+        var rect = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        var element = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var style = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+        if (!element.layoutCalculated) {
+            rect.paddingTop = parseInt(style.paddingTop, 10) || 0;
+            rect.marginTop = parseInt(style.marginTop, 10) || 0;
+            rect.marginRight = parseInt(style.marginRight, 10) || 0;
+            rect.marginBottom = parseInt(style.marginBottom, 10) || 0;
+            rect.marginLeft = parseInt(style.marginLeft, 10) || 0;
+            element.layoutCalculated = true;
+        }
+
+        rect.left = element.offsetLeft || 0;
+        rect.top = element.offsetTop || 0;
+        rect.width = element.offsetWidth || 0;
+        rect.height = element.offsetHeight || 0;
+
+        rect.right = rect.left + rect.width;
+        rect.bottom = rect.top + rect.height;
+
+        rect.scrollTop = element.scrollTop;
+
+        rect.hidden = element.offsetParent === null;
+
+        return rect;
+    };
+
+    var createView =
+        // default view definition
+        function createView() {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+                _ref$tag = _ref.tag,
+                tag = _ref$tag === void 0 ? 'div' : _ref$tag,
+                _ref$name = _ref.name,
+                name = _ref$name === void 0 ? null : _ref$name,
+                _ref$attributes = _ref.attributes,
+                attributes = _ref$attributes === void 0 ? {} : _ref$attributes,
+                _ref$read = _ref.read,
+                read = _ref$read === void 0 ? function() {} : _ref$read,
+                _ref$write = _ref.write,
+                write = _ref$write === void 0 ? function() {} : _ref$write,
+                _ref$create = _ref.create,
+                create = _ref$create === void 0 ? function() {} : _ref$create,
+                _ref$destroy = _ref.destroy,
+                destroy = _ref$destroy === void 0 ? function() {} : _ref$destroy,
+                _ref$filterFrameActio = _ref.filterFrameActionsForChild,
+                filterFrameActionsForChild =
+                    _ref$filterFrameActio === void 0
+                        ? function(child, actions) {
+                              return actions;
+                          }
+                        : _ref$filterFrameActio,
+                _ref$didCreateView = _ref.didCreateView,
+                didCreateView = _ref$didCreateView === void 0 ? function() {} : _ref$didCreateView,
+                _ref$didWriteView = _ref.didWriteView,
+                didWriteView = _ref$didWriteView === void 0 ? function() {} : _ref$didWriteView,
+                _ref$ignoreRect = _ref.ignoreRect,
+                ignoreRect = _ref$ignoreRect === void 0 ? false : _ref$ignoreRect,
+                _ref$ignoreRectUpdate = _ref.ignoreRectUpdate,
+                ignoreRectUpdate = _ref$ignoreRectUpdate === void 0 ? false : _ref$ignoreRectUpdate,
+                _ref$mixins = _ref.mixins,
+                mixins = _ref$mixins === void 0 ? [] : _ref$mixins;
+            return function(
+                // each view requires reference to store
+                store
+            ) {
+                var props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+                // root element should not be changed
+                var element = createElement(tag, 'filepond--' + name, attributes);
+
+                // style reference should also not be changed
+                var style = window.getComputedStyle(element, null);
+
+                // element rectangle
+                var rect = updateRect();
+                var frameRect = null;
+
+                // rest state
+                var isResting = false;
+
+                // pretty self explanatory
+                var childViews = [];
+
+                // loaded mixins
+                var activeMixins = [];
+
+                // references to created children
+                var ref = {};
+
+                // state used for each instance
+                var state = {};
+
+                // list of writers that will be called to update this view
+                var writers = [
+                    write, // default writer
+                ];
+
+                var readers = [
+                    read, // default reader
+                ];
+
+                var destroyers = [
+                    destroy, // default destroy
+                ];
+
+                // core view methods
+                var getElement = function getElement() {
+                    return element;
+                };
+                var getChildViews = function getChildViews() {
+                    return childViews.concat();
+                };
+                var getReference = function getReference() {
+                    return ref;
+                };
+                var createChildView = function createChildView(store) {
+                    return function(view, props) {
+                        return view(store, props);
+                    };
+                };
+                var getRect = function getRect() {
+                    if (frameRect) {
+                        return frameRect;
+                    }
+                    frameRect = getViewRect(rect, childViews, [0, 0], [1, 1]);
+                    return frameRect;
+                };
+                var getStyle = function getStyle() {
+                    return style;
+                };
+
+                /**
+                 * Read data from DOM
+                 * @private
+                 */
+                var _read = function _read() {
+                    frameRect = null;
+
+                    // read child views
+                    childViews.forEach(function(child) {
+                        return child._read();
+                    });
+
+                    var shouldUpdate = !(ignoreRectUpdate && rect.width && rect.height);
+                    if (shouldUpdate) {
+                        updateRect(rect, element, style);
+                    }
+
+                    // readers
+                    var api = { root: internalAPI, props: props, rect: rect };
+                    readers.forEach(function(reader) {
+                        return reader(api);
+                    });
+                };
+
+                /**
+                 * Write data to DOM
+                 * @private
+                 */
+                var _write = function _write(ts, frameActions, shouldOptimize) {
+                    // if no actions, we assume that the view is resting
+                    var resting = frameActions.length === 0;
+
+                    // writers
+                    writers.forEach(function(writer) {
+                        var writerResting = writer({
+                            props: props,
+                            root: internalAPI,
+                            actions: frameActions,
+                            timestamp: ts,
+                            shouldOptimize: shouldOptimize,
+                        });
+
+                        if (writerResting === false) {
+                            resting = false;
+                        }
+                    });
+
+                    // run mixins
+                    activeMixins.forEach(function(mixin) {
+                        // if one of the mixins is still busy after write operation, we are not resting
+                        var mixinResting = mixin.write(ts);
+                        if (mixinResting === false) {
+                            resting = false;
+                        }
+                    });
+
+                    // updates child views that are currently attached to the DOM
+                    childViews
+                        .filter(function(child) {
+                            return !!child.element.parentNode;
+                        })
+                        .forEach(function(child) {
+                            // if a child view is not resting, we are not resting
+                            var childResting = child._write(
+                                ts,
+                                filterFrameActionsForChild(child, frameActions),
+                                shouldOptimize
+                            );
+
+                            if (!childResting) {
+                                resting = false;
+                            }
+                        });
+
+                    // append new elements to DOM and update those
+                    childViews
+                        //.filter(child => !child.element.parentNode)
+                        .forEach(function(child, index) {
+                            // skip
+                            if (child.element.parentNode) {
+                                return;
+                            }
+
+                            // append to DOM
+                            internalAPI.appendChild(child.element, index);
+
+                            // call read (need to know the size of these elements)
+                            child._read();
+
+                            // re-call write
+                            child._write(
+                                ts,
+                                filterFrameActionsForChild(child, frameActions),
+                                shouldOptimize
+                            );
+
+                            // we just added somthing to the dom, no rest
+                            resting = false;
+                        });
+
+                    // update resting state
+                    isResting = resting;
+
+                    didWriteView({
+                        props: props,
+                        root: internalAPI,
+                        actions: frameActions,
+                        timestamp: ts,
+                    });
+
+                    // let parent know if we are resting
+                    return resting;
+                };
+
+                var _destroy = function _destroy() {
+                    activeMixins.forEach(function(mixin) {
+                        return mixin.destroy();
+                    });
+                    destroyers.forEach(function(destroyer) {
+                        destroyer({ root: internalAPI, props: props });
+                    });
+                    childViews.forEach(function(child) {
+                        return child._destroy();
+                    });
+                };
+
+                // sharedAPI
+                var sharedAPIDefinition = {
+                    element: {
+                        get: getElement,
+                    },
+
+                    style: {
+                        get: getStyle,
+                    },
+
+                    childViews: {
+                        get: getChildViews,
+                    },
+                };
+
+                // private API definition
+                var internalAPIDefinition = Object.assign({}, sharedAPIDefinition, {
+                    rect: {
+                        get: getRect,
+                    },
+
+                    // access to custom children references
+                    ref: {
+                        get: getReference,
+                    },
+
+                    // dom modifiers
+                    is: function is(needle) {
+                        return name === needle;
+                    },
+                    appendChild: appendChild(element),
+                    createChildView: createChildView(store),
+                    linkView: function linkView(view) {
+                        childViews.push(view);
+                        return view;
+                    },
+                    unlinkView: function unlinkView(view) {
+                        childViews.splice(childViews.indexOf(view), 1);
+                    },
+                    appendChildView: appendChildView(element, childViews),
+                    removeChildView: removeChildView(element, childViews),
+                    registerWriter: function registerWriter(writer) {
+                        return writers.push(writer);
+                    },
+                    registerReader: function registerReader(reader) {
+                        return readers.push(reader);
+                    },
+                    registerDestroyer: function registerDestroyer(destroyer) {
+                        return destroyers.push(destroyer);
+                    },
+                    invalidateLayout: function invalidateLayout() {
+                        return (element.layoutCalculated = false);
+                    },
+
+                    // access to data store
+                    dispatch: store.dispatch,
+                    query: store.query,
+                });
+
+                // public view API methods
+                var externalAPIDefinition = {
+                    element: {
+                        get: getElement,
+                    },
+
+                    childViews: {
+                        get: getChildViews,
+                    },
+
+                    rect: {
+                        get: getRect,
+                    },
+
+                    resting: {
+                        get: function get() {
+                            return isResting;
+                        },
+                    },
+
+                    isRectIgnored: function isRectIgnored() {
+                        return ignoreRect;
+                    },
+                    _read: _read,
+                    _write: _write,
+                    _destroy: _destroy,
+                };
+
+                // mixin API methods
+                var mixinAPIDefinition = Object.assign({}, sharedAPIDefinition, {
+                    rect: {
+                        get: function get() {
+                            return rect;
+                        },
+                    },
+                });
+
+                // add mixin functionality
+                Object.keys(mixins)
+                    .sort(function(a, b) {
+                        // move styles to the back of the mixin list (so adjustments of other mixins are applied to the props correctly)
+                        if (a === 'styles') {
+                            return 1;
+                        } else if (b === 'styles') {
+                            return -1;
+                        }
+                        return 0;
+                    })
+                    .forEach(function(key) {
+                        var mixinAPI = Mixins[key]({
+                            mixinConfig: mixins[key],
+                            viewProps: props,
+                            viewState: state,
+                            viewInternalAPI: internalAPIDefinition,
+                            viewExternalAPI: externalAPIDefinition,
+                            view: createObject(mixinAPIDefinition),
+                        });
+
+                        if (mixinAPI) {
+                            activeMixins.push(mixinAPI);
+                        }
+                    });
+
+                // construct private api
+                var internalAPI = createObject(internalAPIDefinition);
+
+                // create the view
+                create({
+                    root: internalAPI,
+                    props: props,
+                });
+
+                // append created child views to root node
+                var childCount = getChildCount(element); // need to know the current child count so appending happens in correct order
+                childViews.forEach(function(child, index) {
+                    internalAPI.appendChild(child.element, childCount + index);
+                });
+
+                // call did create
+                didCreateView(internalAPI);
+
+                // expose public api
+                return createObject(externalAPIDefinition);
+            };
+        };
+
+    var createPainter = function createPainter(read, write) {
+        var fps = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 60;
+
+        var name = '__framePainter';
+
+        // set global painter
+        if (window[name]) {
+            window[name].readers.push(read);
+            window[name].writers.push(write);
+            return;
+        }
+
+        window[name] = {
+            readers: [read],
+            writers: [write],
+        };
+
+        var painter = window[name];
+
+        var interval = 1000 / fps;
+        var last = null;
+        var id = null;
+        var requestTick = null;
+        var cancelTick = null;
+
+        var setTimerType = function setTimerType() {
+            if (document.hidden) {
+                requestTick = function requestTick() {
+                    return window.setTimeout(function() {
+                        return tick(performance.now());
+                    }, interval);
+                };
+                cancelTick = function cancelTick() {
+                    return window.clearTimeout(id);
+                };
+            } else {
+                requestTick = function requestTick() {
+                    return window.requestAnimationFrame(tick);
+                };
+                cancelTick = function cancelTick() {
+                    return window.cancelAnimationFrame(id);
+                };
+            }
+        };
+
+        document.addEventListener('visibilitychange', function() {
+            if (cancelTick) cancelTick();
+            setTimerType();
+            tick(performance.now());
+        });
+
+        var tick = function tick(ts) {
+            // queue next tick
+            id = requestTick(tick);
+
+            // limit fps
+            if (!last) {
+                last = ts;
+            }
+
+            var delta = ts - last;
+
+            if (delta <= interval) {
+                // skip frame
+                return;
+            }
+
+            // align next frame
+            last = ts - (delta % interval);
+
+            // update view
+            painter.readers.forEach(function(read) {
+                return read();
+            });
+            painter.writers.forEach(function(write) {
+                return write(ts);
+            });
+        };
+
+        setTimerType();
+        tick(performance.now());
+
+        return {
+            pause: function pause() {
+                cancelTick(id);
+            },
+        };
+    };
+
+    var createRoute = function createRoute(routes, fn) {
+        return function(_ref) {
+            var root = _ref.root,
+                props = _ref.props,
+                _ref$actions = _ref.actions,
+                actions = _ref$actions === void 0 ? [] : _ref$actions,
+                timestamp = _ref.timestamp,
+                shouldOptimize = _ref.shouldOptimize;
+            actions
+                .filter(function(action) {
+                    return routes[action.type];
+                })
+                .forEach(function(action) {
+                    return routes[action.type]({
+                        root: root,
+                        props: props,
+                        action: action.data,
+                        timestamp: timestamp,
+                        shouldOptimize: shouldOptimize,
+                    });
+                });
+
+            if (fn) {
+                fn({
+                    root: root,
+                    props: props,
+                    actions: actions,
+                    timestamp: timestamp,
+                    shouldOptimize: shouldOptimize,
+                });
+            }
+        };
+    };
+
+    var insertBefore = function insertBefore(newNode, referenceNode) {
+        return referenceNode.parentNode.insertBefore(newNode, referenceNode);
+    };
+
+    var insertAfter = function insertAfter(newNode, referenceNode) {
+        return referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+    };
+
+    var isArray = function isArray(value) {
+        return Array.isArray(value);
+    };
+
+    var isEmpty = function isEmpty(value) {
+        return value == null;
+    };
+
+    var trim = function trim(str) {
+        return str.trim();
+    };
+
+    var toString = function toString(value) {
+        return '' + value;
+    };
+
+    var toArray = function toArray(value) {
+        var splitter = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
+        if (isEmpty(value)) {
+            return [];
+        }
+        if (isArray(value)) {
+            return value;
+        }
+        return toString(value)
+            .split(splitter)
+            .map(trim)
+            .filter(function(str) {
+                return str.length;
+            });
+    };
+
+    var isBoolean = function isBoolean(value) {
+        return typeof value === 'boolean';
+    };
+
+    var toBoolean = function toBoolean(value) {
+        return isBoolean(value) ? value : value === 'true';
+    };
+
+    var isString = function isString(value) {
+        return typeof value === 'string';
+    };
+
+    var toNumber = function toNumber(value) {
+        return isNumber(value)
+            ? value
+            : isString(value)
+            ? toString(value).replace(/[a-z]+/gi, '')
+            : 0;
+    };
+
+    var toInt = function toInt(value) {
+        return parseInt(toNumber(value), 10);
+    };
+
+    var toFloat = function toFloat(value) {
+        return parseFloat(toNumber(value));
+    };
+
+    var isInt = function isInt(value) {
+        return isNumber(value) && isFinite(value) && Math.floor(value) === value;
+    };
+
+    var toBytes = function toBytes(value) {
+        var base = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+        // is in bytes
+        if (isInt(value)) {
+            return value;
+        }
+
+        // is natural file size
+        var naturalFileSize = toString(value).trim();
+
+        // if is value in megabytes
+        if (/MB$/i.test(naturalFileSize)) {
+            naturalFileSize = naturalFileSize.replace(/MB$i/, '').trim();
+            return toInt(naturalFileSize) * base * base;
+        }
+
+        // if is value in kilobytes
+        if (/KB/i.test(naturalFileSize)) {
+            naturalFileSize = naturalFileSize.replace(/KB$i/, '').trim();
+            return toInt(naturalFileSize) * base;
+        }
+
+        return toInt(naturalFileSize);
+    };
+
+    var isFunction = function isFunction(value) {
+        return typeof value === 'function';
+    };
+
+    var toFunctionReference = function toFunctionReference(string) {
+        var ref = self;
+        var levels = string.split('.');
+        var level = null;
+        while ((level = levels.shift())) {
+            ref = ref[level];
+            if (!ref) {
+                return null;
+            }
+        }
+        return ref;
+    };
+
+    var methods = {
+        process: 'POST',
+        patch: 'PATCH',
+        revert: 'DELETE',
+        fetch: 'GET',
+        restore: 'GET',
+        load: 'GET',
+    };
+
+    var createServerAPI = function createServerAPI(outline) {
+        var api = {};
+
+        api.url = isString(outline) ? outline : outline.url || '';
+        api.timeout = outline.timeout ? parseInt(outline.timeout, 10) : 0;
+        api.headers = outline.headers ? outline.headers : {};
+
+        forin(methods, function(key) {
+            api[key] = createAction(key, outline[key], methods[key], api.timeout, api.headers);
+        });
+
+        // remove process if no url or process on outline
+        api.process = outline.process || isString(outline) || outline.url ? api.process : null;
+
+        // special treatment for remove
+        api.remove = outline.remove || null;
+
+        // remove generic headers from api object
+        delete api.headers;
+
+        return api;
+    };
+
+    var createAction = function createAction(name, outline, method, timeout, headers) {
+        // is explicitely set to null so disable
+        if (outline === null) {
+            return null;
+        }
+
+        // if is custom function, done! Dev handles everything.
+        if (typeof outline === 'function') {
+            return outline;
+        }
+
+        // build action object
+        var action = {
+            url: method === 'GET' || method === 'PATCH' ? '?' + name + '=' : '',
+            method: method,
+            headers: headers,
+            withCredentials: false,
+            timeout: timeout,
+            onload: null,
+            ondata: null,
+            onerror: null,
+        };
+
+        // is a single url
+        if (isString(outline)) {
+            action.url = outline;
+            return action;
+        }
+
+        // overwrite
+        Object.assign(action, outline);
+
+        // see if should reformat headers;
+        if (isString(action.headers)) {
+            var parts = action.headers.split(/:(.+)/);
+            action.headers = {
+                header: parts[0],
+                value: parts[1],
+            };
+        }
+
+        // if is bool withCredentials
+        action.withCredentials = toBoolean(action.withCredentials);
+
+        return action;
+    };
+
+    var toServerAPI = function toServerAPI(value) {
+        return createServerAPI(value);
+    };
+
+    var isNull = function isNull(value) {
+        return value === null;
+    };
+
+    var isObject = function isObject(value) {
+        return typeof value === 'object' && value !== null;
+    };
+
+    var isAPI = function isAPI(value) {
+        return (
+            isObject(value) &&
+            isString(value.url) &&
+            isObject(value.process) &&
+            isObject(value.revert) &&
+            isObject(value.restore) &&
+            isObject(value.fetch)
+        );
+    };
+
+    var getType = function getType(value) {
+        if (isArray(value)) {
+            return 'array';
+        }
+
+        if (isNull(value)) {
+            return 'null';
+        }
+
+        if (isInt(value)) {
+            return 'int';
+        }
+
+        if (/^[0-9]+ ?(?:GB|MB|KB)$/gi.test(value)) {
+            return 'bytes';
+        }
+
+        if (isAPI(value)) {
+            return 'api';
+        }
+
+        return typeof value;
+    };
+
+    var replaceSingleQuotes = function replaceSingleQuotes(str) {
+        return str
+            .replace(/{\s*'/g, '{"')
+            .replace(/'\s*}/g, '"}')
+            .replace(/'\s*:/g, '":')
+            .replace(/:\s*'/g, ':"')
+            .replace(/,\s*'/g, ',"')
+            .replace(/'\s*,/g, '",');
+    };
+
+    var conversionTable = {
+        array: toArray,
+        boolean: toBoolean,
+        int: function int(value) {
+            return getType(value) === 'bytes' ? toBytes(value) : toInt(value);
+        },
+        number: toFloat,
+        float: toFloat,
+        bytes: toBytes,
+        string: function string(value) {
+            return isFunction(value) ? value : toString(value);
+        },
+        function: function _function(value) {
+            return toFunctionReference(value);
+        },
+        serverapi: toServerAPI,
+        object: function object(value) {
+            try {
+                return JSON.parse(replaceSingleQuotes(value));
+            } catch (e) {
+                return null;
+            }
+        },
+    };
+
+    var convertTo = function convertTo(value, type) {
+        return conversionTable[type](value);
+    };
+
+    var getValueByType = function getValueByType(newValue, defaultValue, valueType) {
+        // can always assign default value
+        if (newValue === defaultValue) {
+            return newValue;
+        }
+
+        // get the type of the new value
+        var newValueType = getType(newValue);
+
+        // is valid type?
+        if (newValueType !== valueType) {
+            // is string input, let's attempt to convert
+            var convertedValue = convertTo(newValue, valueType);
+
+            // what is the type now
+            newValueType = getType(convertedValue);
+
+            // no valid conversions found
+            if (convertedValue === null) {
+                throw 'Trying to assign value with incorrect type to "' +
+                    option +
+                    '", allowed type: "' +
+                    valueType +
+                    '"';
+            } else {
+                newValue = convertedValue;
+            }
+        }
+
+        // assign new value
+        return newValue;
+    };
+
+    var createOption = function createOption(defaultValue, valueType) {
+        var currentValue = defaultValue;
+        return {
+            enumerable: true,
+            get: function get() {
+                return currentValue;
+            },
+            set: function set(newValue) {
+                currentValue = getValueByType(newValue, defaultValue, valueType);
+            },
+        };
+    };
+
+    var createOptions = function createOptions(options) {
+        var obj = {};
+        forin(options, function(prop) {
+            var optionDefinition = options[prop];
+            obj[prop] = createOption(optionDefinition[0], optionDefinition[1]);
+        });
+        return createObject(obj);
+    };
+
+    var createInitialState = function createInitialState(options) {
+        return {
+            // model
+            items: [],
+
+            // timeout used for calling update items
+            listUpdateTimeout: null,
+
+            // timeout used for stacking metadata updates
+            itemUpdateTimeout: null,
+
+            // queue of items waiting to be processed
+            processingQueue: [],
+
+            // options
+            options: createOptions(options),
+        };
+    };
+
+    var fromCamels = function fromCamels(string) {
+        var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
+        return string
+            .split(/(?=[A-Z])/)
+            .map(function(part) {
+                return part.toLowerCase();
+            })
+            .join(separator);
+    };
+
+    var createOptionAPI = function createOptionAPI(store, options) {
+        var obj = {};
+        forin(options, function(key) {
+            obj[key] = {
+                get: function get() {
+                    return store.getState().options[key];
+                },
+                set: function set(value) {
+                    store.dispatch('SET_' + fromCamels(key, '_').toUpperCase(), {
+                        value: value,
+                    });
+                },
+            };
+        });
+        return obj;
+    };
+
+    var createOptionActions = function createOptionActions(options) {
+        return function(dispatch, query, state) {
+            var obj = {};
+            forin(options, function(key) {
+                var name = fromCamels(key, '_').toUpperCase();
+
+                obj['SET_' + name] = function(action) {
+                    try {
+                        state.options[key] = action.value;
+                    } catch (e) {} // nope, failed
+
+                    // we successfully set the value of this option
+                    dispatch('DID_SET_' + name, { value: state.options[key] });
+                };
+            });
+            return obj;
+        };
+    };
+
+    var createOptionQueries = function createOptionQueries(options) {
+        return function(state) {
+            var obj = {};
+            forin(options, function(key) {
+                obj['GET_' + fromCamels(key, '_').toUpperCase()] = function(action) {
+                    return state.options[key];
+                };
+            });
+            return obj;
+        };
+    };
+
+    var InteractionMethod = {
+        API: 1,
+        DROP: 2,
+        BROWSE: 3,
+        PASTE: 4,
+        NONE: 5,
+    };
+
+    var getUniqueId = function getUniqueId() {
+        return Math.random()
+            .toString(36)
+            .substring(2, 11);
+    };
+
+    function _typeof(obj) {
+        if (typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol') {
+            _typeof = function(obj) {
+                return typeof obj;
+            };
+        } else {
+            _typeof = function(obj) {
+                return obj &&
+                    typeof Symbol === 'function' &&
+                    obj.constructor === Symbol &&
+                    obj !== Symbol.prototype
+                    ? 'symbol'
+                    : typeof obj;
+            };
+        }
+
+        return _typeof(obj);
+    }
+
+    var REACT_ELEMENT_TYPE;
+
+    function _jsx(type, props, key, children) {
+        if (!REACT_ELEMENT_TYPE) {
+            REACT_ELEMENT_TYPE =
+                (typeof Symbol === 'function' && Symbol['for'] && Symbol['for']('react.element')) ||
+                0xeac7;
+        }
+
+        var defaultProps = type && type.defaultProps;
+        var childrenLength = arguments.length - 3;
+
+        if (!props && childrenLength !== 0) {
+            props = {
+                children: void 0,
+            };
+        }
+
+        if (props && defaultProps) {
+            for (var propName in defaultProps) {
+                if (props[propName] === void 0) {
+                    props[propName] = defaultProps[propName];
+                }
+            }
+        } else if (!props) {
+            props = defaultProps || {};
+        }
+
+        if (childrenLength === 1) {
+            props.children = children;
+        } else if (childrenLength > 1) {
+            var childArray = new Array(childrenLength);
+
+            for (var i = 0; i < childrenLength; i++) {
+                childArray[i] = arguments[i + 3];
+            }
+
+            props.children = childArray;
+        }
+
+        return {
+            $$typeof: REACT_ELEMENT_TYPE,
+            type: type,
+            key: key === undefined ? null : '' + key,
+            ref: null,
+            props: props,
+            _owner: null,
+        };
+    }
+
+    function _asyncIterator(iterable) {
+        var method;
+
+        if (typeof Symbol !== 'undefined') {
+            if (Symbol.asyncIterator) {
+                method = iterable[Symbol.asyncIterator];
+                if (method != null) return method.call(iterable);
+            }
+
+            if (Symbol.iterator) {
+                method = iterable[Symbol.iterator];
+                if (method != null) return method.call(iterable);
+            }
+        }
+
+        throw new TypeError('Object is not async iterable');
+    }
+
+    function _AwaitValue(value) {
+        this.wrapped = value;
+    }
+
+    function _AsyncGenerator(gen) {
+        var front, back;
+
+        function send(key, arg) {
+            return new Promise(function(resolve, reject) {
+                var request = {
+                    key: key,
+                    arg: arg,
+                    resolve: resolve,
+                    reject: reject,
+                    next: null,
+                };
+
+                if (back) {
+                    back = back.next = request;
+                } else {
+                    front = back = request;
+                    resume(key, arg);
+                }
+            });
+        }
+
+        function resume(key, arg) {
+            try {
+                var result = gen[key](arg);
+                var value = result.value;
+                var wrappedAwait = value instanceof _AwaitValue;
+                Promise.resolve(wrappedAwait ? value.wrapped : value).then(
+                    function(arg) {
+                        if (wrappedAwait) {
+                            resume('next', arg);
+                            return;
+                        }
+
+                        settle(result.done ? 'return' : 'normal', arg);
+                    },
+                    function(err) {
+                        resume('throw', err);
+                    }
+                );
+            } catch (err) {
+                settle('throw', err);
+            }
+        }
+
+        function settle(type, value) {
+            switch (type) {
+                case 'return':
+                    front.resolve({
+                        value: value,
+                        done: true,
+                    });
+                    break;
+
+                case 'throw':
+                    front.reject(value);
+                    break;
+
+                default:
+                    front.resolve({
+                        value: value,
+                        done: false,
+                    });
+                    break;
+            }
+
+            front = front.next;
+
+            if (front) {
+                resume(front.key, front.arg);
+            } else {
+                back = null;
+            }
+        }
+
+        this._invoke = send;
+
+        if (typeof gen.return !== 'function') {
+            this.return = undefined;
+        }
+    }
+
+    if (typeof Symbol === 'function' && Symbol.asyncIterator) {
+        _AsyncGenerator.prototype[Symbol.asyncIterator] = function() {
+            return this;
+        };
+    }
+
+    _AsyncGenerator.prototype.next = function(arg) {
+        return this._invoke('next', arg);
+    };
+
+    _AsyncGenerator.prototype.throw = function(arg) {
+        return this._invoke('throw', arg);
+    };
+
+    _AsyncGenerator.prototype.return = function(arg) {
+        return this._invoke('return', arg);
+    };
+
+    function _wrapAsyncGenerator(fn) {
+        return function() {
+            return new _AsyncGenerator(fn.apply(this, arguments));
+        };
+    }
+
+    function _awaitAsyncGenerator(value) {
+        return new _AwaitValue(value);
+    }
+
+    function _asyncGeneratorDelegate(inner, awaitWrap) {
+        var iter = {},
+            waiting = false;
+
+        function pump(key, value) {
+            waiting = true;
+            value = new Promise(function(resolve) {
+                resolve(inner[key](value));
+            });
+            return {
+                done: false,
+                value: awaitWrap(value),
+            };
+        }
+
+        if (typeof Symbol === 'function' && Symbol.iterator) {
+            iter[Symbol.iterator] = function() {
+                return this;
+            };
+        }
+
+        iter.next = function(value) {
+            if (waiting) {
+                waiting = false;
+                return value;
+            }
+
+            return pump('next', value);
+        };
+
+        if (typeof inner.throw === 'function') {
+            iter.throw = function(value) {
+                if (waiting) {
+                    waiting = false;
+                    throw value;
+                }
+
+                return pump('throw', value);
+            };
+        }
+
+        if (typeof inner.return === 'function') {
+            iter.return = function(value) {
+                return pump('return', value);
+            };
+        }
+
+        return iter;
+    }
+
+    function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+        try {
+            var info = gen[key](arg);
+            var value = info.value;
+        } catch (error) {
+            reject(error);
+            return;
+        }
+
+        if (info.done) {
+            resolve(value);
+        } else {
+            Promise.resolve(value).then(_next, _throw);
+        }
+    }
+
+    function _asyncToGenerator(fn) {
+        return function() {
+            var self = this,
+                args = arguments;
+            return new Promise(function(resolve, reject) {
+                var gen = fn.apply(self, args);
+
+                function _next(value) {
+                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'next', value);
+                }
+
+                function _throw(err) {
+                    asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'throw', err);
+                }
+
+                _next(undefined);
+            });
+        };
+    }
+
+    function _classCallCheck(instance, Constructor) {
+        if (!(instance instanceof Constructor)) {
+            throw new TypeError('Cannot call a class as a function');
+        }
+    }
+
+    function _defineProperties(target, props) {
+        for (var i = 0; i < props.length; i++) {
+            var descriptor = props[i];
+            descriptor.enumerable = descriptor.enumerable || false;
+            descriptor.configurable = true;
+            if ('value' in descriptor) descriptor.writable = true;
+            Object.defineProperty(target, descriptor.key, descriptor);
+        }
+    }
+
+    function _createClass(Constructor, protoProps, staticProps) {
+        if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+        if (staticProps) _defineProperties(Constructor, staticProps);
+        return Constructor;
+    }
+
+    function _defineEnumerableProperties(obj, descs) {
+        for (var key in descs) {
+            var desc = descs[key];
+            desc.configurable = desc.enumerable = true;
+            if ('value' in desc) desc.writable = true;
+            Object.defineProperty(obj, key, desc);
+        }
+
+        if (Object.getOwnPropertySymbols) {
+            var objectSymbols = Object.getOwnPropertySymbols(descs);
+
+            for (var i = 0; i < objectSymbols.length; i++) {
+                var sym = objectSymbols[i];
+                var desc = descs[sym];
+                desc.configurable = desc.enumerable = true;
+                if ('value' in desc) desc.writable = true;
+                Object.defineProperty(obj, sym, desc);
+            }
+        }
+
+        return obj;
+    }
+
+    function _defaults(obj, defaults) {
+        var keys = Object.getOwnPropertyNames(defaults);
+
+        for (var i = 0; i < keys.length; i++) {
+            var key = keys[i];
+            var value = Object.getOwnPropertyDescriptor(defaults, key);
+
+            if (value && value.configurable && obj[key] === undefined) {
+                Object.defineProperty(obj, key, value);
+            }
+        }
+
+        return obj;
+    }
+
+    function _defineProperty(obj, key, value) {
+        if (key in obj) {
+            Object.defineProperty(obj, key, {
+                value: value,
+                enumerable: true,
+                configurable: true,
+                writable: true,
+            });
+        } else {
+            obj[key] = value;
+        }
+
+        return obj;
+    }
+
+    function _extends() {
+        _extends =
+            Object.assign ||
+            function(target) {
+                for (var i = 1; i < arguments.length; i++) {
+                    var source = arguments[i];
+
+                    for (var key in source) {
+                        if (Object.prototype.hasOwnProperty.call(source, key)) {
+                            target[key] = source[key];
+                        }
+                    }
+                }
+
+                return target;
+            };
+
+        return _extends.apply(this, arguments);
+    }
+
+    function _objectSpread(target) {
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i] != null ? arguments[i] : {};
+            var ownKeys = Object.keys(source);
+
+            if (typeof Object.getOwnPropertySymbols === 'function') {
+                ownKeys = ownKeys.concat(
+                    Object.getOwnPropertySymbols(source).filter(function(sym) {
+                        return Object.getOwnPropertyDescriptor(source, sym).enumerable;
+                    })
+                );
+            }
+
+            ownKeys.forEach(function(key) {
+                _defineProperty(target, key, source[key]);
+            });
+        }
+
+        return target;
+    }
+
+    function ownKeys(object, enumerableOnly) {
+        var keys = Object.keys(object);
+
+        if (Object.getOwnPropertySymbols) {
+            var symbols = Object.getOwnPropertySymbols(object);
+            if (enumerableOnly)
+                symbols = symbols.filter(function(sym) {
+                    return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+                });
+            keys.push.apply(keys, symbols);
+        }
+
+        return keys;
+    }
+
+    function _objectSpread2(target) {
+        for (var i = 1; i < arguments.length; i++) {
+            var source = arguments[i] != null ? arguments[i] : {};
+
+            if (i % 2) {
+                ownKeys(source, true).forEach(function(key) {
+                    _defineProperty(target, key, source[key]);
+                });
+            } else if (Object.getOwnPropertyDescriptors) {
+                Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+            } else {
+                ownKeys(source).forEach(function(key) {
+                    Object.defineProperty(
+                        target,
+                        key,
+                        Object.getOwnPropertyDescriptor(source, key)
+                    );
+                });
+            }
+        }
+
+        return target;
+    }
+
+    function _inherits(subClass, superClass) {
+        if (typeof superClass !== 'function' && superClass !== null) {
+            throw new TypeError('Super expression must either be null or a function');
+        }
+
+        subClass.prototype = Object.create(superClass && superClass.prototype, {
+            constructor: {
+                value: subClass,
+                writable: true,
+                configurable: true,
+            },
+        });
+        if (superClass) _setPrototypeOf(subClass, superClass);
+    }
+
+    function _inheritsLoose(subClass, superClass) {
+        subClass.prototype = Object.create(superClass.prototype);
+        subClass.prototype.constructor = subClass;
+        subClass.__proto__ = superClass;
+    }
+
+    function _getPrototypeOf(o) {
+        _getPrototypeOf = Object.setPrototypeOf
+            ? Object.getPrototypeOf
+            : function _getPrototypeOf(o) {
+                  return o.__proto__ || Object.getPrototypeOf(o);
+              };
+        return _getPrototypeOf(o);
+    }
+
+    function _setPrototypeOf(o, p) {
+        _setPrototypeOf =
+            Object.setPrototypeOf ||
+            function _setPrototypeOf(o, p) {
+                o.__proto__ = p;
+                return o;
+            };
+
+        return _setPrototypeOf(o, p);
+    }
+
+    function isNativeReflectConstruct() {
+        if (typeof Reflect === 'undefined' || !Reflect.construct) return false;
+        if (Reflect.construct.sham) return false;
+        if (typeof Proxy === 'function') return true;
+
+        try {
+            Date.prototype.toString.call(Reflect.construct(Date, [], function() {}));
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    function _construct(Parent, args, Class) {
+        if (isNativeReflectConstruct()) {
+            _construct = Reflect.construct;
+        } else {
+            _construct = function _construct(Parent, args, Class) {
+                var a = [null];
+                a.push.apply(a, args);
+                var Constructor = Function.bind.apply(Parent, a);
+                var instance = new Constructor();
+                if (Class) _setPrototypeOf(instance, Class.prototype);
+                return instance;
+            };
+        }
+
+        return _construct.apply(null, arguments);
+    }
+
+    function _isNativeFunction(fn) {
+        return Function.toString.call(fn).indexOf('[native code]') !== -1;
+    }
+
+    function _wrapNativeSuper(Class) {
+        var _cache = typeof Map === 'function' ? new Map() : undefined;
+
+        _wrapNativeSuper = function _wrapNativeSuper(Class) {
+            if (Class === null || !_isNativeFunction(Class)) return Class;
+
+            if (typeof Class !== 'function') {
+                throw new TypeError('Super expression must either be null or a function');
+            }
+
+            if (typeof _cache !== 'undefined') {
+                if (_cache.has(Class)) return _cache.get(Class);
+
+                _cache.set(Class, Wrapper);
+            }
+
+            function Wrapper() {
+                return _construct(Class, arguments, _getPrototypeOf(this).constructor);
+            }
+
+            Wrapper.prototype = Object.create(Class.prototype, {
+                constructor: {
+                    value: Wrapper,
+                    enumerable: false,
+                    writable: true,
+                    configurable: true,
+                },
+            });
+            return _setPrototypeOf(Wrapper, Class);
+        };
+
+        return _wrapNativeSuper(Class);
+    }
+
+    function _instanceof(left, right) {
+        if (right != null && typeof Symbol !== 'undefined' && right[Symbol.hasInstance]) {
+            return !!right[Symbol.hasInstance](left);
+        } else {
+            return left instanceof right;
+        }
+    }
+
+    function _interopRequireDefault(obj) {
+        return obj && obj.__esModule
+            ? obj
+            : {
+                  default: obj,
+              };
+    }
+
+    function _interopRequireWildcard(obj) {
+        if (obj && obj.__esModule) {
+            return obj;
+        } else {
+            var newObj = {};
+
+            if (obj != null) {
+                for (var key in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                        var desc =
+                            Object.defineProperty && Object.getOwnPropertyDescriptor
+                                ? Object.getOwnPropertyDescriptor(obj, key)
+                                : {};
+
+                        if (desc.get || desc.set) {
+                            Object.defineProperty(newObj, key, desc);
+                        } else {
+                            newObj[key] = obj[key];
+                        }
+                    }
+                }
+            }
+
+            newObj.default = obj;
+            return newObj;
+        }
+    }
+
+    function _newArrowCheck(innerThis, boundThis) {
+        if (innerThis !== boundThis) {
+            throw new TypeError('Cannot instantiate an arrow function');
+        }
+    }
+
+    function _objectDestructuringEmpty(obj) {
+        if (obj == null) throw new TypeError('Cannot destructure undefined');
+    }
+
+    function _objectWithoutPropertiesLoose(source, excluded) {
+        if (source == null) return {};
+        var target = {};
+        var sourceKeys = Object.keys(source);
+        var key, i;
+
+        for (i = 0; i < sourceKeys.length; i++) {
+            key = sourceKeys[i];
+            if (excluded.indexOf(key) >= 0) continue;
+            target[key] = source[key];
+        }
+
+        return target;
+    }
+
+    function _objectWithoutProperties(source, excluded) {
+        if (source == null) return {};
+
+        var target = _objectWithoutPropertiesLoose(source, excluded);
+
+        var key, i;
+
+        if (Object.getOwnPropertySymbols) {
+            var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+            for (i = 0; i < sourceSymbolKeys.length; i++) {
+                key = sourceSymbolKeys[i];
+                if (excluded.indexOf(key) >= 0) continue;
+                if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+                target[key] = source[key];
+            }
+        }
+
+        return target;
+    }
+
+    function _assertThisInitialized(self) {
+        if (self === void 0) {
+            throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+        }
+
+        return self;
+    }
+
+    function _possibleConstructorReturn(self, call) {
+        if (call && (typeof call === 'object' || typeof call === 'function')) {
+            return call;
+        }
+
+        return _assertThisInitialized(self);
+    }
+
+    function _superPropBase(object, property) {
+        while (!Object.prototype.hasOwnProperty.call(object, property)) {
+            object = _getPrototypeOf(object);
+            if (object === null) break;
+        }
+
+        return object;
+    }
+
+    function _get(target, property, receiver) {
+        if (typeof Reflect !== 'undefined' && Reflect.get) {
+            _get = Reflect.get;
+        } else {
+            _get = function _get(target, property, receiver) {
+                var base = _superPropBase(target, property);
+
+                if (!base) return;
+                var desc = Object.getOwnPropertyDescriptor(base, property);
+
+                if (desc.get) {
+                    return desc.get.call(receiver);
+                }
+
+                return desc.value;
+            };
+        }
+
+        return _get(target, property, receiver || target);
+    }
+
+    function set(target, property, value, receiver) {
+        if (typeof Reflect !== 'undefined' && Reflect.set) {
+            set = Reflect.set;
+        } else {
+            set = function set(target, property, value, receiver) {
+                var base = _superPropBase(target, property);
+
+                var desc;
+
+                if (base) {
+                    desc = Object.getOwnPropertyDescriptor(base, property);
+
+                    if (desc.set) {
+                        desc.set.call(receiver, value);
+                        return true;
+                    } else if (!desc.writable) {
+                        return false;
+                    }
+                }
+
+                desc = Object.getOwnPropertyDescriptor(receiver, property);
+
+                if (desc) {
+                    if (!desc.writable) {
+                        return false;
+                    }
+
+                    desc.value = value;
+                    Object.defineProperty(receiver, property, desc);
+                } else {
+                    _defineProperty(receiver, property, value);
+                }
+
+                return true;
+            };
+        }
+
+        return set(target, property, value, receiver);
+    }
+
+    function _set(target, property, value, receiver, isStrict) {
+        var s = set(target, property, value, receiver || target);
+
+        if (!s && isStrict) {
+            throw new Error('failed to set property');
+        }
+
+        return value;
+    }
+
+    function _taggedTemplateLiteral(strings, raw) {
+        if (!raw) {
+            raw = strings.slice(0);
+        }
+
+        return Object.freeze(
+            Object.defineProperties(strings, {
+                raw: {
+                    value: Object.freeze(raw),
+                },
+            })
+        );
+    }
+
+    function _taggedTemplateLiteralLoose(strings, raw) {
+        if (!raw) {
+            raw = strings.slice(0);
+        }
+
+        strings.raw = raw;
+        return strings;
+    }
+
+    function _temporalRef(val, name) {
+        if (val === _temporalUndefined) {
+            throw new ReferenceError(name + ' is not defined - temporal dead zone');
+        } else {
+            return val;
+        }
+    }
+
+    function _readOnlyError(name) {
+        throw new Error('"' + name + '" is read-only');
+    }
+
+    function _classNameTDZError(name) {
+        throw new Error('Class "' + name + '" cannot be referenced in computed property keys.');
+    }
+
+    var _temporalUndefined = {};
+
+    function _slicedToArray(arr, i) {
+        return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+    }
+
+    function _slicedToArrayLoose(arr, i) {
+        return _arrayWithHoles(arr) || _iterableToArrayLimitLoose(arr, i) || _nonIterableRest();
+    }
+
+    function _toArray(arr) {
+        return _arrayWithHoles(arr) || _iterableToArray(arr) || _nonIterableRest();
+    }
+
+    function _toConsumableArray(arr) {
+        return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+    }
+
+    function _arrayWithoutHoles(arr) {
+        if (Array.isArray(arr)) {
+            for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+            return arr2;
+        }
+    }
+
+    function _arrayWithHoles(arr) {
+        if (Array.isArray(arr)) return arr;
+    }
+
+    function _iterableToArray(iter) {
+        if (
+            Symbol.iterator in Object(iter) ||
+            Object.prototype.toString.call(iter) === '[object Arguments]'
+        )
+            return Array.from(iter);
+    }
+
+    function _iterableToArrayLimit(arr, i) {
+        var _arr = [];
+        var _n = true;
+        var _d = false;
+        var _e = undefined;
+
+        try {
+            for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+                _arr.push(_s.value);
+
+                if (i && _arr.length === i) break;
+            }
+        } catch (err) {
+            _d = true;
+            _e = err;
+        } finally {
+            try {
+                if (!_n && _i['return'] != null) _i['return']();
+            } finally {
+                if (_d) throw _e;
+            }
+        }
+
+        return _arr;
+    }
+
+    function _iterableToArrayLimitLoose(arr, i) {
+        var _arr = [];
+
+        for (var _iterator = arr[Symbol.iterator](), _step; !(_step = _iterator.next()).done; ) {
+            _arr.push(_step.value);
+
+            if (i && _arr.length === i) break;
+        }
+
+        return _arr;
+    }
+
+    function _nonIterableSpread() {
+        throw new TypeError('Invalid attempt to spread non-iterable instance');
+    }
+
+    function _nonIterableRest() {
+        throw new TypeError('Invalid attempt to destructure non-iterable instance');
+    }
+
+    function _skipFirstGeneratorNext(fn) {
+        return function() {
+            var it = fn.apply(this, arguments);
+            it.next();
+            return it;
+        };
+    }
+
+    function _toPrimitive(input, hint) {
+        if (typeof input !== 'object' || input === null) return input;
+        var prim = input[Symbol.toPrimitive];
+
+        if (prim !== undefined) {
+            var res = prim.call(input, hint || 'default');
+            if (typeof res !== 'object') return res;
+            throw new TypeError('@@toPrimitive must return a primitive value.');
+        }
+
+        return (hint === 'string' ? String : Number)(input);
+    }
+
+    function _toPropertyKey(arg) {
+        var key = _toPrimitive(arg, 'string');
+
+        return typeof key === 'symbol' ? key : String(key);
+    }
+
+    function _initializerWarningHelper(descriptor, context) {
+        throw new Error(
+            'Decorating class property failed. Please ensure that ' +
+                'proposal-class-properties is enabled and set to use loose mode. ' +
+                'To use proposal-class-properties in spec mode with decorators, wait for ' +
+                'the next major version of decorators in stage 2.'
+        );
+    }
+
+    function _initializerDefineProperty(target, property, descriptor, context) {
+        if (!descriptor) return;
+        Object.defineProperty(target, property, {
+            enumerable: descriptor.enumerable,
+            configurable: descriptor.configurable,
+            writable: descriptor.writable,
+            value: descriptor.initializer ? descriptor.initializer.call(context) : void 0,
+        });
+    }
+
+    function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
+        var desc = {};
+        Object.keys(descriptor).forEach(function(key) {
+            desc[key] = descriptor[key];
+        });
+        desc.enumerable = !!desc.enumerable;
+        desc.configurable = !!desc.configurable;
+
+        if ('value' in desc || desc.initializer) {
+            desc.writable = true;
+        }
+
+        desc = decorators
+            .slice()
+            .reverse()
+            .reduce(function(desc, decorator) {
+                return decorator(target, property, desc) || desc;
+            }, desc);
+
+        if (context && desc.initializer !== void 0) {
+            desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
+            desc.initializer = undefined;
+        }
+
+        if (desc.initializer === void 0) {
+            Object.defineProperty(target, property, desc);
+            desc = null;
+        }
+
+        return desc;
+    }
+
+    var id = 0;
+
+    function _classPrivateFieldLooseKey(name) {
+        return '__private_' + id++ + '_' + name;
+    }
+
+    function _classPrivateFieldLooseBase(receiver, privateKey) {
+        if (!Object.prototype.hasOwnProperty.call(receiver, privateKey)) {
+            throw new TypeError('attempted to use private field on non-instance');
+        }
+
+        return receiver;
+    }
+
+    function _classPrivateFieldGet(receiver, privateMap) {
+        var descriptor = privateMap.get(receiver);
+
+        if (!descriptor) {
+            throw new TypeError('attempted to get private field on non-instance');
+        }
+
+        if (descriptor.get) {
+            return descriptor.get.call(receiver);
+        }
+
+        return descriptor.value;
+    }
+
+    function _classPrivateFieldSet(receiver, privateMap, value) {
+        var descriptor = privateMap.get(receiver);
+
+        if (!descriptor) {
+            throw new TypeError('attempted to set private field on non-instance');
+        }
+
+        if (descriptor.set) {
+            descriptor.set.call(receiver, value);
+        } else {
+            if (!descriptor.writable) {
+                throw new TypeError('attempted to set read only private field');
+            }
+
+            descriptor.value = value;
+        }
+
+        return value;
+    }
+
+    function _classPrivateFieldDestructureSet(receiver, privateMap) {
+        if (!privateMap.has(receiver)) {
+            throw new TypeError('attempted to set private field on non-instance');
+        }
+
+        var descriptor = privateMap.get(receiver);
+
+        if (descriptor.set) {
+            if (!('__destrObj' in descriptor)) {
+                descriptor.__destrObj = {
+                    set value(v) {
+                        descriptor.set.call(receiver, v);
+                    },
+                };
+            }
+
+            return descriptor.__destrObj;
+        } else {
+            if (!descriptor.writable) {
+                throw new TypeError('attempted to set read only private field');
+            }
+
+            return descriptor;
+        }
+    }
+
+    function _classStaticPrivateFieldSpecGet(receiver, classConstructor, descriptor) {
+        if (receiver !== classConstructor) {
+            throw new TypeError('Private static access of wrong provenance');
+        }
+
+        return descriptor.value;
+    }
+
+    function _classStaticPrivateFieldSpecSet(receiver, classConstructor, descriptor, value) {
+        if (receiver !== classConstructor) {
+            throw new TypeError('Private static access of wrong provenance');
+        }
+
+        if (!descriptor.writable) {
+            throw new TypeError('attempted to set read only private field');
+        }
+
+        descriptor.value = value;
+        return value;
+    }
+
+    function _classStaticPrivateMethodGet(receiver, classConstructor, method) {
+        if (receiver !== classConstructor) {
+            throw new TypeError('Private static access of wrong provenance');
+        }
+
+        return method;
+    }
+
+    function _classStaticPrivateMethodSet() {
+        throw new TypeError('attempted to set read only static private field');
+    }
+
+    function _decorate(decorators, factory, superClass, mixins) {
+        var api = _getDecoratorsApi();
+
+        if (mixins) {
+            for (var i = 0; i < mixins.length; i++) {
+                api = mixins[i](api);
+            }
+        }
+
+        var r = factory(function initialize(O) {
+            api.initializeInstanceElements(O, decorated.elements);
+        }, superClass);
+        var decorated = api.decorateClass(
+            _coalesceClassElements(r.d.map(_createElementDescriptor)),
+            decorators
+        );
+        api.initializeClassElements(r.F, decorated.elements);
+        return api.runClassFinishers(r.F, decorated.finishers);
+    }
+
+    function _getDecoratorsApi() {
+        _getDecoratorsApi = function() {
+            return api;
+        };
+
+        var api = {
+            elementsDefinitionOrder: [['method'], ['field']],
+            initializeInstanceElements: function(O, elements) {
+                ['method', 'field'].forEach(function(kind) {
+                    elements.forEach(function(element) {
+                        if (element.kind === kind && element.placement === 'own') {
+                            this.defineClassElement(O, element);
+                        }
+                    }, this);
+                }, this);
+            },
+            initializeClassElements: function(F, elements) {
+                var proto = F.prototype;
+                ['method', 'field'].forEach(function(kind) {
+                    elements.forEach(function(element) {
+                        var placement = element.placement;
+
+                        if (
+                            element.kind === kind &&
+                            (placement === 'static' || placement === 'prototype')
+                        ) {
+                            var receiver = placement === 'static' ? F : proto;
+                            this.defineClassElement(receiver, element);
+                        }
+                    }, this);
+                }, this);
+            },
+            defineClassElement: function(receiver, element) {
+                var descriptor = element.descriptor;
+
+                if (element.kind === 'field') {
+                    var initializer = element.initializer;
+                    descriptor = {
+                        enumerable: descriptor.enumerable,
+                        writable: descriptor.writable,
+                        configurable: descriptor.configurable,
+                        value: initializer === void 0 ? void 0 : initializer.call(receiver),
+                    };
+                }
+
+                Object.defineProperty(receiver, element.key, descriptor);
+            },
+            decorateClass: function(elements, decorators) {
+                var newElements = [];
+                var finishers = [];
+                var placements = {
+                    static: [],
+                    prototype: [],
+                    own: [],
+                };
+                elements.forEach(function(element) {
+                    this.addElementPlacement(element, placements);
+                }, this);
+                elements.forEach(function(element) {
+                    if (!_hasDecorators(element)) return newElements.push(element);
+                    var elementFinishersExtras = this.decorateElement(element, placements);
+                    newElements.push(elementFinishersExtras.element);
+                    newElements.push.apply(newElements, elementFinishersExtras.extras);
+                    finishers.push.apply(finishers, elementFinishersExtras.finishers);
+                }, this);
+
+                if (!decorators) {
+                    return {
+                        elements: newElements,
+                        finishers: finishers,
+                    };
+                }
+
+                var result = this.decorateConstructor(newElements, decorators);
+                finishers.push.apply(finishers, result.finishers);
+                result.finishers = finishers;
+                return result;
+            },
+            addElementPlacement: function(element, placements, silent) {
+                var keys = placements[element.placement];
+
+                if (!silent && keys.indexOf(element.key) !== -1) {
+                    throw new TypeError('Duplicated element (' + element.key + ')');
+                }
+
+                keys.push(element.key);
+            },
+            decorateElement: function(element, placements) {
+                var extras = [];
+                var finishers = [];
+
+                for (var decorators = element.decorators, i = decorators.length - 1; i >= 0; i--) {
+                    var keys = placements[element.placement];
+                    keys.splice(keys.indexOf(element.key), 1);
+                    var elementObject = this.fromElementDescriptor(element);
+                    var elementFinisherExtras = this.toElementFinisherExtras(
+                        (0, decorators[i])(elementObject) || elementObject
+                    );
+                    element = elementFinisherExtras.element;
+                    this.addElementPlacement(element, placements);
+
+                    if (elementFinisherExtras.finisher) {
+                        finishers.push(elementFinisherExtras.finisher);
+                    }
+
+                    var newExtras = elementFinisherExtras.extras;
+
+                    if (newExtras) {
+                        for (var j = 0; j < newExtras.length; j++) {
+                            this.addElementPlacement(newExtras[j], placements);
+                        }
+
+                        extras.push.apply(extras, newExtras);
+                    }
+                }
+
+                return {
+                    element: element,
+                    finishers: finishers,
+                    extras: extras,
+                };
+            },
+            decorateConstructor: function(elements, decorators) {
+                var finishers = [];
+
+                for (var i = decorators.length - 1; i >= 0; i--) {
+                    var obj = this.fromClassDescriptor(elements);
+                    var elementsAndFinisher = this.toClassDescriptor(
+                        (0, decorators[i])(obj) || obj
+                    );
+
+                    if (elementsAndFinisher.finisher !== undefined) {
+                        finishers.push(elementsAndFinisher.finisher);
+                    }
+
+                    if (elementsAndFinisher.elements !== undefined) {
+                        elements = elementsAndFinisher.elements;
+
+                        for (var j = 0; j < elements.length - 1; j++) {
+                            for (var k = j + 1; k < elements.length; k++) {
+                                if (
+                                    elements[j].key === elements[k].key &&
+                                    elements[j].placement === elements[k].placement
+                                ) {
+                                    throw new TypeError(
+                                        'Duplicated element (' + elements[j].key + ')'
+                                    );
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return {
+                    elements: elements,
+                    finishers: finishers,
+                };
+            },
+            fromElementDescriptor: function(element) {
+                var obj = {
+                    kind: element.kind,
+                    key: element.key,
+                    placement: element.placement,
+                    descriptor: element.descriptor,
+                };
+                var desc = {
+                    value: 'Descriptor',
+                    configurable: true,
+                };
+                Object.defineProperty(obj, Symbol.toStringTag, desc);
+                if (element.kind === 'field') obj.initializer = element.initializer;
+                return obj;
+            },
+            toElementDescriptors: function(elementObjects) {
+                if (elementObjects === undefined) return;
+                return _toArray(elementObjects).map(function(elementObject) {
+                    var element = this.toElementDescriptor(elementObject);
+                    this.disallowProperty(elementObject, 'finisher', 'An element descriptor');
+                    this.disallowProperty(elementObject, 'extras', 'An element descriptor');
+                    return element;
+                }, this);
+            },
+            toElementDescriptor: function(elementObject) {
+                var kind = String(elementObject.kind);
+
+                if (kind !== 'method' && kind !== 'field') {
+                    throw new TypeError(
+                        'An element descriptor\'s .kind property must be either "method" or' +
+                            ' "field", but a decorator created an element descriptor with' +
+                            ' .kind "' +
+                            kind +
+                            '"'
+                    );
+                }
+
+                var key = _toPropertyKey(elementObject.key);
+
+                var placement = String(elementObject.placement);
+
+                if (placement !== 'static' && placement !== 'prototype' && placement !== 'own') {
+                    throw new TypeError(
+                        'An element descriptor\'s .placement property must be one of "static",' +
+                            ' "prototype" or "own", but a decorator created an element descriptor' +
+                            ' with .placement "' +
+                            placement +
+                            '"'
+                    );
+                }
+
+                var descriptor = elementObject.descriptor;
+                this.disallowProperty(elementObject, 'elements', 'An element descriptor');
+                var element = {
+                    kind: kind,
+                    key: key,
+                    placement: placement,
+                    descriptor: Object.assign({}, descriptor),
+                };
+
+                if (kind !== 'field') {
+                    this.disallowProperty(elementObject, 'initializer', 'A method descriptor');
+                } else {
+                    this.disallowProperty(
+                        descriptor,
+                        'get',
+                        'The property descriptor of a field descriptor'
+                    );
+                    this.disallowProperty(
+                        descriptor,
+                        'set',
+                        'The property descriptor of a field descriptor'
+                    );
+                    this.disallowProperty(
+                        descriptor,
+                        'value',
+                        'The property descriptor of a field descriptor'
+                    );
+                    element.initializer = elementObject.initializer;
+                }
+
+                return element;
+            },
+            toElementFinisherExtras: function(elementObject) {
+                var element = this.toElementDescriptor(elementObject);
+
+                var finisher = _optionalCallableProperty(elementObject, 'finisher');
+
+                var extras = this.toElementDescriptors(elementObject.extras);
+                return {
+                    element: element,
+                    finisher: finisher,
+                    extras: extras,
+                };
+            },
+            fromClassDescriptor: function(elements) {
+                var obj = {
+                    kind: 'class',
+                    elements: elements.map(this.fromElementDescriptor, this),
+                };
+                var desc = {
+                    value: 'Descriptor',
+                    configurable: true,
+                };
+                Object.defineProperty(obj, Symbol.toStringTag, desc);
+                return obj;
+            },
+            toClassDescriptor: function(obj) {
+                var kind = String(obj.kind);
+
+                if (kind !== 'class') {
+                    throw new TypeError(
+                        'A class descriptor\'s .kind property must be "class", but a decorator' +
+                            ' created a class descriptor with .kind "' +
+                            kind +
+                            '"'
+                    );
+                }
+
+                this.disallowProperty(obj, 'key', 'A class descriptor');
+                this.disallowProperty(obj, 'placement', 'A class descriptor');
+                this.disallowProperty(obj, 'descriptor', 'A class descriptor');
+                this.disallowProperty(obj, 'initializer', 'A class descriptor');
+                this.disallowProperty(obj, 'extras', 'A class descriptor');
+
+                var finisher = _optionalCallableProperty(obj, 'finisher');
+
+                var elements = this.toElementDescriptors(obj.elements);
+                return {
+                    elements: elements,
+                    finisher: finisher,
+                };
+            },
+            runClassFinishers: function(constructor, finishers) {
+                for (var i = 0; i < finishers.length; i++) {
+                    var newConstructor = (0, finishers[i])(constructor);
+
+                    if (newConstructor !== undefined) {
+                        if (typeof newConstructor !== 'function') {
+                            throw new TypeError('Finishers must return a constructor.');
+                        }
+
+                        constructor = newConstructor;
+                    }
+                }
+
+                return constructor;
+            },
+            disallowProperty: function(obj, name, objectType) {
+                if (obj[name] !== undefined) {
+                    throw new TypeError(objectType + " can't have a ." + name + ' property.');
+                }
+            },
+        };
+        return api;
+    }
+
+    function _createElementDescriptor(def) {
+        var key = _toPropertyKey(def.key);
+
+        var descriptor;
+
+        if (def.kind === 'method') {
+            descriptor = {
+                value: def.value,
+                writable: true,
+                configurable: true,
+                enumerable: false,
+            };
+        } else if (def.kind === 'get') {
+            descriptor = {
+                get: def.value,
+                configurable: true,
+                enumerable: false,
+            };
+        } else if (def.kind === 'set') {
+            descriptor = {
+                set: def.value,
+                configurable: true,
+                enumerable: false,
+            };
+        } else if (def.kind === 'field') {
+            descriptor = {
+                configurable: true,
+                writable: true,
+                enumerable: true,
+            };
+        }
+
+        var element = {
+            kind: def.kind === 'field' ? 'field' : 'method',
+            key: key,
+            placement: def.static ? 'static' : def.kind === 'field' ? 'own' : 'prototype',
+            descriptor: descriptor,
+        };
+        if (def.decorators) element.decorators = def.decorators;
+        if (def.kind === 'field') element.initializer = def.value;
+        return element;
+    }
+
+    function _coalesceGetterSetter(element, other) {
+        if (element.descriptor.get !== undefined) {
+            other.descriptor.get = element.descriptor.get;
+        } else {
+            other.descriptor.set = element.descriptor.set;
+        }
+    }
+
+    function _coalesceClassElements(elements) {
+        var newElements = [];
+
+        var isSameElement = function(other) {
+            return (
+                other.kind === 'method' &&
+                other.key === element.key &&
+                other.placement === element.placement
+            );
+        };
+
+        for (var i = 0; i < elements.length; i++) {
+            var element = elements[i];
+            var other;
+
+            if (element.kind === 'method' && (other = newElements.find(isSameElement))) {
+                if (_isDataDescriptor(element.descriptor) || _isDataDescriptor(other.descriptor)) {
+                    if (_hasDecorators(element) || _hasDecorators(other)) {
+                        throw new ReferenceError(
+                            'Duplicated methods (' + element.key + ") can't be decorated."
+                        );
+                    }
+
+                    other.descriptor = element.descriptor;
+                } else {
+                    if (_hasDecorators(element)) {
+                        if (_hasDecorators(other)) {
+                            throw new ReferenceError(
+                                "Decorators can't be placed on different accessors with for " +
+                                    'the same property (' +
+                                    element.key +
+                                    ').'
+                            );
+                        }
+
+                        other.decorators = element.decorators;
+                    }
+
+                    _coalesceGetterSetter(element, other);
+                }
+            } else {
+                newElements.push(element);
+            }
+        }
+
+        return newElements;
+    }
+
+    function _hasDecorators(element) {
+        return element.decorators && element.decorators.length;
+    }
+
+    function _isDataDescriptor(desc) {
+        return desc !== undefined && !(desc.value === undefined && desc.writable === undefined);
+    }
+
+    function _optionalCallableProperty(obj, name) {
+        var value = obj[name];
+
+        if (value !== undefined && typeof value !== 'function') {
+            throw new TypeError("Expected '" + name + "' to be a function");
+        }
+
+        return value;
+    }
+
+    function _classPrivateMethodGet(receiver, privateSet, fn) {
+        if (!privateSet.has(receiver)) {
+            throw new TypeError('attempted to get private field on non-instance');
+        }
+
+        return fn;
+    }
+
+    function _classPrivateMethodSet() {
+        throw new TypeError('attempted to reassign private method');
+    }
+
+    function _wrapRegExp(re, groups) {
+        _wrapRegExp = function(re, groups) {
+            return new BabelRegExp(re, groups);
+        };
+
+        var _RegExp = _wrapNativeSuper(RegExp);
+
+        var _super = RegExp.prototype;
+
+        var _groups = new WeakMap();
+
+        function BabelRegExp(re, groups) {
+            var _this = _RegExp.call(this, re);
+
+            _groups.set(_this, groups);
+
+            return _this;
+        }
+
+        _inherits(BabelRegExp, _RegExp);
+
+        BabelRegExp.prototype.exec = function(str) {
+            var result = _super.exec.call(this, str);
+
+            if (result) result.groups = buildGroups(result, this);
+            return result;
+        };
+
+        BabelRegExp.prototype[Symbol.replace] = function(str, substitution) {
+            if (typeof substitution === 'string') {
+                var groups = _groups.get(this);
+
+                return _super[Symbol.replace].call(
+                    this,
+                    str,
+                    substitution.replace(/\$<([^>]+)>/g, function(_, name) {
+                        return '$' + groups[name];
+                    })
+                );
+            } else if (typeof substitution === 'function') {
+                var _this = this;
+
+                return _super[Symbol.replace].call(this, str, function() {
+                    var args = [];
+                    args.push.apply(args, arguments);
+
+                    if (typeof args[args.length - 1] !== 'object') {
+                        args.push(buildGroups(args, _this));
+                    }
+
+                    return substitution.apply(this, args);
+                });
+            } else {
+                return _super[Symbol.replace].call(this, str, substitution);
+            }
+        };
+
+        function buildGroups(result, re) {
+            var g = _groups.get(re);
+
+            return Object.keys(g).reduce(function(groups, name) {
+                groups[name] = result[g[name]];
+                return groups;
+            }, Object.create(null));
+        }
+
+        return _wrapRegExp.apply(this, arguments);
+    }
+
+    var arrayRemove = function arrayRemove(arr, index) {
+        return arr.splice(index, 1);
+    };
+
+    var run = function run(cb, sync) {
+        if (sync) {
+            cb();
+        } else if (document.hidden) {
+            Promise.resolve(1).then(cb);
+        } else {
+            setTimeout(cb, 0);
+        }
+    };
+
+    var on = function on() {
+        var listeners = [];
+        var off = function off(event, cb) {
+            arrayRemove(
+                listeners,
+                listeners.findIndex(function(listener) {
+                    return listener.event === event && (listener.cb === cb || !cb);
+                })
+            );
+        };
+        var _fire = function fire(event, args, sync) {
+            listeners
+                .filter(function(listener) {
+                    return listener.event === event;
+                })
+                .map(function(listener) {
+                    return listener.cb;
+                })
+                .forEach(function(cb) {
+                    return run(function() {
+                        return cb.apply(void 0, _toConsumableArray(args));
+                    }, sync);
+                });
+        };
+        return {
+            fireSync: function fireSync(event) {
+                for (
+                    var _len = arguments.length,
+                        args = new Array(_len > 1 ? _len - 1 : 0),
+                        _key = 1;
+                    _key < _len;
+                    _key++
+                ) {
+                    args[_key - 1] = arguments[_key];
+                }
+                _fire(event, args, true);
+            },
+            fire: function fire(event) {
+                for (
+                    var _len2 = arguments.length,
+                        args = new Array(_len2 > 1 ? _len2 - 1 : 0),
+                        _key2 = 1;
+                    _key2 < _len2;
+                    _key2++
+                ) {
+                    args[_key2 - 1] = arguments[_key2];
+                }
+                _fire(event, args, false);
+            },
+            on: function on(event, cb) {
+                listeners.push({ event: event, cb: cb });
+            },
+            onOnce: function onOnce(event, _cb) {
+                listeners.push({
+                    event: event,
+                    cb: function cb() {
+                        off(event, _cb);
+                        _cb.apply(void 0, arguments);
+                    },
+                });
+            },
+            off: off,
+        };
+    };
+
+    var copyObjectPropertiesToObject = function copyObjectPropertiesToObject(
+        src,
+        target,
+        excluded
+    ) {
+        Object.getOwnPropertyNames(src)
+            .filter(function(property) {
+                return !excluded.includes(property);
+            })
+            .forEach(function(key) {
+                return Object.defineProperty(
+                    target,
+                    key,
+                    Object.getOwnPropertyDescriptor(src, key)
+                );
+            });
+    };
+
+    var PRIVATE = [
+        'fire',
+        'process',
+        'revert',
+        'load',
+        'on',
+        'off',
+        'onOnce',
+        'retryLoad',
+        'extend',
+        'archive',
+        'archived',
+        'release',
+        'released',
+        'requestProcessing',
+        'freeze',
+    ];
+
+    var createItemAPI = function createItemAPI(item) {
+        var api = {};
+        copyObjectPropertiesToObject(item, api, PRIVATE);
+        return api;
+    };
+
+    var removeReleasedItems = function removeReleasedItems(items) {
+        items.forEach(function(item, index) {
+            if (item.released) {
+                arrayRemove(items, index);
+            }
+        });
+    };
+
+    var ItemStatus = {
+        INIT: 1,
+        IDLE: 2,
+        PROCESSING_QUEUED: 9,
+        PROCESSING: 3,
+        PROCESSING_COMPLETE: 5,
+        PROCESSING_ERROR: 6,
+        PROCESSING_REVERT_ERROR: 10,
+        LOADING: 7,
+        LOAD_ERROR: 8,
+    };
+
+    var FileOrigin = {
+        INPUT: 1,
+        LIMBO: 2,
+        LOCAL: 3,
+    };
+
+    var getNonNumeric = function getNonNumeric(str) {
+        return /[^0-9]+/.exec(str);
+    };
+
+    var getDecimalSeparator = function getDecimalSeparator() {
+        return getNonNumeric((1.1).toLocaleString())[0];
+    };
+
+    var getThousandsSeparator = function getThousandsSeparator() {
+        // Added for browsers that do not return the thousands separator (happend on native browser Android 4.4.4)
+        // We check against the normal toString output and if they're the same return a comma when decimal separator is a dot
+        var decimalSeparator = getDecimalSeparator();
+        var thousandsStringWithSeparator = (1000.0).toLocaleString();
+        var thousandsStringWithoutSeparator = (1000.0).toString();
+        if (thousandsStringWithSeparator !== thousandsStringWithoutSeparator) {
+            return getNonNumeric(thousandsStringWithSeparator)[0];
+        }
+        return decimalSeparator === '.' ? ',' : '.';
+    };
+
+    var Type = {
+        BOOLEAN: 'boolean',
+        INT: 'int',
+        NUMBER: 'number',
+        STRING: 'string',
+        ARRAY: 'array',
+        OBJECT: 'object',
+        FUNCTION: 'function',
+        ACTION: 'action',
+        SERVER_API: 'serverapi',
+        REGEX: 'regex',
+    };
+
+    // all registered filters
+    var filters = [];
+
+    // loops over matching filters and passes options to each filter, returning the mapped results
+    var applyFilterChain = function applyFilterChain(key, value, utils) {
+        return new Promise(function(resolve, reject) {
+            // find matching filters for this key
+            var matchingFilters = filters
+                .filter(function(f) {
+                    return f.key === key;
+                })
+                .map(function(f) {
+                    return f.cb;
+                });
+
+            // resolve now
+            if (matchingFilters.length === 0) {
+                resolve(value);
+                return;
+            }
+
+            // first filter to kick things of
+            var initialFilter = matchingFilters.shift();
+
+            // chain filters
+            matchingFilters
+                .reduce(
+                    // loop over promises passing value to next promise
+                    function(current, next) {
+                        return current.then(function(value) {
+                            return next(value, utils);
+                        });
+                    },
+
+                    // call initial filter, will return a promise
+                    initialFilter(value, utils)
+
+                    // all executed
+                )
+                .then(function(value) {
+                    return resolve(value);
+                })
+                .catch(function(error) {
+                    return reject(error);
+                });
+        });
+    };
+
+    var applyFilters = function applyFilters(key, value, utils) {
+        return filters
+            .filter(function(f) {
+                return f.key === key;
+            })
+            .map(function(f) {
+                return f.cb(value, utils);
+            });
+    };
+
+    // adds a new filter to the list
+    var addFilter = function addFilter(key, cb) {
+        return filters.push({ key: key, cb: cb });
+    };
+
+    var extendDefaultOptions = function extendDefaultOptions(additionalOptions) {
+        return Object.assign(defaultOptions, additionalOptions);
+    };
+
+    var getOptions = function getOptions() {
+        return Object.assign({}, defaultOptions);
+    };
+
+    var setOptions = function setOptions(opts) {
+        forin(opts, function(key, value) {
+            // key does not exist, so this option cannot be set
+            if (!defaultOptions[key]) {
+                return;
+            }
+            defaultOptions[key][0] = getValueByType(
+                value,
+                defaultOptions[key][0],
+                defaultOptions[key][1]
+            );
+        });
+    };
+
+    // default options on app
+    var defaultOptions = {
+        // the id to add to the root element
+        id: [null, Type.STRING],
+
+        // input field name to use
+        name: ['filepond', Type.STRING],
+
+        // disable the field
+        disabled: [false, Type.BOOLEAN],
+
+        // classname to put on wrapper
+        className: [null, Type.STRING],
+
+        // is the field required
+        required: [false, Type.BOOLEAN],
+
+        // Allow media capture when value is set
+        captureMethod: [null, Type.STRING],
+        // - "camera", "microphone" or "camcorder",
+        // - Does not work with multiple on apple devices
+        // - If set, acceptedFileTypes must be made to match with media wildcard "image/*", "audio/*" or "video/*"
+
+        // sync `acceptedFileTypes` property with `accept` attribute
+        allowSyncAcceptAttribute: [true, Type.BOOLEAN],
+
+        // Feature toggles
+        allowDrop: [true, Type.BOOLEAN], // Allow dropping of files
+        allowBrowse: [true, Type.BOOLEAN], // Allow browsing the file system
+        allowPaste: [true, Type.BOOLEAN], // Allow pasting files
+        allowMultiple: [false, Type.BOOLEAN], // Allow multiple files (disabled by default, as multiple attribute is also required on input to allow multiple)
+        allowReplace: [true, Type.BOOLEAN], // Allow dropping a file on other file to replace it (only works when multiple is set to false)
+        allowRevert: [true, Type.BOOLEAN], // Allows user to revert file upload
+        allowRemove: [true, Type.BOOLEAN], // Allow user to remove a file
+        allowProcess: [true, Type.BOOLEAN], // Allows user to process a file, when set to false, this removes the file upload button
+        allowReorder: [false, Type.BOOLEAN], // Allow reordering of files
+        allowDirectoriesOnly: [false, Type.BOOLEAN], // Allow only selecting directories with browse (no support for filtering dnd at this point)
+
+        // Try store file if `server` not set
+        storeAsFile: [false, Type.BOOLEAN],
+
+        // Revert mode
+        forceRevert: [false, Type.BOOLEAN], // Set to 'force' to require the file to be reverted before removal
+
+        // Input requirements
+        maxFiles: [null, Type.INT], // Max number of files
+        checkValidity: [false, Type.BOOLEAN], // Enables custom validity messages
+
+        // Where to put file
+        itemInsertLocationFreedom: [true, Type.BOOLEAN], // Set to false to always add items to begin or end of list
+        itemInsertLocation: ['before', Type.STRING], // Default index in list to add items that have been dropped at the top of the list
+        itemInsertInterval: [75, Type.INT],
+
+        // Drag 'n Drop related
+        dropOnPage: [false, Type.BOOLEAN], // Allow dropping of files anywhere on page (prevents browser from opening file if dropped outside of Up)
+        dropOnElement: [true, Type.BOOLEAN], // Drop needs to happen on element (set to false to also load drops outside of Up)
+        dropValidation: [false, Type.BOOLEAN], // Enable or disable validating files on drop
+        ignoredFiles: [['.ds_store', 'thumbs.db', 'desktop.ini'], Type.ARRAY],
+
+        // Upload related
+        instantUpload: [true, Type.BOOLEAN], // Should upload files immediately on drop
+        maxParallelUploads: [2, Type.INT], // Maximum files to upload in parallel
+        allowMinimumUploadDuration: [true, Type.BOOLEAN], // if true uploads take at least 750 ms, this ensures the user sees the upload progress giving trust the upload actually happened
+
+        // Chunks
+        chunkUploads: [false, Type.BOOLEAN], // Enable chunked uploads
+        chunkForce: [false, Type.BOOLEAN], // Force use of chunk uploads even for files smaller than chunk size
+        chunkSize: [5000000, Type.INT], // Size of chunks (5MB default)
+        chunkRetryDelays: [[500, 1000, 3000], Type.ARRAY], // Amount of times to retry upload of a chunk when it fails
+
+        // The server api end points to use for uploading (see docs)
+        server: [null, Type.SERVER_API],
+
+        // File size calculations, can set to 1024, this is only used for display, properties use file size base 1000
+        fileSizeBase: [1000, Type.INT],
+
+        // Labels and status messages
+        labelFileSizeBytes: ['bytes', Type.STRING],
+        labelFileSizeKilobytes: ['KB', Type.STRING],
+        labelFileSizeMegabytes: ['MB', Type.STRING],
+        labelFileSizeGigabytes: ['GB', Type.STRING],
+
+        labelDecimalSeparator: [getDecimalSeparator(), Type.STRING], // Default is locale separator
+        labelThousandsSeparator: [getThousandsSeparator(), Type.STRING], // Default is locale separator
+
+        labelIdle: [
+            'Drag & Drop your files or <span class="filepond--label-action">Browse</span>',
+            Type.STRING,
+        ],
+
+        labelInvalidField: ['Field contains invalid files', Type.STRING],
+        labelFileWaitingForSize: ['Waiting for size', Type.STRING],
+        labelFileSizeNotAvailable: ['Size not available', Type.STRING],
+        labelFileCountSingular: ['file in list', Type.STRING],
+        labelFileCountPlural: ['files in list', Type.STRING],
+        labelFileLoading: ['Loading', Type.STRING],
+        labelFileAdded: ['Added', Type.STRING], // assistive only
+        labelFileLoadError: ['Error during load', Type.STRING],
+        labelFileRemoved: ['Removed', Type.STRING], // assistive only
+        labelFileRemoveError: ['Error during remove', Type.STRING],
+        labelFileProcessing: ['Uploading', Type.STRING],
+        labelFileProcessingComplete: ['Upload complete', Type.STRING],
+        labelFileProcessingAborted: ['Upload cancelled', Type.STRING],
+        labelFileProcessingError: ['Error during upload', Type.STRING],
+        labelFileProcessingRevertError: ['Error during revert', Type.STRING],
+
+        labelTapToCancel: ['tap to cancel', Type.STRING],
+        labelTapToRetry: ['tap to retry', Type.STRING],
+        labelTapToUndo: ['tap to undo', Type.STRING],
+
+        labelButtonRemoveItem: ['Remove', Type.STRING],
+        labelButtonAbortItemLoad: ['Abort', Type.STRING],
+        labelButtonRetryItemLoad: ['Retry', Type.STRING],
+        labelButtonAbortItemProcessing: ['Cancel', Type.STRING],
+        labelButtonUndoItemProcessing: ['Undo', Type.STRING],
+        labelButtonRetryItemProcessing: ['Retry', Type.STRING],
+        labelButtonProcessItem: ['Upload', Type.STRING],
+
+        // make sure width and height plus viewpox are even numbers so icons are nicely centered
+        iconRemove: [
+            '<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M11.586 13l-2.293 2.293a1 1 0 0 0 1.414 1.414L13 14.414l2.293 2.293a1 1 0 0 0 1.414-1.414L14.414 13l2.293-2.293a1 1 0 0 0-1.414-1.414L13 11.586l-2.293-2.293a1 1 0 0 0-1.414 1.414L11.586 13z" fill="currentColor" fill-rule="nonzero"/></svg>',
+            Type.STRING,
+        ],
+
+        iconProcess: [
+            '<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M14 10.414v3.585a1 1 0 0 1-2 0v-3.585l-1.293 1.293a1 1 0 0 1-1.414-1.415l3-3a1 1 0 0 1 1.414 0l3 3a1 1 0 0 1-1.414 1.415L14 10.414zM9 18a1 1 0 0 1 0-2h8a1 1 0 0 1 0 2H9z" fill="currentColor" fill-rule="evenodd"/></svg>',
+            Type.STRING,
+        ],
+
+        iconRetry: [
+            '<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M10.81 9.185l-.038.02A4.997 4.997 0 0 0 8 13.683a5 5 0 0 0 5 5 5 5 0 0 0 5-5 1 1 0 0 1 2 0A7 7 0 1 1 9.722 7.496l-.842-.21a.999.999 0 1 1 .484-1.94l3.23.806c.535.133.86.675.73 1.21l-.804 3.233a.997.997 0 0 1-1.21.73.997.997 0 0 1-.73-1.21l.23-.928v-.002z" fill="currentColor" fill-rule="nonzero"/></svg>',
+            Type.STRING,
+        ],
+
+        iconUndo: [
+            '<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M9.185 10.81l.02-.038A4.997 4.997 0 0 1 13.683 8a5 5 0 0 1 5 5 5 5 0 0 1-5 5 1 1 0 0 0 0 2A7 7 0 1 0 7.496 9.722l-.21-.842a.999.999 0 1 0-1.94.484l.806 3.23c.133.535.675.86 1.21.73l3.233-.803a.997.997 0 0 0 .73-1.21.997.997 0 0 0-1.21-.73l-.928.23-.002-.001z" fill="currentColor" fill-rule="nonzero"/></svg>',
+            Type.STRING,
+        ],
+
+        iconDone: [
+            '<svg width="26" height="26" viewBox="0 0 26 26" xmlns="http://www.w3.org/2000/svg"><path d="M18.293 9.293a1 1 0 0 1 1.414 1.414l-7.002 7a1 1 0 0 1-1.414 0l-3.998-4a1 1 0 1 1 1.414-1.414L12 15.586l6.294-6.293z" fill="currentColor" fill-rule="nonzero"/></svg>',
+            Type.STRING,
+        ],
+
+        // event handlers
+        oninit: [null, Type.FUNCTION],
+        onwarning: [null, Type.FUNCTION],
+        onerror: [null, Type.FUNCTION],
+        onactivatefile: [null, Type.FUNCTION],
+        oninitfile: [null, Type.FUNCTION],
+        onaddfilestart: [null, Type.FUNCTION],
+        onaddfileprogress: [null, Type.FUNCTION],
+        onaddfile: [null, Type.FUNCTION],
+        onprocessfilestart: [null, Type.FUNCTION],
+        onprocessfileprogress: [null, Type.FUNCTION],
+        onprocessfileabort: [null, Type.FUNCTION],
+        onprocessfilerevert: [null, Type.FUNCTION],
+        onprocessfile: [null, Type.FUNCTION],
+        onprocessfiles: [null, Type.FUNCTION],
+        onremovefile: [null, Type.FUNCTION],
+        onpreparefile: [null, Type.FUNCTION],
+        onupdatefiles: [null, Type.FUNCTION],
+        onreorderfiles: [null, Type.FUNCTION],
+
+        // hooks
+        beforeDropFile: [null, Type.FUNCTION],
+        beforeAddFile: [null, Type.FUNCTION],
+        beforeRemoveFile: [null, Type.FUNCTION],
+        beforePrepareFile: [null, Type.FUNCTION],
+
+        // styles
+        stylePanelLayout: [null, Type.STRING], // null 'integrated', 'compact', 'circle'
+        stylePanelAspectRatio: [null, Type.STRING], // null or '3:2' or 1
+        styleItemPanelAspectRatio: [null, Type.STRING],
+        styleButtonRemoveItemPosition: ['left', Type.STRING],
+        styleButtonProcessItemPosition: ['right', Type.STRING],
+        styleLoadIndicatorPosition: ['right', Type.STRING],
+        styleProgressIndicatorPosition: ['right', Type.STRING],
+        styleButtonRemoveItemAlign: [false, Type.BOOLEAN],
+
+        // custom initial files array
+        files: [[], Type.ARRAY],
+
+        // show support by displaying credits
+        credits: [['https://pqina.nl/', 'Powered by PQINA'], Type.ARRAY],
+    };
+
+    var getItemByQuery = function getItemByQuery(items, query) {
+        // just return first index
+        if (isEmpty(query)) {
+            return items[0] || null;
+        }
+
+        // query is index
+        if (isInt(query)) {
+            return items[query] || null;
+        }
+
+        // if query is item, get the id
+        if (typeof query === 'object') {
+            query = query.id;
+        }
+
+        // assume query is a string and return item by id
+        return (
+            items.find(function(item) {
+                return item.id === query;
+            }) || null
+        );
+    };
+
+    var getNumericAspectRatioFromString = function getNumericAspectRatioFromString(aspectRatio) {
+        if (isEmpty(aspectRatio)) {
+            return aspectRatio;
+        }
+        if (/:/.test(aspectRatio)) {
+            var parts = aspectRatio.split(':');
+            return parts[1] / parts[0];
+        }
+        return parseFloat(aspectRatio);
+    };
+
+    var getActiveItems = function getActiveItems(items) {
+        return items.filter(function(item) {
+            return !item.archived;
+        });
+    };
+
+    var Status = {
+        EMPTY: 0,
+        IDLE: 1, // waiting
+        ERROR: 2, // a file is in error state
+        BUSY: 3, // busy processing or loading
+        READY: 4, // all files uploaded
+    };
+
+    var res = null;
+    var canUpdateFileInput = function canUpdateFileInput() {
+        if (res === null) {
+            try {
+                var dataTransfer = new DataTransfer();
+                dataTransfer.items.add(new File(['hello world'], 'This_Works.txt'));
+                var el = document.createElement('input');
+                el.setAttribute('type', 'file');
+                el.files = dataTransfer.files;
+                res = el.files.length === 1;
+            } catch (err) {
+                res = false;
+            }
+        }
+        return res;
+    };
+
+    var ITEM_ERROR = [
+        ItemStatus.LOAD_ERROR,
+        ItemStatus.PROCESSING_ERROR,
+        ItemStatus.PROCESSING_REVERT_ERROR,
+    ];
+
+    var ITEM_BUSY = [
+        ItemStatus.LOADING,
+        ItemStatus.PROCESSING,
+        ItemStatus.PROCESSING_QUEUED,
+        ItemStatus.INIT,
+    ];
+
+    var ITEM_READY = [ItemStatus.PROCESSING_COMPLETE];
+
+    var isItemInErrorState = function isItemInErrorState(item) {
+        return ITEM_ERROR.includes(item.status);
+    };
+    var isItemInBusyState = function isItemInBusyState(item) {
+        return ITEM_BUSY.includes(item.status);
+    };
+    var isItemInReadyState = function isItemInReadyState(item) {
+        return ITEM_READY.includes(item.status);
+    };
+
+    var isAsync = function isAsync(state) {
+        return (
+            isObject(state.options.server) &&
+            (isObject(state.options.server.process) || isFunction(state.options.server.process))
+        );
+    };
+
+    var queries = function queries(state) {
+        return {
+            GET_STATUS: function GET_STATUS() {
+                var items = getActiveItems(state.items);
+                var EMPTY = Status.EMPTY,
+                    ERROR = Status.ERROR,
+                    BUSY = Status.BUSY,
+                    IDLE = Status.IDLE,
+                    READY = Status.READY;
+
+                if (items.length === 0) return EMPTY;
+
+                if (items.some(isItemInErrorState)) return ERROR;
+
+                if (items.some(isItemInBusyState)) return BUSY;
+
+                if (items.some(isItemInReadyState)) return READY;
+
+                return IDLE;
+            },
+
+            GET_ITEM: function GET_ITEM(query) {
+                return getItemByQuery(state.items, query);
+            },
+
+            GET_ACTIVE_ITEM: function GET_ACTIVE_ITEM(query) {
+                return getItemByQuery(getActiveItems(state.items), query);
+            },
+
+            GET_ACTIVE_ITEMS: function GET_ACTIVE_ITEMS() {
+                return getActiveItems(state.items);
+            },
+
+            GET_ITEMS: function GET_ITEMS() {
+                return state.items;
+            },
+
+            GET_ITEM_NAME: function GET_ITEM_NAME(query) {
+                var item = getItemByQuery(state.items, query);
+                return item ? item.filename : null;
+            },
+
+            GET_ITEM_SIZE: function GET_ITEM_SIZE(query) {
+                var item = getItemByQuery(state.items, query);
+                return item ? item.fileSize : null;
+            },
+
+            GET_STYLES: function GET_STYLES() {
+                return Object.keys(state.options)
+                    .filter(function(key) {
+                        return /^style/.test(key);
+                    })
+                    .map(function(option) {
+                        return {
+                            name: option,
+                            value: state.options[option],
+                        };
+                    });
+            },
+
+            GET_PANEL_ASPECT_RATIO: function GET_PANEL_ASPECT_RATIO() {
+                var isShapeCircle = /circle/.test(state.options.stylePanelLayout);
+                var aspectRatio = isShapeCircle
+                    ? 1
+                    : getNumericAspectRatioFromString(state.options.stylePanelAspectRatio);
+                return aspectRatio;
+            },
+
+            GET_ITEM_PANEL_ASPECT_RATIO: function GET_ITEM_PANEL_ASPECT_RATIO() {
+                return state.options.styleItemPanelAspectRatio;
+            },
+
+            GET_ITEMS_BY_STATUS: function GET_ITEMS_BY_STATUS(status) {
+                return getActiveItems(state.items).filter(function(item) {
+                    return item.status === status;
+                });
+            },
+
+            GET_TOTAL_ITEMS: function GET_TOTAL_ITEMS() {
+                return getActiveItems(state.items).length;
+            },
+
+            SHOULD_UPDATE_FILE_INPUT: function SHOULD_UPDATE_FILE_INPUT() {
+                return state.options.storeAsFile && canUpdateFileInput() && !isAsync(state);
+            },
+
+            IS_ASYNC: function IS_ASYNC() {
+                return isAsync(state);
+            },
+
+            GET_FILE_SIZE_LABELS: function GET_FILE_SIZE_LABELS(query) {
+                return {
+                    labelBytes: query('GET_LABEL_FILE_SIZE_BYTES') || undefined,
+                    labelKilobytes: query('GET_LABEL_FILE_SIZE_KILOBYTES') || undefined,
+                    labelMegabytes: query('GET_LABEL_FILE_SIZE_MEGABYTES') || undefined,
+                    labelGigabytes: query('GET_LABEL_FILE_SIZE_GIGABYTES') || undefined,
+                };
+            },
+        };
+    };
+
+    var hasRoomForItem = function hasRoomForItem(state) {
+        var count = getActiveItems(state.items).length;
+
+        // if cannot have multiple items, to add one item it should currently not contain items
+        if (!state.options.allowMultiple) {
+            return count === 0;
+        }
+
+        // if allows multiple items, we check if a max item count has been set, if not, there's no limit
+        var maxFileCount = state.options.maxFiles;
+        if (maxFileCount === null) {
+            return true;
+        }
+
+        // we check if the current count is smaller than the max count, if so, another file can still be added
+        if (count < maxFileCount) {
+            return true;
+        }
+
+        // no more room for another file
+        return false;
+    };
+
+    var limit = function limit(value, min, max) {
+        return Math.max(Math.min(max, value), min);
+    };
+
+    var arrayInsert = function arrayInsert(arr, index, item) {
+        return arr.splice(index, 0, item);
+    };
+
+    var insertItem = function insertItem(items, item, index) {
+        if (isEmpty(item)) {
+            return null;
+        }
+
+        // if index is undefined, append
+        if (typeof index === 'undefined') {
+            items.push(item);
+            return item;
+        }
+
+        // limit the index to the size of the items array
+        index = limit(index, 0, items.length);
+
+        // add item to array
+        arrayInsert(items, index, item);
+
+        // expose
+        return item;
+    };
+
+    var isBase64DataURI = function isBase64DataURI(str) {
+        return /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,([a-z0-9!$&',()*+;=\-._~:@\/?%\s]*)\s*$/i.test(
+            str
+        );
+    };
+
+    var getFilenameFromURL = function getFilenameFromURL(url) {
+        return url
+            .split('/')
+            .pop()
+            .split('?')
+            .shift();
+    };
+
+    var getExtensionFromFilename = function getExtensionFromFilename(name) {
+        return name.split('.').pop();
+    };
+
+    var guesstimateExtension = function guesstimateExtension(type) {
+        // if no extension supplied, exit here
+        if (typeof type !== 'string') {
+            return '';
+        }
+
+        // get subtype
+        var subtype = type.split('/').pop();
+
+        // is svg subtype
+        if (/svg/.test(subtype)) {
+            return 'svg';
+        }
+
+        if (/zip|compressed/.test(subtype)) {
+            return 'zip';
+        }
+
+        if (/plain/.test(subtype)) {
+            return 'txt';
+        }
+
+        if (/msword/.test(subtype)) {
+            return 'doc';
+        }
+
+        // if is valid subtype
+        if (/[a-z]+/.test(subtype)) {
+            // always use jpg extension
+            if (subtype === 'jpeg') {
+                return 'jpg';
+            }
+
+            // return subtype
+            return subtype;
+        }
+
+        return '';
+    };
+
+    var leftPad = function leftPad(value) {
+        var padding = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        return (padding + value).slice(-padding.length);
+    };
+
+    var getDateString = function getDateString() {
+        var date = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : new Date();
+        return (
+            date.getFullYear() +
+            '-' +
+            leftPad(date.getMonth() + 1, '00') +
+            '-' +
+            leftPad(date.getDate(), '00') +
+            '_' +
+            leftPad(date.getHours(), '00') +
+            '-' +
+            leftPad(date.getMinutes(), '00') +
+            '-' +
+            leftPad(date.getSeconds(), '00')
+        );
+    };
+
+    var getFileFromBlob = function getFileFromBlob(blob, filename) {
+        var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        var extension = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+        var file =
+            typeof type === 'string'
+                ? blob.slice(0, blob.size, type)
+                : blob.slice(0, blob.size, blob.type);
+        file.lastModifiedDate = new Date();
+
+        // copy relative path
+        if (blob._relativePath) file._relativePath = blob._relativePath;
+
+        // if blob has name property, use as filename if no filename supplied
+        if (!isString(filename)) {
+            filename = getDateString();
+        }
+
+        // if filename supplied but no extension and filename has extension
+        if (filename && extension === null && getExtensionFromFilename(filename)) {
+            file.name = filename;
+        } else {
+            extension = extension || guesstimateExtension(file.type);
+            file.name = filename + (extension ? '.' + extension : '');
+        }
+
+        return file;
+    };
+
+    var getBlobBuilder = function getBlobBuilder() {
+        return (window.BlobBuilder =
+            window.BlobBuilder ||
+            window.WebKitBlobBuilder ||
+            window.MozBlobBuilder ||
+            window.MSBlobBuilder);
+    };
+
+    var createBlob = function createBlob(arrayBuffer, mimeType) {
+        var BB = getBlobBuilder();
+
+        if (BB) {
+            var bb = new BB();
+            bb.append(arrayBuffer);
+            return bb.getBlob(mimeType);
+        }
+
+        return new Blob([arrayBuffer], {
+            type: mimeType,
+        });
+    };
+
+    var getBlobFromByteStringWithMimeType = function getBlobFromByteStringWithMimeType(
+        byteString,
+        mimeType
+    ) {
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+
+        for (var i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+
+        return createBlob(ab, mimeType);
+    };
+
+    var getMimeTypeFromBase64DataURI = function getMimeTypeFromBase64DataURI(dataURI) {
+        return (/^data:(.+);/.exec(dataURI) || [])[1] || null;
+    };
+
+    var getBase64DataFromBase64DataURI = function getBase64DataFromBase64DataURI(dataURI) {
+        // get data part of string (remove data:image/jpeg...,)
+        var data = dataURI.split(',')[1];
+
+        // remove any whitespace as that causes InvalidCharacterError in IE
+        return data.replace(/\s/g, '');
+    };
+
+    var getByteStringFromBase64DataURI = function getByteStringFromBase64DataURI(dataURI) {
+        return atob(getBase64DataFromBase64DataURI(dataURI));
+    };
+
+    var getBlobFromBase64DataURI = function getBlobFromBase64DataURI(dataURI) {
+        var mimeType = getMimeTypeFromBase64DataURI(dataURI);
+        var byteString = getByteStringFromBase64DataURI(dataURI);
+
+        return getBlobFromByteStringWithMimeType(byteString, mimeType);
+    };
+
+    var getFileFromBase64DataURI = function getFileFromBase64DataURI(dataURI, filename, extension) {
+        return getFileFromBlob(getBlobFromBase64DataURI(dataURI), filename, null, extension);
+    };
+
+    var getFileNameFromHeader = function getFileNameFromHeader(header) {
+        // test if is content disposition header, if not exit
+        if (!/^content-disposition:/i.test(header)) return null;
+
+        // get filename parts
+        var matches = header
+            .split(/filename=|filename\*=.+''/)
+            .splice(1)
+            .map(function(name) {
+                return name.trim().replace(/^["']|[;"']{0,2}$/g, '');
+            })
+            .filter(function(name) {
+                return name.length;
+            });
+
+        return matches.length ? decodeURI(matches[matches.length - 1]) : null;
+    };
+
+    var getFileSizeFromHeader = function getFileSizeFromHeader(header) {
+        if (/content-length:/i.test(header)) {
+            var size = header.match(/[0-9]+/)[0];
+            return size ? parseInt(size, 10) : null;
+        }
+        return null;
+    };
+
+    var getTranfserIdFromHeader = function getTranfserIdFromHeader(header) {
+        if (/x-content-transfer-id:/i.test(header)) {
+            var id = (header.split(':')[1] || '').trim();
+            return id || null;
+        }
+        return null;
+    };
+
+    var getFileInfoFromHeaders = function getFileInfoFromHeaders(headers) {
+        var info = {
+            source: null,
+            name: null,
+            size: null,
+        };
+
+        var rows = headers.split('\n');
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+        try {
+            for (
+                var _iterator = rows[Symbol.iterator](), _step;
+                !(_iteratorNormalCompletion = (_step = _iterator.next()).done);
+                _iteratorNormalCompletion = true
+            ) {
+                var header = _step.value;
+
+                var name = getFileNameFromHeader(header);
+                if (name) {
+                    info.name = name;
+                    continue;
+                }
+
+                var size = getFileSizeFromHeader(header);
+                if (size) {
+                    info.size = size;
+                    continue;
+                }
+
+                var source = getTranfserIdFromHeader(header);
+                if (source) {
+                    info.source = source;
+                    continue;
+                }
+            }
+        } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+        } finally {
+            try {
+                if (!_iteratorNormalCompletion && _iterator.return != null) {
+                    _iterator.return();
+                }
+            } finally {
+                if (_didIteratorError) {
+                    throw _iteratorError;
+                }
+            }
+        }
+
+        return info;
+    };
+
+    var createFileLoader = function createFileLoader(fetchFn) {
+        var state = {
+            source: null,
+            complete: false,
+            progress: 0,
+            size: null,
+            timestamp: null,
+            duration: 0,
+            request: null,
+        };
+
+        var getProgress = function getProgress() {
+            return state.progress;
+        };
+        var abort = function abort() {
+            if (state.request && state.request.abort) {
+                state.request.abort();
+            }
+        };
+
+        // load source
+        var load = function load() {
+            // get quick reference
+            var source = state.source;
+
+            api.fire('init', source);
+
+            // Load Files
+            if (source instanceof File) {
+                api.fire('load', source);
+            } else if (source instanceof Blob) {
+                // Load blobs, set default name to current date
+                api.fire('load', getFileFromBlob(source, source.name));
+            } else if (isBase64DataURI(source)) {
+                // Load base 64, set default name to current date
+                api.fire('load', getFileFromBase64DataURI(source));
+            } else {
+                // Deal as if is external URL, let's load it!
+                loadURL(source);
+            }
+        };
+
+        // loads a url
+        var loadURL = function loadURL(url) {
+            // is remote url and no fetch method supplied
+            if (!fetchFn) {
+                api.fire('error', {
+                    type: 'error',
+                    body: "Can't load URL",
+                    code: 400,
+                });
+
+                return;
+            }
+
+            // set request start
+            state.timestamp = Date.now();
+
+            // load file
+            state.request = fetchFn(
+                url,
+                function(response) {
+                    // update duration
+                    state.duration = Date.now() - state.timestamp;
+
+                    // done!
+                    state.complete = true;
+
+                    // turn blob response into a file
+                    if (response instanceof Blob) {
+                        response = getFileFromBlob(
+                            response,
+                            response.name || getFilenameFromURL(url)
+                        );
+                    }
+
+                    api.fire(
+                        'load',
+                        // if has received blob, we go with blob, if no response, we return null
+                        response instanceof Blob ? response : response ? response.body : null
+                    );
+                },
+                function(error) {
+                    api.fire(
+                        'error',
+                        typeof error === 'string'
+                            ? {
+                                  type: 'error',
+                                  code: 0,
+                                  body: error,
+                              }
+                            : error
+                    );
+                },
+                function(computable, current, total) {
+                    // collected some meta data already
+                    if (total) {
+                        state.size = total;
+                    }
+
+                    // update duration
+                    state.duration = Date.now() - state.timestamp;
+
+                    // if we can't compute progress, we're not going to fire progress events
+                    if (!computable) {
+                        state.progress = null;
+                        return;
+                    }
+
+                    // update progress percentage
+                    state.progress = current / total;
+
+                    // expose
+                    api.fire('progress', state.progress);
+                },
+                function() {
+                    api.fire('abort');
+                },
+                function(response) {
+                    var fileinfo = getFileInfoFromHeaders(
+                        typeof response === 'string' ? response : response.headers
+                    );
+                    api.fire('meta', {
+                        size: state.size || fileinfo.size,
+                        filename: fileinfo.name,
+                        source: fileinfo.source,
+                    });
+                }
+            );
+        };
+
+        var api = Object.assign({}, on(), {
+            setSource: function setSource(source) {
+                return (state.source = source);
+            },
+            getProgress: getProgress, // file load progress
+            abort: abort, // abort file load
+            load: load, // start load
+        });
+
+        return api;
+    };
+
+    var isGet = function isGet(method) {
+        return /GET|HEAD/.test(method);
+    };
+
+    var sendRequest = function sendRequest(data, url, options) {
+        var api = {
+            onheaders: function onheaders() {},
+            onprogress: function onprogress() {},
+            onload: function onload() {},
+            ontimeout: function ontimeout() {},
+            onerror: function onerror() {},
+            onabort: function onabort() {},
+            abort: function abort() {
+                aborted = true;
+                xhr.abort();
+            },
+        };
+
+        // timeout identifier, only used when timeout is defined
+        var aborted = false;
+        var headersReceived = false;
+
+        // set default options
+        options = Object.assign(
+            {
+                method: 'POST',
+                headers: {},
+                withCredentials: false,
+            },
+            options
+        );
+
+        // encode url
+        url = encodeURI(url);
+
+        // if method is GET, add any received data to url
+
+        if (isGet(options.method) && data) {
+            url =
+                '' +
+                url +
+                encodeURIComponent(typeof data === 'string' ? data : JSON.stringify(data));
+        }
+
+        // create request
+        var xhr = new XMLHttpRequest();
+
+        // progress of load
+        var process = isGet(options.method) ? xhr : xhr.upload;
+        process.onprogress = function(e) {
+            // no progress event when aborted ( onprogress is called once after abort() )
+            if (aborted) {
+                return;
+            }
+
+            api.onprogress(e.lengthComputable, e.loaded, e.total);
+        };
+
+        // tries to get header info to the app as fast as possible
+        xhr.onreadystatechange = function() {
+            // not interesting in these states ('unsent' and 'openend' as they don't give us any additional info)
+            if (xhr.readyState < 2) {
+                return;
+            }
+
+            // no server response
+            if (xhr.readyState === 4 && xhr.status === 0) {
+                return;
+            }
+
+            if (headersReceived) {
+                return;
+            }
+
+            headersReceived = true;
+
+            // we've probably received some useful data in response headers
+            api.onheaders(xhr);
+        };
+
+        // load successful
+        xhr.onload = function() {
+            // is classified as valid response
+            if (xhr.status >= 200 && xhr.status < 300) {
+                api.onload(xhr);
+            } else {
+                api.onerror(xhr);
+            }
+        };
+
+        // error during load
+        xhr.onerror = function() {
+            return api.onerror(xhr);
+        };
+
+        // request aborted
+        xhr.onabort = function() {
+            aborted = true;
+            api.onabort();
+        };
+
+        // request timeout
+        xhr.ontimeout = function() {
+            return api.ontimeout(xhr);
+        };
+
+        // open up open up!
+        xhr.open(options.method, url, true);
+
+        // set timeout if defined (do it after open so IE11 plays ball)
+        if (isInt(options.timeout)) {
+            xhr.timeout = options.timeout;
+        }
+
+        // add headers
+        Object.keys(options.headers).forEach(function(key) {
+            var value = unescape(encodeURIComponent(options.headers[key]));
+            xhr.setRequestHeader(key, value);
+        });
+
+        // set type of response
+        if (options.responseType) {
+            xhr.responseType = options.responseType;
+        }
+
+        // set credentials
+        if (options.withCredentials) {
+            xhr.withCredentials = true;
+        }
+
+        // let's send our data
+        xhr.send(data);
+
+        return api;
+    };
+
+    var createResponse = function createResponse(type, code, body, headers) {
+        return {
+            type: type,
+            code: code,
+            body: body,
+            headers: headers,
+        };
+    };
+
+    var createTimeoutResponse = function createTimeoutResponse(cb) {
+        return function(xhr) {
+            cb(createResponse('error', 0, 'Timeout', xhr.getAllResponseHeaders()));
+        };
+    };
+
+    var hasQS = function hasQS(str) {
+        return /\?/.test(str);
+    };
+    var buildURL = function buildURL() {
+        var url = '';
+        for (var _len = arguments.length, parts = new Array(_len), _key = 0; _key < _len; _key++) {
+            parts[_key] = arguments[_key];
+        }
+        parts.forEach(function(part) {
+            url += hasQS(url) && hasQS(part) ? part.replace(/\?/, '&') : part;
+        });
+        return url;
+    };
+
+    var createFetchFunction = function createFetchFunction() {
+        var apiUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var action = arguments.length > 1 ? arguments[1] : undefined;
+        // custom handler (should also handle file, load, error, progress and abort)
+        if (typeof action === 'function') {
+            return action;
+        }
+
+        // no action supplied
+        if (!action || !isString(action.url)) {
+            return null;
+        }
+
+        // set onload hanlder
+        var onload =
+            action.onload ||
+            function(res) {
+                return res;
+            };
+        var onerror =
+            action.onerror ||
+            function(res) {
+                return null;
+            };
+
+        // internal handler
+        return function(url, load, error, progress, abort, headers) {
+            // do local or remote request based on if the url is external
+            var request = sendRequest(
+                url,
+                buildURL(apiUrl, action.url),
+                Object.assign({}, action, {
+                    responseType: 'blob',
+                })
+            );
+
+            request.onload = function(xhr) {
+                // get headers
+                var headers = xhr.getAllResponseHeaders();
+
+                // get filename
+                var filename = getFileInfoFromHeaders(headers).name || getFilenameFromURL(url);
+
+                // create response
+                load(
+                    createResponse(
+                        'load',
+                        xhr.status,
+                        action.method === 'HEAD'
+                            ? null
+                            : getFileFromBlob(onload(xhr.response), filename),
+                        headers
+                    )
+                );
+            };
+
+            request.onerror = function(xhr) {
+                error(
+                    createResponse(
+                        'error',
+                        xhr.status,
+                        onerror(xhr.response) || xhr.statusText,
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.onheaders = function(xhr) {
+                headers(createResponse('headers', xhr.status, null, xhr.getAllResponseHeaders()));
+            };
+
+            request.ontimeout = createTimeoutResponse(error);
+            request.onprogress = progress;
+            request.onabort = abort;
+
+            // should return request
+            return request;
+        };
+    };
+
+    var ChunkStatus = {
+        QUEUED: 0,
+        COMPLETE: 1,
+        PROCESSING: 2,
+        ERROR: 3,
+        WAITING: 4,
+    };
+
+    /*
+                                                       function signature:
+                                                         (file, metadata, load, error, progress, abort, transfer, options) => {
+                                                           return {
+                                                           abort:() => {}
+                                                         }
+                                                       }
+                                                       */
+
+    // apiUrl, action, name, file, metadata, load, error, progress, abort, transfer, options
+    var processFileChunked = function processFileChunked(
+        apiUrl,
+        action,
+        name,
+        file,
+        metadata,
+        load,
+        error,
+        progress,
+        abort,
+        transfer,
+        options
+    ) {
+        // all chunks
+        var chunks = [];
+        var chunkTransferId = options.chunkTransferId,
+            chunkServer = options.chunkServer,
+            chunkSize = options.chunkSize,
+            chunkRetryDelays = options.chunkRetryDelays;
+
+        // default state
+        var state = {
+            serverId: chunkTransferId,
+            aborted: false,
+        };
+
+        // set onload handlers
+        var ondata =
+            action.ondata ||
+            function(fd) {
+                return fd;
+            };
+        var onload =
+            action.onload ||
+            function(xhr, method) {
+                return method === 'HEAD' ? xhr.getResponseHeader('Upload-Offset') : xhr.response;
+            };
+        var onerror =
+            action.onerror ||
+            function(res) {
+                return null;
+            };
+
+        // create server hook
+        var requestTransferId = function requestTransferId(cb) {
+            var formData = new FormData();
+
+            // add metadata under same name
+            if (isObject(metadata)) formData.append(name, JSON.stringify(metadata));
+
+            var headers =
+                typeof action.headers === 'function'
+                    ? action.headers(file, metadata)
+                    : Object.assign({}, action.headers, {
+                          'Upload-Length': file.size,
+                      });
+
+            var requestParams = Object.assign({}, action, {
+                headers: headers,
+            });
+
+            // send request object
+            var request = sendRequest(
+                ondata(formData),
+                buildURL(apiUrl, action.url),
+                requestParams
+            );
+
+            request.onload = function(xhr) {
+                return cb(onload(xhr, requestParams.method));
+            };
+
+            request.onerror = function(xhr) {
+                return error(
+                    createResponse(
+                        'error',
+                        xhr.status,
+                        onerror(xhr.response) || xhr.statusText,
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.ontimeout = createTimeoutResponse(error);
+        };
+
+        var requestTransferOffset = function requestTransferOffset(cb) {
+            var requestUrl = buildURL(apiUrl, chunkServer.url, state.serverId);
+
+            var headers =
+                typeof action.headers === 'function'
+                    ? action.headers(state.serverId)
+                    : Object.assign({}, action.headers);
+
+            var requestParams = {
+                headers: headers,
+                method: 'HEAD',
+            };
+
+            var request = sendRequest(null, requestUrl, requestParams);
+
+            request.onload = function(xhr) {
+                return cb(onload(xhr, requestParams.method));
+            };
+
+            request.onerror = function(xhr) {
+                return error(
+                    createResponse(
+                        'error',
+                        xhr.status,
+                        onerror(xhr.response) || xhr.statusText,
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.ontimeout = createTimeoutResponse(error);
+        };
+
+        // create chunks
+        var lastChunkIndex = Math.floor(file.size / chunkSize);
+        for (var i = 0; i <= lastChunkIndex; i++) {
+            var offset = i * chunkSize;
+            var data = file.slice(offset, offset + chunkSize, 'application/offset+octet-stream');
+            chunks[i] = {
+                index: i,
+                size: data.size,
+                offset: offset,
+                data: data,
+                file: file,
+                progress: 0,
+                retries: _toConsumableArray(chunkRetryDelays),
+                status: ChunkStatus.QUEUED,
+                error: null,
+                request: null,
+                timeout: null,
+            };
+        }
+
+        var completeProcessingChunks = function completeProcessingChunks() {
+            return load(state.serverId);
+        };
+
+        var canProcessChunk = function canProcessChunk(chunk) {
+            return chunk.status === ChunkStatus.QUEUED || chunk.status === ChunkStatus.ERROR;
+        };
+
+        var processChunk = function processChunk(chunk) {
+            // processing is paused, wait here
+            if (state.aborted) return;
+
+            // get next chunk to process
+            chunk = chunk || chunks.find(canProcessChunk);
+
+            // no more chunks to process
+            if (!chunk) {
+                // all done?
+                if (
+                    chunks.every(function(chunk) {
+                        return chunk.status === ChunkStatus.COMPLETE;
+                    })
+                ) {
+                    completeProcessingChunks();
+                }
+
+                // no chunk to handle
+                return;
+            }
+
+            // now processing this chunk
+            chunk.status = ChunkStatus.PROCESSING;
+            chunk.progress = null;
+
+            // allow parsing of formdata
+            var ondata =
+                chunkServer.ondata ||
+                function(fd) {
+                    return fd;
+                };
+            var onerror =
+                chunkServer.onerror ||
+                function(res) {
+                    return null;
+                };
+
+            // send request object
+            var requestUrl = buildURL(apiUrl, chunkServer.url, state.serverId);
+
+            var headers =
+                typeof chunkServer.headers === 'function'
+                    ? chunkServer.headers(chunk)
+                    : Object.assign({}, chunkServer.headers, {
+                          'Content-Type': 'application/offset+octet-stream',
+                          'Upload-Offset': chunk.offset,
+                          'Upload-Length': file.size,
+                          'Upload-Name': file.name,
+                      });
+
+            var request = (chunk.request = sendRequest(
+                ondata(chunk.data),
+                requestUrl,
+                Object.assign({}, chunkServer, {
+                    headers: headers,
+                })
+            ));
+
+            request.onload = function() {
+                // done!
+                chunk.status = ChunkStatus.COMPLETE;
+
+                // remove request reference
+                chunk.request = null;
+
+                // start processing more chunks
+                processChunks();
+            };
+
+            request.onprogress = function(lengthComputable, loaded, total) {
+                chunk.progress = lengthComputable ? loaded : null;
+                updateTotalProgress();
+            };
+
+            request.onerror = function(xhr) {
+                chunk.status = ChunkStatus.ERROR;
+                chunk.request = null;
+                chunk.error = onerror(xhr.response) || xhr.statusText;
+                if (!retryProcessChunk(chunk)) {
+                    error(
+                        createResponse(
+                            'error',
+                            xhr.status,
+                            onerror(xhr.response) || xhr.statusText,
+                            xhr.getAllResponseHeaders()
+                        )
+                    );
+                }
+            };
+
+            request.ontimeout = function(xhr) {
+                chunk.status = ChunkStatus.ERROR;
+                chunk.request = null;
+                if (!retryProcessChunk(chunk)) {
+                    createTimeoutResponse(error)(xhr);
+                }
+            };
+
+            request.onabort = function() {
+                chunk.status = ChunkStatus.QUEUED;
+                chunk.request = null;
+                abort();
+            };
+        };
+
+        var retryProcessChunk = function retryProcessChunk(chunk) {
+            // no more retries left
+            if (chunk.retries.length === 0) return false;
+
+            // new retry
+            chunk.status = ChunkStatus.WAITING;
+            clearTimeout(chunk.timeout);
+            chunk.timeout = setTimeout(function() {
+                processChunk(chunk);
+            }, chunk.retries.shift());
+
+            // we're going to retry
+            return true;
+        };
+
+        var updateTotalProgress = function updateTotalProgress() {
+            // calculate total progress fraction
+            var totalBytesTransfered = chunks.reduce(function(p, chunk) {
+                if (p === null || chunk.progress === null) return null;
+                return p + chunk.progress;
+            }, 0);
+
+            // can't compute progress
+            if (totalBytesTransfered === null) return progress(false, 0, 0);
+
+            // calculate progress values
+            var totalSize = chunks.reduce(function(total, chunk) {
+                return total + chunk.size;
+            }, 0);
+
+            // can update progress indicator
+            progress(true, totalBytesTransfered, totalSize);
+        };
+
+        // process new chunks
+        var processChunks = function processChunks() {
+            var totalProcessing = chunks.filter(function(chunk) {
+                return chunk.status === ChunkStatus.PROCESSING;
+            }).length;
+            if (totalProcessing >= 1) return;
+            processChunk();
+        };
+
+        var abortChunks = function abortChunks() {
+            chunks.forEach(function(chunk) {
+                clearTimeout(chunk.timeout);
+                if (chunk.request) {
+                    chunk.request.abort();
+                }
+            });
+        };
+
+        // let's go!
+        if (!state.serverId) {
+            requestTransferId(function(serverId) {
+                // stop here if aborted, might have happened in between request and callback
+                if (state.aborted) return;
+
+                // pass back to item so we can use it if something goes wrong
+                transfer(serverId);
+
+                // store internally
+                state.serverId = serverId;
+                processChunks();
+            });
+        } else {
+            requestTransferOffset(function(offset) {
+                // stop here if aborted, might have happened in between request and callback
+                if (state.aborted) return;
+
+                // mark chunks with lower offset as complete
+                chunks
+                    .filter(function(chunk) {
+                        return chunk.offset < offset;
+                    })
+                    .forEach(function(chunk) {
+                        chunk.status = ChunkStatus.COMPLETE;
+                        chunk.progress = chunk.size;
+                    });
+
+                // continue processing
+                processChunks();
+            });
+        }
+
+        return {
+            abort: function abort() {
+                state.aborted = true;
+                abortChunks();
+            },
+        };
+    };
+
+    /*
+                                                               function signature:
+                                                                 (file, metadata, load, error, progress, abort) => {
+                                                                   return {
+                                                                   abort:() => {}
+                                                                 }
+                                                               }
+                                                               */
+    var createFileProcessorFunction = function createFileProcessorFunction(
+        apiUrl,
+        action,
+        name,
+        options
+    ) {
+        return function(file, metadata, load, error, progress, abort, transfer) {
+            // no file received
+            if (!file) return;
+
+            // if was passed a file, and we can chunk it, exit here
+            var canChunkUpload = options.chunkUploads;
+            var shouldChunkUpload = canChunkUpload && file.size > options.chunkSize;
+            var willChunkUpload = canChunkUpload && (shouldChunkUpload || options.chunkForce);
+            if (file instanceof Blob && willChunkUpload)
+                return processFileChunked(
+                    apiUrl,
+                    action,
+                    name,
+                    file,
+                    metadata,
+                    load,
+                    error,
+                    progress,
+                    abort,
+                    transfer,
+                    options
+                );
+
+            // set handlers
+            var ondata =
+                action.ondata ||
+                function(fd) {
+                    return fd;
+                };
+            var onload =
+                action.onload ||
+                function(res) {
+                    return res;
+                };
+            var onerror =
+                action.onerror ||
+                function(res) {
+                    return null;
+                };
+
+            var headers =
+                typeof action.headers === 'function'
+                    ? action.headers(file, metadata) || {}
+                    : Object.assign(
+                          {},
+
+                          action.headers
+                      );
+
+            var requestParams = Object.assign({}, action, {
+                headers: headers,
+            });
+
+            // create formdata object
+            var formData = new FormData();
+
+            // add metadata under same name
+            if (isObject(metadata)) {
+                formData.append(name, JSON.stringify(metadata));
+            }
+
+            // Turn into an array of objects so no matter what the input, we can handle it the same way
+            (file instanceof Blob ? [{ name: null, file: file }] : file).forEach(function(item) {
+                formData.append(
+                    name,
+                    item.file,
+                    item.name === null ? item.file.name : '' + item.name + item.file.name
+                );
+            });
+
+            // send request object
+            var request = sendRequest(
+                ondata(formData),
+                buildURL(apiUrl, action.url),
+                requestParams
+            );
+            request.onload = function(xhr) {
+                load(
+                    createResponse(
+                        'load',
+                        xhr.status,
+                        onload(xhr.response),
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.onerror = function(xhr) {
+                error(
+                    createResponse(
+                        'error',
+                        xhr.status,
+                        onerror(xhr.response) || xhr.statusText,
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.ontimeout = createTimeoutResponse(error);
+            request.onprogress = progress;
+            request.onabort = abort;
+
+            // should return request
+            return request;
+        };
+    };
+
+    var createProcessorFunction = function createProcessorFunction() {
+        var apiUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var action = arguments.length > 1 ? arguments[1] : undefined;
+        var name = arguments.length > 2 ? arguments[2] : undefined;
+        var options = arguments.length > 3 ? arguments[3] : undefined;
+
+        // custom handler (should also handle file, load, error, progress and abort)
+        if (typeof action === 'function')
+            return function() {
+                for (
+                    var _len = arguments.length, params = new Array(_len), _key = 0;
+                    _key < _len;
+                    _key++
+                ) {
+                    params[_key] = arguments[_key];
+                }
+                return action.apply(void 0, [name].concat(params, [options]));
+            };
+
+        // no action supplied
+        if (!action || !isString(action.url)) return null;
+
+        // internal handler
+        return createFileProcessorFunction(apiUrl, action, name, options);
+    };
+
+    /*
+                                                      function signature:
+                                                      (uniqueFileId, load, error) => { }
+                                                      */
+    var createRevertFunction = function createRevertFunction() {
+        var apiUrl = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var action = arguments.length > 1 ? arguments[1] : undefined;
+        // is custom implementation
+        if (typeof action === 'function') {
+            return action;
+        }
+
+        // no action supplied, return stub function, interface will work, but file won't be removed
+        if (!action || !isString(action.url)) {
+            return function(uniqueFileId, load) {
+                return load();
+            };
+        }
+
+        // set onload hanlder
+        var onload =
+            action.onload ||
+            function(res) {
+                return res;
+            };
+        var onerror =
+            action.onerror ||
+            function(res) {
+                return null;
+            };
+
+        // internal implementation
+        return function(uniqueFileId, load, error) {
+            var request = sendRequest(
+                uniqueFileId,
+                apiUrl + action.url,
+                action // contains method, headers and withCredentials properties
+            );
+            request.onload = function(xhr) {
+                load(
+                    createResponse(
+                        'load',
+                        xhr.status,
+                        onload(xhr.response),
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.onerror = function(xhr) {
+                error(
+                    createResponse(
+                        'error',
+                        xhr.status,
+                        onerror(xhr.response) || xhr.statusText,
+                        xhr.getAllResponseHeaders()
+                    )
+                );
+            };
+
+            request.ontimeout = createTimeoutResponse(error);
+
+            return request;
+        };
+    };
+
+    var getRandomNumber = function getRandomNumber() {
+        var min = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var max = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+        return min + Math.random() * (max - min);
+    };
+
+    var createPerceivedPerformanceUpdater = function createPerceivedPerformanceUpdater(cb) {
+        var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1000;
+        var offset = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+        var tickMin = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 25;
+        var tickMax = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 250;
+        var timeout = null;
+        var start = Date.now();
+
+        var tick = function tick() {
+            var runtime = Date.now() - start;
+            var delay = getRandomNumber(tickMin, tickMax);
+
+            if (runtime + delay > duration) {
+                delay = runtime + delay - duration;
+            }
+
+            var progress = runtime / duration;
+            if (progress >= 1 || document.hidden) {
+                cb(1);
+                return;
+            }
+
+            cb(progress);
+
+            timeout = setTimeout(tick, delay);
+        };
+
+        if (duration > 0) tick();
+
+        return {
+            clear: function clear() {
+                clearTimeout(timeout);
+            },
+        };
+    };
+
+    var createFileProcessor = function createFileProcessor(processFn, options) {
+        var state = {
+            complete: false,
+            perceivedProgress: 0,
+            perceivedPerformanceUpdater: null,
+            progress: null,
+            timestamp: null,
+            perceivedDuration: 0,
+            duration: 0,
+            request: null,
+            response: null,
+        };
+        var allowMinimumUploadDuration = options.allowMinimumUploadDuration;
+
+        var process = function process(file, metadata) {
+            var progressFn = function progressFn() {
+                // we've not yet started the real download, stop here
+                // the request might not go through, for instance, there might be some server trouble
+                // if state.progress is null, the server does not allow computing progress and we show the spinner instead
+                if (state.duration === 0 || state.progress === null) return;
+
+                // as we're now processing, fire the progress event
+                api.fire('progress', api.getProgress());
+            };
+
+            var completeFn = function completeFn() {
+                state.complete = true;
+                api.fire('load-perceived', state.response.body);
+            };
+
+            // let's start processing
+            api.fire('start');
+
+            // set request start
+            state.timestamp = Date.now();
+
+            // create perceived performance progress indicator
+            state.perceivedPerformanceUpdater = createPerceivedPerformanceUpdater(
+                function(progress) {
+                    state.perceivedProgress = progress;
+                    state.perceivedDuration = Date.now() - state.timestamp;
+
+                    progressFn();
+
+                    // if fake progress is done, and a response has been received,
+                    // and we've not yet called the complete method
+                    if (state.response && state.perceivedProgress === 1 && !state.complete) {
+                        // we done!
+                        completeFn();
+                    }
+                },
+                // random delay as in a list of files you start noticing
+                // files uploading at the exact same speed
+                allowMinimumUploadDuration ? getRandomNumber(750, 1500) : 0
+            );
+
+            // remember request so we can abort it later
+            state.request = processFn(
+                // the file to process
+                file,
+
+                // the metadata to send along
+                metadata,
+
+                // callbacks (load, error, progress, abort, transfer)
+                // load expects the body to be a server id if
+                // you want to make use of revert
+                function(response) {
+                    // we put the response in state so we can access
+                    // it outside of this method
+                    state.response = isObject(response)
+                        ? response
+                        : {
+                              type: 'load',
+                              code: 200,
+                              body: '' + response,
+                              headers: {},
+                          };
+
+                    // update duration
+                    state.duration = Date.now() - state.timestamp;
+
+                    // force progress to 1 as we're now done
+                    state.progress = 1;
+
+                    // actual load is done let's share results
+                    api.fire('load', state.response.body);
+
+                    // we are really done
+                    // if perceived progress is 1 ( wait for perceived progress to complete )
+                    // or if server does not support progress ( null )
+                    if (
+                        !allowMinimumUploadDuration ||
+                        (allowMinimumUploadDuration && state.perceivedProgress === 1)
+                    ) {
+                        completeFn();
+                    }
+                },
+
+                // error is expected to be an object with type, code, body
+                function(error) {
+                    // cancel updater
+                    state.perceivedPerformanceUpdater.clear();
+
+                    // update others about this error
+                    api.fire(
+                        'error',
+                        isObject(error)
+                            ? error
+                            : {
+                                  type: 'error',
+                                  code: 0,
+                                  body: '' + error,
+                              }
+                    );
+                },
+
+                // actual processing progress
+                function(computable, current, total) {
+                    // update actual duration
+                    state.duration = Date.now() - state.timestamp;
+
+                    // update actual progress
+                    state.progress = computable ? current / total : null;
+
+                    progressFn();
+                },
+
+                // abort does not expect a value
+                function() {
+                    // stop updater
+                    state.perceivedPerformanceUpdater.clear();
+
+                    // fire the abort event so we can switch visuals
+                    api.fire('abort', state.response ? state.response.body : null);
+                },
+
+                // register the id for this transfer
+                function(transferId) {
+                    api.fire('transfer', transferId);
+                }
+            );
+        };
+
+        var abort = function abort() {
+            // no request running, can't abort
+            if (!state.request) return;
+
+            // stop updater
+            state.perceivedPerformanceUpdater.clear();
+
+            // abort actual request
+            if (state.request.abort) state.request.abort();
+
+            // if has response object, we've completed the request
+            state.complete = true;
+        };
+
+        var reset = function reset() {
+            abort();
+            state.complete = false;
+            state.perceivedProgress = 0;
+            state.progress = 0;
+            state.timestamp = null;
+            state.perceivedDuration = 0;
+            state.duration = 0;
+            state.request = null;
+            state.response = null;
+        };
+
+        var getProgress = allowMinimumUploadDuration
+            ? function() {
+                  return state.progress ? Math.min(state.progress, state.perceivedProgress) : null;
+              }
+            : function() {
+                  return state.progress || null;
+              };
+
+        var getDuration = allowMinimumUploadDuration
+            ? function() {
+                  return Math.min(state.duration, state.perceivedDuration);
+              }
+            : function() {
+                  return state.duration;
+              };
+
+        var api = Object.assign({}, on(), {
+            process: process, // start processing file
+            abort: abort, // abort active process request
+            getProgress: getProgress,
+            getDuration: getDuration,
+            reset: reset,
+        });
+
+        return api;
+    };
+
+    var getFilenameWithoutExtension = function getFilenameWithoutExtension(name) {
+        return name.substring(0, name.lastIndexOf('.')) || name;
+    };
+
+    var createFileStub = function createFileStub(source) {
+        var data = [source.name, source.size, source.type];
+
+        // is blob or base64, then we need to set the name
+        if (source instanceof Blob || isBase64DataURI(source)) {
+            data[0] = source.name || getDateString();
+        } else if (isBase64DataURI(source)) {
+            // if is base64 data uri we need to determine the average size and type
+            data[1] = source.length;
+            data[2] = getMimeTypeFromBase64DataURI(source);
+        } else if (isString(source)) {
+            // url
+            data[0] = getFilenameFromURL(source);
+            data[1] = 0;
+            data[2] = 'application/octet-stream';
+        }
+
+        return {
+            name: data[0],
+            size: data[1],
+            type: data[2],
+        };
+    };
+
+    var isFile = function isFile(value) {
+        return !!(value instanceof File || (value instanceof Blob && value.name));
+    };
+
+    var deepCloneObject = function deepCloneObject(src) {
+        if (!isObject(src)) return src;
+        var target = isArray(src) ? [] : {};
+        for (var key in src) {
+            if (!src.hasOwnProperty(key)) continue;
+            var v = src[key];
+            target[key] = v && isObject(v) ? deepCloneObject(v) : v;
+        }
+        return target;
+    };
+
+    var createItem = function createItem() {
+        var origin = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var serverFileReference =
+            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+        var file = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+        // unique id for this item, is used to identify the item across views
+        var id = getUniqueId();
+
+        /**
+         * Internal item state
+         */
+        var state = {
+            // is archived
+            archived: false,
+
+            // if is frozen, no longer fires events
+            frozen: false,
+
+            // removed from view
+            released: false,
+
+            // original source
+            source: null,
+
+            // file model reference
+            file: file,
+
+            // id of file on server
+            serverFileReference: serverFileReference,
+
+            // id of file transfer on server
+            transferId: null,
+
+            // is aborted
+            processingAborted: false,
+
+            // current item status
+            status: serverFileReference ? ItemStatus.PROCESSING_COMPLETE : ItemStatus.INIT,
+
+            // active processes
+            activeLoader: null,
+            activeProcessor: null,
+        };
+
+        // callback used when abort processing is called to link back to the resolve method
+        var abortProcessingRequestComplete = null;
+
+        /**
+         * Externally added item metadata
+         */
+        var metadata = {};
+
+        // item data
+        var setStatus = function setStatus(status) {
+            return (state.status = status);
+        };
+
+        // fire event unless the item has been archived
+        var fire = function fire(event) {
+            if (state.released || state.frozen) return;
+            for (
+                var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1;
+                _key < _len;
+                _key++
+            ) {
+                params[_key - 1] = arguments[_key];
+            }
+            api.fire.apply(api, [event].concat(params));
+        };
+
+        // file data
+        var getFileExtension = function getFileExtension() {
+            return getExtensionFromFilename(state.file.name);
+        };
+        var getFileType = function getFileType() {
+            return state.file.type;
+        };
+        var getFileSize = function getFileSize() {
+            return state.file.size;
+        };
+        var getFile = function getFile() {
+            return state.file;
+        };
+
+        //
+        // logic to load a file
+        //
+        var load = function load(source, loader, onload) {
+            // remember the original item source
+            state.source = source;
+
+            // source is known
+            api.fireSync('init');
+
+            // file stub is already there
+            if (state.file) {
+                api.fireSync('load-skip');
+                return;
+            }
+
+            // set a stub file object while loading the actual data
+            state.file = createFileStub(source);
+
+            // starts loading
+            loader.on('init', function() {
+                fire('load-init');
+            });
+
+            // we'eve received a size indication, let's update the stub
+            loader.on('meta', function(meta) {
+                // set size of file stub
+                state.file.size = meta.size;
+
+                // set name of file stub
+                state.file.filename = meta.filename;
+
+                // if has received source, we done
+                if (meta.source) {
+                    origin = FileOrigin.LIMBO;
+                    state.serverFileReference = meta.source;
+                    state.status = ItemStatus.PROCESSING_COMPLETE;
+                }
+
+                // size has been updated
+                fire('load-meta');
+            });
+
+            // the file is now loading we need to update the progress indicators
+            loader.on('progress', function(progress) {
+                setStatus(ItemStatus.LOADING);
+
+                fire('load-progress', progress);
+            });
+
+            // an error was thrown while loading the file, we need to switch to error state
+            loader.on('error', function(error) {
+                setStatus(ItemStatus.LOAD_ERROR);
+
+                fire('load-request-error', error);
+            });
+
+            // user or another process aborted the file load (cannot retry)
+            loader.on('abort', function() {
+                setStatus(ItemStatus.INIT);
+                fire('load-abort');
+            });
+
+            // done loading
+            loader.on('load', function(file) {
+                // as we've now loaded the file the loader is no longer required
+                state.activeLoader = null;
+
+                // called when file has loaded succesfully
+                var success = function success(result) {
+                    // set (possibly) transformed file
+                    state.file = isFile(result) ? result : state.file;
+
+                    // file received
+                    if (origin === FileOrigin.LIMBO && state.serverFileReference) {
+                        setStatus(ItemStatus.PROCESSING_COMPLETE);
+                    } else {
+                        setStatus(ItemStatus.IDLE);
+                    }
+
+                    fire('load');
+                };
+
+                var error = function error(result) {
+                    // set original file
+                    state.file = file;
+                    fire('load-meta');
+
+                    setStatus(ItemStatus.LOAD_ERROR);
+                    fire('load-file-error', result);
+                };
+
+                // if we already have a server file reference, we don't need to call the onload method
+                if (state.serverFileReference) {
+                    success(file);
+                    return;
+                }
+
+                // no server id, let's give this file the full treatment
+                onload(file, success, error);
+            });
+
+            // set loader source data
+            loader.setSource(source);
+
+            // set as active loader
+            state.activeLoader = loader;
+
+            // load the source data
+            loader.load();
+        };
+
+        var retryLoad = function retryLoad() {
+            if (!state.activeLoader) {
+                return;
+            }
+            state.activeLoader.load();
+        };
+
+        var abortLoad = function abortLoad() {
+            if (state.activeLoader) {
+                state.activeLoader.abort();
+                return;
+            }
+            setStatus(ItemStatus.INIT);
+            fire('load-abort');
+        };
+
+        //
+        // logic to process a file
+        //
+        var process = function process(processor, onprocess) {
+            // processing was aborted
+            if (state.processingAborted) {
+                state.processingAborted = false;
+                return;
+            }
+
+            // now processing
+            setStatus(ItemStatus.PROCESSING);
+
+            // reset abort callback
+            abortProcessingRequestComplete = null;
+
+            // if no file loaded we'll wait for the load event
+            if (!(state.file instanceof Blob)) {
+                api.on('load', function() {
+                    process(processor, onprocess);
+                });
+                return;
+            }
+
+            // setup processor
+            processor.on('load', function(serverFileReference) {
+                // need this id to be able to revert the upload
+                state.transferId = null;
+                state.serverFileReference = serverFileReference;
+            });
+
+            // register transfer id
+            processor.on('transfer', function(transferId) {
+                // need this id to be able to revert the upload
+                state.transferId = transferId;
+            });
+
+            processor.on('load-perceived', function(serverFileReference) {
+                // no longer required
+                state.activeProcessor = null;
+
+                // need this id to be able to rever the upload
+                state.transferId = null;
+                state.serverFileReference = serverFileReference;
+
+                setStatus(ItemStatus.PROCESSING_COMPLETE);
+                fire('process-complete', serverFileReference);
+            });
+
+            processor.on('start', function() {
+                fire('process-start');
+            });
+
+            processor.on('error', function(error) {
+                state.activeProcessor = null;
+                setStatus(ItemStatus.PROCESSING_ERROR);
+                fire('process-error', error);
+            });
+
+            processor.on('abort', function(serverFileReference) {
+                state.activeProcessor = null;
+
+                // if file was uploaded but processing was cancelled during perceived processor time store file reference
+                state.serverFileReference = serverFileReference;
+
+                setStatus(ItemStatus.IDLE);
+                fire('process-abort');
+
+                // has timeout so doesn't interfere with remove action
+                if (abortProcessingRequestComplete) {
+                    abortProcessingRequestComplete();
+                }
+            });
+
+            processor.on('progress', function(progress) {
+                fire('process-progress', progress);
+            });
+
+            // when successfully transformed
+            var success = function success(file) {
+                // if was archived in the mean time, don't process
+                if (state.archived) return;
+
+                // process file!
+                processor.process(file, Object.assign({}, metadata));
+            };
+
+            // something went wrong during transform phase
+            var error = console.error;
+
+            // start processing the file
+            onprocess(state.file, success, error);
+
+            // set as active processor
+            state.activeProcessor = processor;
+        };
+
+        var requestProcessing = function requestProcessing() {
+            state.processingAborted = false;
+            setStatus(ItemStatus.PROCESSING_QUEUED);
+        };
+
+        var abortProcessing = function abortProcessing() {
+            return new Promise(function(resolve) {
+                if (!state.activeProcessor) {
+                    state.processingAborted = true;
+
+                    setStatus(ItemStatus.IDLE);
+                    fire('process-abort');
+
+                    resolve();
+                    return;
+                }
+
+                abortProcessingRequestComplete = function abortProcessingRequestComplete() {
+                    resolve();
+                };
+
+                state.activeProcessor.abort();
+            });
+        };
+
+        //
+        // logic to revert a processed file
+        //
+        var revert = function revert(revertFileUpload, forceRevert) {
+            return new Promise(function(resolve, reject) {
+                // a completed upload will have a serverFileReference, a failed chunked upload where
+                // getting a serverId succeeded but >=0 chunks have been uploaded will have transferId set
+                var serverTransferId =
+                    state.serverFileReference !== null
+                        ? state.serverFileReference
+                        : state.transferId;
+
+                // cannot revert without a server id for this process
+                if (serverTransferId === null) {
+                    resolve();
+                    return;
+                }
+
+                // revert the upload (fire and forget)
+                revertFileUpload(
+                    serverTransferId,
+                    function() {
+                        // reset file server id and transfer id as now it's not available on the server
+                        state.serverFileReference = null;
+                        state.transferId = null;
+                        resolve();
+                    },
+                    function(error) {
+                        // don't set error state when reverting is optional, it will always resolve
+                        if (!forceRevert) {
+                            resolve();
+                            return;
+                        }
+
+                        // oh no errors
+                        setStatus(ItemStatus.PROCESSING_REVERT_ERROR);
+                        fire('process-revert-error');
+                        reject(error);
+                    }
+                );
+
+                // fire event
+                setStatus(ItemStatus.IDLE);
+                fire('process-revert');
+            });
+        };
+
+        // exposed methods
+        var _setMetadata = function setMetadata(key, value, silent) {
+            var keys = key.split('.');
+            var root = keys[0];
+            var last = keys.pop();
+            var data = metadata;
+            keys.forEach(function(key) {
+                return (data = data[key]);
+            });
+
+            // compare old value against new value, if they're the same, we're not updating
+            if (JSON.stringify(data[last]) === JSON.stringify(value)) return;
+
+            // update value
+            data[last] = value;
+
+            // fire update
+            fire('metadata-update', {
+                key: root,
+                value: metadata[root],
+                silent: silent,
+            });
+        };
+
+        var getMetadata = function getMetadata(key) {
+            return deepCloneObject(key ? metadata[key] : metadata);
+        };
+
+        var api = Object.assign(
+            {
+                id: {
+                    get: function get() {
+                        return id;
+                    },
+                },
+                origin: {
+                    get: function get() {
+                        return origin;
+                    },
+                    set: function set(value) {
+                        return (origin = value);
+                    },
+                },
+                serverId: {
+                    get: function get() {
+                        return state.serverFileReference;
+                    },
+                },
+                transferId: {
+                    get: function get() {
+                        return state.transferId;
+                    },
+                },
+                status: {
+                    get: function get() {
+                        return state.status;
+                    },
+                },
+                filename: {
+                    get: function get() {
+                        return state.file.name;
+                    },
+                },
+                filenameWithoutExtension: {
+                    get: function get() {
+                        return getFilenameWithoutExtension(state.file.name);
+                    },
+                },
+                fileExtension: { get: getFileExtension },
+                fileType: { get: getFileType },
+                fileSize: { get: getFileSize },
+                file: { get: getFile },
+                relativePath: {
+                    get: function get() {
+                        return state.file._relativePath;
+                    },
+                },
+
+                source: {
+                    get: function get() {
+                        return state.source;
+                    },
+                },
+
+                getMetadata: getMetadata,
+                setMetadata: function setMetadata(key, value, silent) {
+                    if (isObject(key)) {
+                        var data = key;
+                        Object.keys(data).forEach(function(key) {
+                            _setMetadata(key, data[key], value);
+                        });
+                        return key;
+                    }
+                    _setMetadata(key, value, silent);
+                    return value;
+                },
+
+                extend: function extend(name, handler) {
+                    return (itemAPI[name] = handler);
+                },
+
+                abortLoad: abortLoad,
+                retryLoad: retryLoad,
+                requestProcessing: requestProcessing,
+                abortProcessing: abortProcessing,
+
+                load: load,
+                process: process,
+                revert: revert,
+            },
+
+            on(),
+            {
+                freeze: function freeze() {
+                    return (state.frozen = true);
+                },
+
+                release: function release() {
+                    return (state.released = true);
+                },
+                released: {
+                    get: function get() {
+                        return state.released;
+                    },
+                },
+
+                archive: function archive() {
+                    return (state.archived = true);
+                },
+                archived: {
+                    get: function get() {
+                        return state.archived;
+                    },
+                },
+            }
+        );
+
+        // create it here instead of returning it instantly so we can extend it later
+        var itemAPI = createObject(api);
+
+        return itemAPI;
+    };
+
+    var getItemIndexByQuery = function getItemIndexByQuery(items, query) {
+        // just return first index
+        if (isEmpty(query)) {
+            return 0;
+        }
+
+        // invalid queries
+        if (!isString(query)) {
+            return -1;
+        }
+
+        // return item by id (or -1 if not found)
+        return items.findIndex(function(item) {
+            return item.id === query;
+        });
+    };
+
+    var getItemById = function getItemById(items, itemId) {
+        var index = getItemIndexByQuery(items, itemId);
+        if (index < 0) {
+            return;
+        }
+        return items[index] || null;
+    };
+
+    var fetchBlob = function fetchBlob(url, load, error, progress, abort, headers) {
+        var request = sendRequest(null, url, {
+            method: 'GET',
+            responseType: 'blob',
+        });
+
+        request.onload = function(xhr) {
+            // get headers
+            var headers = xhr.getAllResponseHeaders();
+
+            // get filename
+            var filename = getFileInfoFromHeaders(headers).name || getFilenameFromURL(url);
+
+            // create response
+            load(
+                createResponse('load', xhr.status, getFileFromBlob(xhr.response, filename), headers)
+            );
+        };
+
+        request.onerror = function(xhr) {
+            error(createResponse('error', xhr.status, xhr.statusText, xhr.getAllResponseHeaders()));
+        };
+
+        request.onheaders = function(xhr) {
+            headers(createResponse('headers', xhr.status, null, xhr.getAllResponseHeaders()));
+        };
+
+        request.ontimeout = createTimeoutResponse(error);
+        request.onprogress = progress;
+        request.onabort = abort;
+
+        // should return request
+        return request;
+    };
+
+    var getDomainFromURL = function getDomainFromURL(url) {
+        if (url.indexOf('//') === 0) {
+            url = location.protocol + url;
+        }
+        return url
+            .toLowerCase()
+            .replace('blob:', '')
+            .replace(/([a-z])?:\/\//, '$1')
+            .split('/')[0];
+    };
+
+    var isExternalURL = function isExternalURL(url) {
+        return (
+            (url.indexOf(':') > -1 || url.indexOf('//') > -1) &&
+            getDomainFromURL(location.href) !== getDomainFromURL(url)
+        );
+    };
+
+    var dynamicLabel = function dynamicLabel(label) {
+        return function() {
+            return isFunction(label) ? label.apply(void 0, arguments) : label;
+        };
+    };
+
+    var isMockItem = function isMockItem(item) {
+        return !isFile(item.file);
+    };
+
+    var listUpdated = function listUpdated(dispatch, state) {
+        clearTimeout(state.listUpdateTimeout);
+        state.listUpdateTimeout = setTimeout(function() {
+            dispatch('DID_UPDATE_ITEMS', { items: getActiveItems(state.items) });
+        }, 0);
+    };
+
+    var optionalPromise = function optionalPromise(fn) {
+        for (
+            var _len = arguments.length, params = new Array(_len > 1 ? _len - 1 : 0), _key = 1;
+            _key < _len;
+            _key++
+        ) {
+            params[_key - 1] = arguments[_key];
+        }
+        return new Promise(function(resolve) {
+            if (!fn) {
+                return resolve(true);
+            }
+
+            var result = fn.apply(void 0, params);
+
+            if (result == null) {
+                return resolve(true);
+            }
+
+            if (typeof result === 'boolean') {
+                return resolve(result);
+            }
+
+            if (typeof result.then === 'function') {
+                result.then(resolve);
+            }
+        });
+    };
+
+    var sortItems = function sortItems(state, compare) {
+        state.items.sort(function(a, b) {
+            return compare(createItemAPI(a), createItemAPI(b));
+        });
+    };
+
+    // returns item based on state
+    var getItemByQueryFromState = function getItemByQueryFromState(state, itemHandler) {
+        return function() {
+            var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+            var query = _ref.query,
+                _ref$success = _ref.success,
+                success = _ref$success === void 0 ? function() {} : _ref$success,
+                _ref$failure = _ref.failure,
+                failure = _ref$failure === void 0 ? function() {} : _ref$failure,
+                options = _objectWithoutProperties(_ref, ['query', 'success', 'failure']);
+            var item = getItemByQuery(state.items, query);
+            if (!item) {
+                failure({
+                    error: createResponse('error', 0, 'Item not found'),
+                    file: null,
+                });
+
+                return;
+            }
+            itemHandler(item, success, failure, options || {});
+        };
+    };
+
+    var actions = function actions(dispatch, query, state) {
+        return {
+            /**
+             * Aborts all ongoing processes
+             */
+            ABORT_ALL: function ABORT_ALL() {
+                getActiveItems(state.items).forEach(function(item) {
+                    item.freeze();
+                    item.abortLoad();
+                    item.abortProcessing();
+                });
+            },
+
+            /**
+             * Sets initial files
+             */
+            DID_SET_FILES: function DID_SET_FILES(_ref2) {
+                var _ref2$value = _ref2.value,
+                    value = _ref2$value === void 0 ? [] : _ref2$value;
+                // map values to file objects
+                var files = value.map(function(file) {
+                    return {
+                        source: file.source ? file.source : file,
+                        options: file.options,
+                    };
+                });
+
+                // loop over files, if file is in list, leave it be, if not, remove
+                // test if items should be moved
+                var activeItems = getActiveItems(state.items);
+
+                activeItems.forEach(function(item) {
+                    // if item not is in new value, remove
+                    if (
+                        !files.find(function(file) {
+                            return file.source === item.source || file.source === item.file;
+                        })
+                    ) {
+                        dispatch('REMOVE_ITEM', { query: item, remove: false });
+                    }
+                });
+
+                // add new files
+                activeItems = getActiveItems(state.items);
+                files.forEach(function(file, index) {
+                    // if file is already in list
+                    if (
+                        activeItems.find(function(item) {
+                            return item.source === file.source || item.file === file.source;
+                        })
+                    )
+                        return;
+
+                    // not in list, add
+                    dispatch(
+                        'ADD_ITEM',
+                        Object.assign({}, file, {
+                            interactionMethod: InteractionMethod.NONE,
+                            index: index,
+                        })
+                    );
+                });
+            },
+
+            DID_UPDATE_ITEM_METADATA: function DID_UPDATE_ITEM_METADATA(_ref3) {
+                var id = _ref3.id,
+                    action = _ref3.action,
+                    change = _ref3.change;
+                // don't do anything
+                if (change.silent) return;
+
+                // if is called multiple times in close succession we combined all calls together to save resources
+                clearTimeout(state.itemUpdateTimeout);
+                state.itemUpdateTimeout = setTimeout(function() {
+                    var item = getItemById(state.items, id);
+
+                    // only revert and attempt to upload when we're uploading to a server
+                    if (!query('IS_ASYNC')) {
+                        // should we update the output data
+                        applyFilterChain('SHOULD_PREPARE_OUTPUT', false, {
+                            item: item,
+                            query: query,
+                            action: action,
+                            change: change,
+                        }).then(function(shouldPrepareOutput) {
+                            // plugins determined the output data should be prepared (or not), can be adjusted with beforePrepareOutput hook
+                            var beforePrepareFile = query('GET_BEFORE_PREPARE_FILE');
+                            if (beforePrepareFile)
+                                shouldPrepareOutput = beforePrepareFile(item, shouldPrepareOutput);
+
+                            if (!shouldPrepareOutput) return;
+
+                            dispatch(
+                                'REQUEST_PREPARE_OUTPUT',
+                                {
+                                    query: id,
+                                    item: item,
+                                    success: function success(file) {
+                                        dispatch('DID_PREPARE_OUTPUT', { id: id, file: file });
+                                    },
+                                },
+
+                                true
+                            );
+                        });
+
+                        return;
+                    }
+
+                    // if is local item we need to enable upload button so change can be propagated to server
+                    if (item.origin === FileOrigin.LOCAL) {
+                        dispatch('DID_LOAD_ITEM', {
+                            id: item.id,
+                            error: null,
+                            serverFileReference: item.source,
+                        });
+                    }
+
+                    // for async scenarios
+                    var upload = function upload() {
+                        // we push this forward a bit so the interface is updated correctly
+                        setTimeout(function() {
+                            dispatch('REQUEST_ITEM_PROCESSING', { query: id });
+                        }, 32);
+                    };
+
+                    var revert = function revert(doUpload) {
+                        item.revert(
+                            createRevertFunction(
+                                state.options.server.url,
+                                state.options.server.revert
+                            ),
+                            query('GET_FORCE_REVERT')
+                        )
+                            .then(doUpload ? upload : function() {})
+                            .catch(function() {});
+                    };
+
+                    var abort = function abort(doUpload) {
+                        item.abortProcessing().then(doUpload ? upload : function() {});
+                    };
+
+                    // if we should re-upload the file immediately
+                    if (item.status === ItemStatus.PROCESSING_COMPLETE) {
+                        return revert(state.options.instantUpload);
+                    }
+
+                    // if currently uploading, cancel upload
+                    if (item.status === ItemStatus.PROCESSING) {
+                        return abort(state.options.instantUpload);
+                    }
+
+                    if (state.options.instantUpload) {
+                        upload();
+                    }
+                }, 0);
+            },
+
+            MOVE_ITEM: function MOVE_ITEM(_ref4) {
+                var query = _ref4.query,
+                    index = _ref4.index;
+                var item = getItemByQuery(state.items, query);
+                if (!item) return;
+                var currentIndex = state.items.indexOf(item);
+                index = limit(index, 0, state.items.length - 1);
+                if (currentIndex === index) return;
+                state.items.splice(index, 0, state.items.splice(currentIndex, 1)[0]);
+            },
+
+            SORT: function SORT(_ref5) {
+                var compare = _ref5.compare;
+                sortItems(state, compare);
+                dispatch('DID_SORT_ITEMS', {
+                    items: query('GET_ACTIVE_ITEMS'),
+                });
+            },
+
+            ADD_ITEMS: function ADD_ITEMS(_ref6) {
+                var items = _ref6.items,
+                    index = _ref6.index,
+                    interactionMethod = _ref6.interactionMethod,
+                    _ref6$success = _ref6.success,
+                    success = _ref6$success === void 0 ? function() {} : _ref6$success,
+                    _ref6$failure = _ref6.failure,
+                    failure = _ref6$failure === void 0 ? function() {} : _ref6$failure;
+                var currentIndex = index;
+
+                if (index === -1 || typeof index === 'undefined') {
+                    var insertLocation = query('GET_ITEM_INSERT_LOCATION');
+                    var totalItems = query('GET_TOTAL_ITEMS');
+                    currentIndex = insertLocation === 'before' ? 0 : totalItems;
+                }
+
+                var ignoredFiles = query('GET_IGNORED_FILES');
+                var isValidFile = function isValidFile(source) {
+                    return isFile(source)
+                        ? !ignoredFiles.includes(source.name.toLowerCase())
+                        : !isEmpty(source);
+                };
+                var validItems = items.filter(isValidFile);
+
+                var promises = validItems.map(function(source) {
+                    return new Promise(function(resolve, reject) {
+                        dispatch('ADD_ITEM', {
+                            interactionMethod: interactionMethod,
+                            source: source.source || source,
+                            success: resolve,
+                            failure: reject,
+                            index: currentIndex++,
+                            options: source.options || {},
+                        });
+                    });
+                });
+
+                Promise.all(promises)
+                    .then(success)
+                    .catch(failure);
+            },
+
+            /**
+             * @param source
+             * @param index
+             * @param interactionMethod
+             */
+            ADD_ITEM: function ADD_ITEM(_ref7) {
+                var source = _ref7.source,
+                    _ref7$index = _ref7.index,
+                    index = _ref7$index === void 0 ? -1 : _ref7$index,
+                    interactionMethod = _ref7.interactionMethod,
+                    _ref7$success = _ref7.success,
+                    success = _ref7$success === void 0 ? function() {} : _ref7$success,
+                    _ref7$failure = _ref7.failure,
+                    failure = _ref7$failure === void 0 ? function() {} : _ref7$failure,
+                    _ref7$options = _ref7.options,
+                    options = _ref7$options === void 0 ? {} : _ref7$options;
+                // if no source supplied
+                if (isEmpty(source)) {
+                    failure({
+                        error: createResponse('error', 0, 'No source'),
+                        file: null,
+                    });
+
+                    return;
+                }
+
+                // filter out invalid file items, used to filter dropped directory contents
+                if (
+                    isFile(source) &&
+                    state.options.ignoredFiles.includes(source.name.toLowerCase())
+                ) {
+                    // fail silently
+                    return;
+                }
+
+                // test if there's still room in the list of files
+                if (!hasRoomForItem(state)) {
+                    // if multiple allowed, we can't replace
+                    // or if only a single item is allowed but we're not allowed to replace it we exit
+                    if (
+                        state.options.allowMultiple ||
+                        (!state.options.allowMultiple && !state.options.allowReplace)
+                    ) {
+                        var error = createResponse('warning', 0, 'Max files');
+
+                        dispatch('DID_THROW_MAX_FILES', {
+                            source: source,
+                            error: error,
+                        });
+
+                        failure({ error: error, file: null });
+
+                        return;
+                    }
+
+                    // let's replace the item
+                    // id of first item we're about to remove
+                    var _item = getActiveItems(state.items)[0];
+
+                    // if has been processed remove it from the server as well
+                    if (
+                        _item.status === ItemStatus.PROCESSING_COMPLETE ||
+                        _item.status === ItemStatus.PROCESSING_REVERT_ERROR
+                    ) {
+                        var forceRevert = query('GET_FORCE_REVERT');
+                        _item
+                            .revert(
+                                createRevertFunction(
+                                    state.options.server.url,
+                                    state.options.server.revert
+                                ),
+                                forceRevert
+                            )
+                            .then(function() {
+                                if (!forceRevert) return;
+
+                                // try to add now
+                                dispatch('ADD_ITEM', {
+                                    source: source,
+                                    index: index,
+                                    interactionMethod: interactionMethod,
+                                    success: success,
+                                    failure: failure,
+                                    options: options,
+                                });
+                            })
+                            .catch(function() {}); // no need to handle this catch state for now
+
+                        if (forceRevert) return;
+                    }
+
+                    // remove first item as it will be replaced by this item
+                    dispatch('REMOVE_ITEM', { query: _item.id });
+                }
+
+                // where did the file originate
+                var origin =
+                    options.type === 'local'
+                        ? FileOrigin.LOCAL
+                        : options.type === 'limbo'
+                        ? FileOrigin.LIMBO
+                        : FileOrigin.INPUT;
+
+                // create a new blank item
+                var item = createItem(
+                    // where did this file come from
+                    origin,
+
+                    // an input file never has a server file reference
+                    origin === FileOrigin.INPUT ? null : source,
+
+                    // file mock data, if defined
+                    options.file
+                );
+
+                // set initial meta data
+                Object.keys(options.metadata || {}).forEach(function(key) {
+                    item.setMetadata(key, options.metadata[key]);
+                });
+
+                // created the item, let plugins add methods
+                applyFilters('DID_CREATE_ITEM', item, { query: query, dispatch: dispatch });
+
+                // where to insert new items
+                var itemInsertLocation = query('GET_ITEM_INSERT_LOCATION');
+
+                // adjust index if is not allowed to pick location
+                if (!state.options.itemInsertLocationFreedom) {
+                    index = itemInsertLocation === 'before' ? -1 : state.items.length;
+                }
+
+                // add item to list
+                insertItem(state.items, item, index);
+
+                // sort items in list
+                if (isFunction(itemInsertLocation) && source) {
+                    sortItems(state, itemInsertLocation);
+                }
+
+                // get a quick reference to the item id
+                var id = item.id;
+
+                // observe item events
+                item.on('init', function() {
+                    dispatch('DID_INIT_ITEM', { id: id });
+                });
+
+                item.on('load-init', function() {
+                    dispatch('DID_START_ITEM_LOAD', { id: id });
+                });
+
+                item.on('load-meta', function() {
+                    dispatch('DID_UPDATE_ITEM_META', { id: id });
+                });
+
+                item.on('load-progress', function(progress) {
+                    dispatch('DID_UPDATE_ITEM_LOAD_PROGRESS', { id: id, progress: progress });
+                });
+
+                item.on('load-request-error', function(error) {
+                    var mainStatus = dynamicLabel(state.options.labelFileLoadError)(error);
+
+                    // is client error, no way to recover
+                    if (error.code >= 400 && error.code < 500) {
+                        dispatch('DID_THROW_ITEM_INVALID', {
+                            id: id,
+                            error: error,
+                            status: {
+                                main: mainStatus,
+                                sub: error.code + ' (' + error.body + ')',
+                            },
+                        });
+
+                        // reject the file so can be dealt with through API
+                        failure({ error: error, file: createItemAPI(item) });
+                        return;
+                    }
+
+                    // is possible server error, so might be possible to retry
+                    dispatch('DID_THROW_ITEM_LOAD_ERROR', {
+                        id: id,
+                        error: error,
+                        status: {
+                            main: mainStatus,
+                            sub: state.options.labelTapToRetry,
+                        },
+                    });
+                });
+
+                item.on('load-file-error', function(error) {
+                    dispatch('DID_THROW_ITEM_INVALID', {
+                        id: id,
+                        error: error.status,
+                        status: error.status,
+                    });
+
+                    failure({ error: error.status, file: createItemAPI(item) });
+                });
+
+                item.on('load-abort', function() {
+                    dispatch('REMOVE_ITEM', { query: id });
+                });
+
+                item.on('load-skip', function() {
+                    dispatch('COMPLETE_LOAD_ITEM', {
+                        query: id,
+                        item: item,
+                        data: {
+                            source: source,
+                            success: success,
+                        },
+                    });
+                });
+
+                item.on('load', function() {
+                    var handleAdd = function handleAdd(shouldAdd) {
+                        // no should not add this file
+                        if (!shouldAdd) {
+                            dispatch('REMOVE_ITEM', {
+                                query: id,
+                            });
+
+                            return;
+                        }
+
+                        // now interested in metadata updates
+                        item.on('metadata-update', function(change) {
+                            dispatch('DID_UPDATE_ITEM_METADATA', { id: id, change: change });
+                        });
+
+                        // let plugins decide if the output data should be prepared at this point
+                        // means we'll do this and wait for idle state
+                        applyFilterChain('SHOULD_PREPARE_OUTPUT', false, {
+                            item: item,
+                            query: query,
+                        }).then(function(shouldPrepareOutput) {
+                            // plugins determined the output data should be prepared (or not), can be adjusted with beforePrepareOutput hook
+                            var beforePrepareFile = query('GET_BEFORE_PREPARE_FILE');
+                            if (beforePrepareFile)
+                                shouldPrepareOutput = beforePrepareFile(item, shouldPrepareOutput);
+
+                            var loadComplete = function loadComplete() {
+                                dispatch('COMPLETE_LOAD_ITEM', {
+                                    query: id,
+                                    item: item,
+                                    data: {
+                                        source: source,
+                                        success: success,
+                                    },
+                                });
+
+                                listUpdated(dispatch, state);
+                            };
+
+                            // exit
+                            if (shouldPrepareOutput) {
+                                // wait for idle state and then run PREPARE_OUTPUT
+                                dispatch(
+                                    'REQUEST_PREPARE_OUTPUT',
+                                    {
+                                        query: id,
+                                        item: item,
+                                        success: function success(file) {
+                                            dispatch('DID_PREPARE_OUTPUT', { id: id, file: file });
+                                            loadComplete();
+                                        },
+                                    },
+
+                                    true
+                                );
+
+                                return;
+                            }
+
+                            loadComplete();
+                        });
+                    };
+
+                    // item loaded, allow plugins to
+                    // - read data (quickly)
+                    // - add metadata
+                    applyFilterChain('DID_LOAD_ITEM', item, { query: query, dispatch: dispatch })
+                        .then(function() {
+                            optionalPromise(query('GET_BEFORE_ADD_FILE'), createItemAPI(item)).then(
+                                handleAdd
+                            );
+                        })
+                        .catch(function(e) {
+                            if (!e || !e.error || !e.status) return handleAdd(false);
+                            dispatch('DID_THROW_ITEM_INVALID', {
+                                id: id,
+                                error: e.error,
+                                status: e.status,
+                            });
+                        });
+                });
+
+                item.on('process-start', function() {
+                    dispatch('DID_START_ITEM_PROCESSING', { id: id });
+                });
+
+                item.on('process-progress', function(progress) {
+                    dispatch('DID_UPDATE_ITEM_PROCESS_PROGRESS', { id: id, progress: progress });
+                });
+
+                item.on('process-error', function(error) {
+                    dispatch('DID_THROW_ITEM_PROCESSING_ERROR', {
+                        id: id,
+                        error: error,
+                        status: {
+                            main: dynamicLabel(state.options.labelFileProcessingError)(error),
+                            sub: state.options.labelTapToRetry,
+                        },
+                    });
+                });
+
+                item.on('process-revert-error', function(error) {
+                    dispatch('DID_THROW_ITEM_PROCESSING_REVERT_ERROR', {
+                        id: id,
+                        error: error,
+                        status: {
+                            main: dynamicLabel(state.options.labelFileProcessingRevertError)(error),
+                            sub: state.options.labelTapToRetry,
+                        },
+                    });
+                });
+
+                item.on('process-complete', function(serverFileReference) {
+                    dispatch('DID_COMPLETE_ITEM_PROCESSING', {
+                        id: id,
+                        error: null,
+                        serverFileReference: serverFileReference,
+                    });
+
+                    dispatch('DID_DEFINE_VALUE', { id: id, value: serverFileReference });
+                });
+
+                item.on('process-abort', function() {
+                    dispatch('DID_ABORT_ITEM_PROCESSING', { id: id });
+                });
+
+                item.on('process-revert', function() {
+                    dispatch('DID_REVERT_ITEM_PROCESSING', { id: id });
+                    dispatch('DID_DEFINE_VALUE', { id: id, value: null });
+                });
+
+                // let view know the item has been inserted
+                dispatch('DID_ADD_ITEM', {
+                    id: id,
+                    index: index,
+                    interactionMethod: interactionMethod,
+                });
+
+                listUpdated(dispatch, state);
+
+                // start loading the source
+                var _ref8 = state.options.server || {},
+                    url = _ref8.url,
+                    load = _ref8.load,
+                    restore = _ref8.restore,
+                    fetch = _ref8.fetch;
+
+                item.load(
+                    source,
+
+                    // this creates a function that loads the file based on the type of file (string, base64, blob, file) and location of file (local, remote, limbo)
+                    createFileLoader(
+                        origin === FileOrigin.INPUT
+                            ? // input, if is remote, see if should use custom fetch, else use default fetchBlob
+                              isString(source) && isExternalURL(source)
+                                ? fetch
+                                    ? createFetchFunction(url, fetch)
+                                    : fetchBlob // remote url
+                                : fetchBlob // try to fetch url
+                            : // limbo or local
+                            origin === FileOrigin.LIMBO
+                            ? createFetchFunction(url, restore) // limbo
+                            : createFetchFunction(url, load) // local
+                    ),
+
+                    // called when the file is loaded so it can be piped through the filters
+                    function(file, success, error) {
+                        // let's process the file
+                        applyFilterChain('LOAD_FILE', file, { query: query })
+                            .then(success)
+                            .catch(error);
+                    }
+                );
+            },
+
+            REQUEST_PREPARE_OUTPUT: function REQUEST_PREPARE_OUTPUT(_ref9) {
+                var item = _ref9.item,
+                    success = _ref9.success,
+                    _ref9$failure = _ref9.failure,
+                    failure = _ref9$failure === void 0 ? function() {} : _ref9$failure;
+                // error response if item archived
+                var err = {
+                    error: createResponse('error', 0, 'Item not found'),
+                    file: null,
+                };
+
+                // don't handle archived items, an item could have been archived (load aborted) while waiting to be prepared
+                if (item.archived) return failure(err);
+
+                // allow plugins to alter the file data
+                applyFilterChain('PREPARE_OUTPUT', item.file, { query: query, item: item }).then(
+                    function(result) {
+                        applyFilterChain('COMPLETE_PREPARE_OUTPUT', result, {
+                            query: query,
+                            item: item,
+                        }).then(function(result) {
+                            // don't handle archived items, an item could have been archived (load aborted) while being prepared
+                            if (item.archived) return failure(err);
+
+                            // we done!
+                            success(result);
+                        });
+                    }
+                );
+            },
+
+            COMPLETE_LOAD_ITEM: function COMPLETE_LOAD_ITEM(_ref10) {
+                var item = _ref10.item,
+                    data = _ref10.data;
+                var success = data.success,
+                    source = data.source;
+
+                // sort items in list
+                var itemInsertLocation = query('GET_ITEM_INSERT_LOCATION');
+                if (isFunction(itemInsertLocation) && source) {
+                    sortItems(state, itemInsertLocation);
+                }
+
+                // let interface know the item has loaded
+                dispatch('DID_LOAD_ITEM', {
+                    id: item.id,
+                    error: null,
+                    serverFileReference: item.origin === FileOrigin.INPUT ? null : source,
+                });
+
+                // item has been successfully loaded and added to the
+                // list of items so can now be safely returned for use
+                success(createItemAPI(item));
+
+                // if this is a local server file we need to show a different state
+                if (item.origin === FileOrigin.LOCAL) {
+                    dispatch('DID_LOAD_LOCAL_ITEM', { id: item.id });
+                    return;
+                }
+
+                // if is a temp server file we prevent async upload call here (as the file is already on the server)
+                if (item.origin === FileOrigin.LIMBO) {
+                    dispatch('DID_COMPLETE_ITEM_PROCESSING', {
+                        id: item.id,
+                        error: null,
+                        serverFileReference: source,
+                    });
+
+                    dispatch('DID_DEFINE_VALUE', {
+                        id: item.id,
+                        value: item.serverId || source,
+                    });
+
+                    return;
+                }
+
+                // id we are allowed to upload the file immediately, lets do it
+                if (query('IS_ASYNC') && state.options.instantUpload) {
+                    dispatch('REQUEST_ITEM_PROCESSING', { query: item.id });
+                }
+            },
+
+            RETRY_ITEM_LOAD: getItemByQueryFromState(state, function(item) {
+                // try loading the source one more time
+                item.retryLoad();
+            }),
+
+            REQUEST_ITEM_PREPARE: getItemByQueryFromState(state, function(item, _success, failure) {
+                dispatch(
+                    'REQUEST_PREPARE_OUTPUT',
+                    {
+                        query: item.id,
+                        item: item,
+                        success: function success(file) {
+                            dispatch('DID_PREPARE_OUTPUT', { id: item.id, file: file });
+                            _success({
+                                file: item,
+                                output: file,
+                            });
+                        },
+                        failure: failure,
+                    },
+
+                    true
+                );
+            }),
+
+            REQUEST_ITEM_PROCESSING: getItemByQueryFromState(state, function(
+                item,
+                success,
+                failure
+            ) {
+                // cannot be queued (or is already queued)
+                var itemCanBeQueuedForProcessing =
+                    // waiting for something
+                    item.status === ItemStatus.IDLE ||
+                    // processing went wrong earlier
+                    item.status === ItemStatus.PROCESSING_ERROR;
+
+                // not ready to be processed
+                if (!itemCanBeQueuedForProcessing) {
+                    var processNow = function processNow() {
+                        return dispatch('REQUEST_ITEM_PROCESSING', {
+                            query: item,
+                            success: success,
+                            failure: failure,
+                        });
+                    };
+
+                    var process = function process() {
+                        return document.hidden ? processNow() : setTimeout(processNow, 32);
+                    };
+
+                    // if already done processing or tried to revert but didn't work, try again
+                    if (
+                        item.status === ItemStatus.PROCESSING_COMPLETE ||
+                        item.status === ItemStatus.PROCESSING_REVERT_ERROR
+                    ) {
+                        item.revert(
+                            createRevertFunction(
+                                state.options.server.url,
+                                state.options.server.revert
+                            ),
+                            query('GET_FORCE_REVERT')
+                        )
+                            .then(process)
+                            .catch(function() {}); // don't continue with processing if something went wrong
+                    } else if (item.status === ItemStatus.PROCESSING) {
+                        item.abortProcessing().then(process);
+                    }
+
+                    return;
+                }
+
+                // already queued for processing
+                if (item.status === ItemStatus.PROCESSING_QUEUED) return;
+
+                item.requestProcessing();
+
+                dispatch('DID_REQUEST_ITEM_PROCESSING', { id: item.id });
+
+                dispatch('PROCESS_ITEM', { query: item, success: success, failure: failure }, true);
+            }),
+
+            PROCESS_ITEM: getItemByQueryFromState(state, function(item, success, failure) {
+                var maxParallelUploads = query('GET_MAX_PARALLEL_UPLOADS');
+                var totalCurrentUploads = query('GET_ITEMS_BY_STATUS', ItemStatus.PROCESSING)
+                    .length;
+
+                // queue and wait till queue is freed up
+                if (totalCurrentUploads === maxParallelUploads) {
+                    // queue for later processing
+                    state.processingQueue.push({
+                        id: item.id,
+                        success: success,
+                        failure: failure,
+                    });
+
+                    // stop it!
+                    return;
+                }
+
+                // if was not queued or is already processing exit here
+                if (item.status === ItemStatus.PROCESSING) return;
+
+                var processNext = function processNext() {
+                    // process queueud items
+                    var queueEntry = state.processingQueue.shift();
+
+                    // no items left
+                    if (!queueEntry) return;
+
+                    // get item reference
+                    var id = queueEntry.id,
+                        success = queueEntry.success,
+                        failure = queueEntry.failure;
+                    var itemReference = getItemByQuery(state.items, id);
+
+                    // if item was archived while in queue, jump to next
+                    if (!itemReference || itemReference.archived) {
+                        processNext();
+                        return;
+                    }
+
+                    // process queued item
+                    dispatch(
+                        'PROCESS_ITEM',
+                        { query: id, success: success, failure: failure },
+                        true
+                    );
+                };
+
+                // we done function
+                item.onOnce('process-complete', function() {
+                    success(createItemAPI(item));
+                    processNext();
+
+                    // if origin is local, and we're instant uploading, trigger remove of original
+                    // as revert will remove file from list
+                    var server = state.options.server;
+                    var instantUpload = state.options.instantUpload;
+                    if (
+                        instantUpload &&
+                        item.origin === FileOrigin.LOCAL &&
+                        isFunction(server.remove)
+                    ) {
+                        var noop = function noop() {};
+                        item.origin = FileOrigin.LIMBO;
+                        state.options.server.remove(item.source, noop, noop);
+                    }
+
+                    // All items processed? No errors?
+                    var allItemsProcessed =
+                        query('GET_ITEMS_BY_STATUS', ItemStatus.PROCESSING_COMPLETE).length ===
+                        state.items.length;
+                    if (allItemsProcessed) {
+                        dispatch('DID_COMPLETE_ITEM_PROCESSING_ALL');
+                    }
+                });
+
+                // we error function
+                item.onOnce('process-error', function(error) {
+                    failure({ error: error, file: createItemAPI(item) });
+                    processNext();
+                });
+
+                // start file processing
+                var options = state.options;
+                item.process(
+                    createFileProcessor(
+                        createProcessorFunction(
+                            options.server.url,
+                            options.server.process,
+                            options.name,
+                            {
+                                chunkTransferId: item.transferId,
+                                chunkServer: options.server.patch,
+                                chunkUploads: options.chunkUploads,
+                                chunkForce: options.chunkForce,
+                                chunkSize: options.chunkSize,
+                                chunkRetryDelays: options.chunkRetryDelays,
+                            }
+                        ),
+
+                        {
+                            allowMinimumUploadDuration: query('GET_ALLOW_MINIMUM_UPLOAD_DURATION'),
+                        }
+                    ),
+
+                    // called when the file is about to be processed so it can be piped through the transform filters
+                    function(file, success, error) {
+                        // allow plugins to alter the file data
+                        applyFilterChain('PREPARE_OUTPUT', file, { query: query, item: item })
+                            .then(function(file) {
+                                dispatch('DID_PREPARE_OUTPUT', { id: item.id, file: file });
+
+                                success(file);
+                            })
+                            .catch(error);
+                    }
+                );
+            }),
+
+            RETRY_ITEM_PROCESSING: getItemByQueryFromState(state, function(item) {
+                dispatch('REQUEST_ITEM_PROCESSING', { query: item });
+            }),
+
+            REQUEST_REMOVE_ITEM: getItemByQueryFromState(state, function(item) {
+                optionalPromise(query('GET_BEFORE_REMOVE_FILE'), createItemAPI(item)).then(function(
+                    shouldRemove
+                ) {
+                    if (!shouldRemove) {
+                        return;
+                    }
+                    dispatch('REMOVE_ITEM', { query: item });
+                });
+            }),
+
+            RELEASE_ITEM: getItemByQueryFromState(state, function(item) {
+                item.release();
+            }),
+
+            REMOVE_ITEM: getItemByQueryFromState(state, function(item, success, failure, options) {
+                var removeFromView = function removeFromView() {
+                    // get id reference
+                    var id = item.id;
+
+                    // archive the item, this does not remove it from the list
+                    getItemById(state.items, id).archive();
+
+                    // tell the view the item has been removed
+                    dispatch('DID_REMOVE_ITEM', { error: null, id: id, item: item });
+
+                    // now the list has been modified
+                    listUpdated(dispatch, state);
+
+                    // correctly removed
+                    success(createItemAPI(item));
+                };
+
+                // if this is a local file and the `server.remove` function has been configured,
+                // send source there so dev can remove file from server
+                var server = state.options.server;
+                if (
+                    item.origin === FileOrigin.LOCAL &&
+                    server &&
+                    isFunction(server.remove) &&
+                    options.remove !== false
+                ) {
+                    dispatch('DID_START_ITEM_REMOVE', { id: item.id });
+
+                    server.remove(
+                        item.source,
+                        function() {
+                            return removeFromView();
+                        },
+                        function(status) {
+                            dispatch('DID_THROW_ITEM_REMOVE_ERROR', {
+                                id: item.id,
+                                error: createResponse('error', 0, status, null),
+                                status: {
+                                    main: dynamicLabel(state.options.labelFileRemoveError)(status),
+                                    sub: state.options.labelTapToRetry,
+                                },
+                            });
+                        }
+                    );
+                } else {
+                    // if is requesting revert and can revert need to call revert handler (not calling request_ because that would also trigger beforeRemoveHook)
+                    if (
+                        (options.revert &&
+                            item.origin !== FileOrigin.LOCAL &&
+                            item.serverId !== null) ||
+                        // if chunked uploads are enabled and we're uploading in chunks for this specific file
+                        // or if the file isn't big enough for chunked uploads but chunkForce is set then call
+                        // revert before removing from the view...
+                        (state.options.chunkUploads && item.file.size > state.options.chunkSize) ||
+                        (state.options.chunkUploads && state.options.chunkForce)
+                    ) {
+                        item.revert(
+                            createRevertFunction(
+                                state.options.server.url,
+                                state.options.server.revert
+                            ),
+                            query('GET_FORCE_REVERT')
+                        );
+                    }
+
+                    // can now safely remove from view
+                    removeFromView();
+                }
+            }),
+
+            ABORT_ITEM_LOAD: getItemByQueryFromState(state, function(item) {
+                item.abortLoad();
+            }),
+
+            ABORT_ITEM_PROCESSING: getItemByQueryFromState(state, function(item) {
+                // test if is already processed
+                if (item.serverId) {
+                    dispatch('REVERT_ITEM_PROCESSING', { id: item.id });
+                    return;
+                }
+
+                // abort
+                item.abortProcessing().then(function() {
+                    var shouldRemove = state.options.instantUpload;
+                    if (shouldRemove) {
+                        dispatch('REMOVE_ITEM', { query: item.id });
+                    }
+                });
+            }),
+
+            REQUEST_REVERT_ITEM_PROCESSING: getItemByQueryFromState(state, function(item) {
+                // not instant uploading, revert immediately
+                if (!state.options.instantUpload) {
+                    dispatch('REVERT_ITEM_PROCESSING', { query: item });
+                    return;
+                }
+
+                // if we're instant uploading the file will also be removed if we revert,
+                // so if a before remove file hook is defined we need to run it now
+                var handleRevert = function handleRevert(shouldRevert) {
+                    if (!shouldRevert) return;
+                    dispatch('REVERT_ITEM_PROCESSING', { query: item });
+                };
+
+                var fn = query('GET_BEFORE_REMOVE_FILE');
+                if (!fn) {
+                    return handleRevert(true);
+                }
+
+                var requestRemoveResult = fn(createItemAPI(item));
+                if (requestRemoveResult == null) {
+                    // undefined or null
+                    return handleRevert(true);
+                }
+
+                if (typeof requestRemoveResult === 'boolean') {
+                    return handleRevert(requestRemoveResult);
+                }
+
+                if (typeof requestRemoveResult.then === 'function') {
+                    requestRemoveResult.then(handleRevert);
+                }
+            }),
+
+            REVERT_ITEM_PROCESSING: getItemByQueryFromState(state, function(item) {
+                item.revert(
+                    createRevertFunction(state.options.server.url, state.options.server.revert),
+                    query('GET_FORCE_REVERT')
+                )
+                    .then(function() {
+                        var shouldRemove = state.options.instantUpload || isMockItem(item);
+                        if (shouldRemove) {
+                            dispatch('REMOVE_ITEM', { query: item.id });
+                        }
+                    })
+                    .catch(function() {});
+            }),
+
+            SET_OPTIONS: function SET_OPTIONS(_ref11) {
+                var options = _ref11.options;
+                // get all keys passed
+                var optionKeys = Object.keys(options);
+
+                // get prioritized keyed to include (remove once not in options object)
+                var prioritizedOptionKeys = PrioritizedOptions.filter(function(key) {
+                    return optionKeys.includes(key);
+                });
+
+                // order the keys, prioritized first, then rest
+                var orderedOptionKeys = [].concat(
+                    _toConsumableArray(prioritizedOptionKeys),
+                    _toConsumableArray(
+                        Object.keys(options).filter(function(key) {
+                            return !prioritizedOptionKeys.includes(key);
+                        })
+                    )
+                );
+
+                // dispatch set event for each option
+                orderedOptionKeys.forEach(function(key) {
+                    dispatch('SET_' + fromCamels(key, '_').toUpperCase(), {
+                        value: options[key],
+                    });
+                });
+            },
+        };
+    };
+
+    var PrioritizedOptions = ['server'];
+
+    var formatFilename = function formatFilename(name) {
+        return name;
+    };
+
+    var createElement$1 = function createElement(tagName) {
+        return document.createElement(tagName);
+    };
+
+    var text = function text(node, value) {
+        var textNode = node.childNodes[0];
+        if (!textNode) {
+            textNode = document.createTextNode(value);
+            node.appendChild(textNode);
+        } else if (value !== textNode.nodeValue) {
+            textNode.nodeValue = value;
+        }
+    };
+
+    var polarToCartesian = function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+        var angleInRadians = (((angleInDegrees % 360) - 90) * Math.PI) / 180.0;
+        return {
+            x: centerX + radius * Math.cos(angleInRadians),
+            y: centerY + radius * Math.sin(angleInRadians),
+        };
+    };
+
+    var describeArc = function describeArc(x, y, radius, startAngle, endAngle, arcSweep) {
+        var start = polarToCartesian(x, y, radius, endAngle);
+        var end = polarToCartesian(x, y, radius, startAngle);
+        return ['M', start.x, start.y, 'A', radius, radius, 0, arcSweep, 0, end.x, end.y].join(' ');
+    };
+
+    var percentageArc = function percentageArc(x, y, radius, from, to) {
+        var arcSweep = 1;
+        if (to > from && to - from <= 0.5) {
+            arcSweep = 0;
+        }
+        if (from > to && from - to >= 0.5) {
+            arcSweep = 0;
+        }
+        return describeArc(
+            x,
+            y,
+            radius,
+            Math.min(0.9999, from) * 360,
+            Math.min(0.9999, to) * 360,
+            arcSweep
+        );
+    };
+
+    var create = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        // start at 0
+        props.spin = false;
+        props.progress = 0;
+        props.opacity = 0;
+
+        // svg
+        var svg = createElement('svg');
+        root.ref.path = createElement('path', {
+            'stroke-width': 2,
+            'stroke-linecap': 'round',
+        });
+
+        svg.appendChild(root.ref.path);
+
+        root.ref.svg = svg;
+
+        root.appendChild(svg);
+    };
+
+    var write = function write(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+        if (props.opacity === 0) {
+            return;
+        }
+
+        if (props.align) {
+            root.element.dataset.align = props.align;
+        }
+
+        // get width of stroke
+        var ringStrokeWidth = parseInt(attr(root.ref.path, 'stroke-width'), 10);
+
+        // calculate size of ring
+        var size = root.rect.element.width * 0.5;
+
+        // ring state
+        var ringFrom = 0;
+        var ringTo = 0;
+
+        // now in busy mode
+        if (props.spin) {
+            ringFrom = 0;
+            ringTo = 0.5;
+        } else {
+            ringFrom = 0;
+            ringTo = props.progress;
+        }
+
+        // get arc path
+        var coordinates = percentageArc(size, size, size - ringStrokeWidth, ringFrom, ringTo);
+
+        // update progress bar
+        attr(root.ref.path, 'd', coordinates);
+
+        // hide while contains 0 value
+        attr(root.ref.path, 'stroke-opacity', props.spin || props.progress > 0 ? 1 : 0);
+    };
+
+    var progressIndicator = createView({
+        tag: 'div',
+        name: 'progress-indicator',
+        ignoreRectUpdate: true,
+        ignoreRect: true,
+        create: create,
+        write: write,
+        mixins: {
+            apis: ['progress', 'spin', 'align'],
+            styles: ['opacity'],
+            animations: {
+                opacity: { type: 'tween', duration: 500 },
+                progress: {
+                    type: 'spring',
+                    stiffness: 0.95,
+                    damping: 0.65,
+                    mass: 10,
+                },
+            },
+        },
+    });
+
+    var create$1 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        root.element.innerHTML = (props.icon || '') + ('<span>' + props.label + '</span>');
+
+        props.isDisabled = false;
+    };
+
+    var write$1 = function write(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+        var isDisabled = props.isDisabled;
+        var shouldDisable = root.query('GET_DISABLED') || props.opacity === 0;
+
+        if (shouldDisable && !isDisabled) {
+            props.isDisabled = true;
+            attr(root.element, 'disabled', 'disabled');
+        } else if (!shouldDisable && isDisabled) {
+            props.isDisabled = false;
+            root.element.removeAttribute('disabled');
+        }
+    };
+
+    var fileActionButton = createView({
+        tag: 'button',
+        attributes: {
+            type: 'button',
+        },
+
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        name: 'file-action-button',
+        mixins: {
+            apis: ['label'],
+            styles: ['translateX', 'translateY', 'scaleX', 'scaleY', 'opacity'],
+            animations: {
+                scaleX: 'spring',
+                scaleY: 'spring',
+                translateX: 'spring',
+                translateY: 'spring',
+                opacity: { type: 'tween', duration: 250 },
+            },
+
+            listeners: true,
+        },
+
+        create: create$1,
+        write: write$1,
+    });
+
+    var toNaturalFileSize = function toNaturalFileSize(bytes) {
+        var decimalSeparator =
+            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '.';
+        var base = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1000;
+        var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+        var _options$labelBytes = options.labelBytes,
+            labelBytes = _options$labelBytes === void 0 ? 'bytes' : _options$labelBytes,
+            _options$labelKilobyt = options.labelKilobytes,
+            labelKilobytes = _options$labelKilobyt === void 0 ? 'KB' : _options$labelKilobyt,
+            _options$labelMegabyt = options.labelMegabytes,
+            labelMegabytes = _options$labelMegabyt === void 0 ? 'MB' : _options$labelMegabyt,
+            _options$labelGigabyt = options.labelGigabytes,
+            labelGigabytes = _options$labelGigabyt === void 0 ? 'GB' : _options$labelGigabyt;
+
+        // no negative byte sizes
+        bytes = Math.round(Math.abs(bytes));
+
+        var KB = base;
+        var MB = base * base;
+        var GB = base * base * base;
+
+        // just bytes
+        if (bytes < KB) {
+            return bytes + ' ' + labelBytes;
+        }
+
+        // kilobytes
+        if (bytes < MB) {
+            return Math.floor(bytes / KB) + ' ' + labelKilobytes;
+        }
+
+        // megabytes
+        if (bytes < GB) {
+            return removeDecimalsWhenZero(bytes / MB, 1, decimalSeparator) + ' ' + labelMegabytes;
+        }
+
+        // gigabytes
+        return removeDecimalsWhenZero(bytes / GB, 2, decimalSeparator) + ' ' + labelGigabytes;
+    };
+
+    var removeDecimalsWhenZero = function removeDecimalsWhenZero(value, decimalCount, separator) {
+        return value
+            .toFixed(decimalCount)
+            .split('.')
+            .filter(function(part) {
+                return part !== '0';
+            })
+            .join(separator);
+    };
+
+    var create$2 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        // filename
+        var fileName = createElement$1('span');
+        fileName.className = 'filepond--file-info-main';
+        // hide for screenreaders
+        // the file is contained in a fieldset with legend that contains the filename
+        // no need to read it twice
+        attr(fileName, 'aria-hidden', 'true');
+        root.appendChild(fileName);
+        root.ref.fileName = fileName;
+
+        // filesize
+        var fileSize = createElement$1('span');
+        fileSize.className = 'filepond--file-info-sub';
+        root.appendChild(fileSize);
+        root.ref.fileSize = fileSize;
+
+        // set initial values
+        text(fileSize, root.query('GET_LABEL_FILE_WAITING_FOR_SIZE'));
+        text(fileName, formatFilename(root.query('GET_ITEM_NAME', props.id)));
+    };
+
+    var updateFile = function updateFile(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+        text(
+            root.ref.fileSize,
+            toNaturalFileSize(
+                root.query('GET_ITEM_SIZE', props.id),
+                '.',
+                root.query('GET_FILE_SIZE_BASE'),
+                root.query('GET_FILE_SIZE_LABELS', root.query)
+            )
+        );
+
+        text(root.ref.fileName, formatFilename(root.query('GET_ITEM_NAME', props.id)));
+    };
+
+    var updateFileSizeOnError = function updateFileSizeOnError(_ref3) {
+        var root = _ref3.root,
+            props = _ref3.props;
+        // if size is available don't fallback to unknown size message
+        if (isInt(root.query('GET_ITEM_SIZE', props.id))) {
+            updateFile({ root: root, props: props });
+            return;
+        }
+
+        text(root.ref.fileSize, root.query('GET_LABEL_FILE_SIZE_NOT_AVAILABLE'));
+    };
+
+    var fileInfo = createView({
+        name: 'file-info',
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        write: createRoute({
+            DID_LOAD_ITEM: updateFile,
+            DID_UPDATE_ITEM_META: updateFile,
+            DID_THROW_ITEM_LOAD_ERROR: updateFileSizeOnError,
+            DID_THROW_ITEM_INVALID: updateFileSizeOnError,
+        }),
+
+        didCreateView: function didCreateView(root) {
+            applyFilters('CREATE_VIEW', Object.assign({}, root, { view: root }));
+        },
+        create: create$2,
+        mixins: {
+            styles: ['translateX', 'translateY'],
+            animations: {
+                translateX: 'spring',
+                translateY: 'spring',
+            },
+        },
+    });
+
+    var toPercentage = function toPercentage(value) {
+        return Math.round(value * 100);
+    };
+
+    var create$3 = function create(_ref) {
+        var root = _ref.root;
+
+        // main status
+        var main = createElement$1('span');
+        main.className = 'filepond--file-status-main';
+        root.appendChild(main);
+        root.ref.main = main;
+
+        // sub status
+        var sub = createElement$1('span');
+        sub.className = 'filepond--file-status-sub';
+        root.appendChild(sub);
+        root.ref.sub = sub;
+
+        didSetItemLoadProgress({ root: root, action: { progress: null } });
+    };
+
+    var didSetItemLoadProgress = function didSetItemLoadProgress(_ref2) {
+        var root = _ref2.root,
+            action = _ref2.action;
+        var title =
+            action.progress === null
+                ? root.query('GET_LABEL_FILE_LOADING')
+                : root.query('GET_LABEL_FILE_LOADING') + ' ' + toPercentage(action.progress) + '%';
+
+        text(root.ref.main, title);
+        text(root.ref.sub, root.query('GET_LABEL_TAP_TO_CANCEL'));
+    };
+
+    var didSetItemProcessProgress = function didSetItemProcessProgress(_ref3) {
+        var root = _ref3.root,
+            action = _ref3.action;
+        var title =
+            action.progress === null
+                ? root.query('GET_LABEL_FILE_PROCESSING')
+                : root.query('GET_LABEL_FILE_PROCESSING') +
+                  ' ' +
+                  toPercentage(action.progress) +
+                  '%';
+
+        text(root.ref.main, title);
+        text(root.ref.sub, root.query('GET_LABEL_TAP_TO_CANCEL'));
+    };
+
+    var didRequestItemProcessing = function didRequestItemProcessing(_ref4) {
+        var root = _ref4.root;
+        text(root.ref.main, root.query('GET_LABEL_FILE_PROCESSING'));
+        text(root.ref.sub, root.query('GET_LABEL_TAP_TO_CANCEL'));
+    };
+
+    var didAbortItemProcessing = function didAbortItemProcessing(_ref5) {
+        var root = _ref5.root;
+        text(root.ref.main, root.query('GET_LABEL_FILE_PROCESSING_ABORTED'));
+        text(root.ref.sub, root.query('GET_LABEL_TAP_TO_RETRY'));
+    };
+
+    var didCompleteItemProcessing = function didCompleteItemProcessing(_ref6) {
+        var root = _ref6.root;
+        text(root.ref.main, root.query('GET_LABEL_FILE_PROCESSING_COMPLETE'));
+        text(root.ref.sub, root.query('GET_LABEL_TAP_TO_UNDO'));
+    };
+
+    var clear = function clear(_ref7) {
+        var root = _ref7.root;
+        text(root.ref.main, '');
+        text(root.ref.sub, '');
+    };
+
+    var error = function error(_ref8) {
+        var root = _ref8.root,
+            action = _ref8.action;
+        text(root.ref.main, action.status.main);
+        text(root.ref.sub, action.status.sub);
+    };
+
+    var fileStatus = createView({
+        name: 'file-status',
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        write: createRoute({
+            DID_LOAD_ITEM: clear,
+            DID_REVERT_ITEM_PROCESSING: clear,
+            DID_REQUEST_ITEM_PROCESSING: didRequestItemProcessing,
+            DID_ABORT_ITEM_PROCESSING: didAbortItemProcessing,
+            DID_COMPLETE_ITEM_PROCESSING: didCompleteItemProcessing,
+            DID_UPDATE_ITEM_PROCESS_PROGRESS: didSetItemProcessProgress,
+            DID_UPDATE_ITEM_LOAD_PROGRESS: didSetItemLoadProgress,
+            DID_THROW_ITEM_LOAD_ERROR: error,
+            DID_THROW_ITEM_INVALID: error,
+            DID_THROW_ITEM_PROCESSING_ERROR: error,
+            DID_THROW_ITEM_PROCESSING_REVERT_ERROR: error,
+            DID_THROW_ITEM_REMOVE_ERROR: error,
+        }),
+
+        didCreateView: function didCreateView(root) {
+            applyFilters('CREATE_VIEW', Object.assign({}, root, { view: root }));
+        },
+        create: create$3,
+        mixins: {
+            styles: ['translateX', 'translateY', 'opacity'],
+            animations: {
+                opacity: { type: 'tween', duration: 250 },
+                translateX: 'spring',
+                translateY: 'spring',
+            },
+        },
+    });
+
+    /**
+     * Button definitions for the file view
+     */
+
+    var Buttons = {
+        AbortItemLoad: {
+            label: 'GET_LABEL_BUTTON_ABORT_ITEM_LOAD',
+            action: 'ABORT_ITEM_LOAD',
+            className: 'filepond--action-abort-item-load',
+            align: 'LOAD_INDICATOR_POSITION', // right
+        },
+        RetryItemLoad: {
+            label: 'GET_LABEL_BUTTON_RETRY_ITEM_LOAD',
+            action: 'RETRY_ITEM_LOAD',
+            icon: 'GET_ICON_RETRY',
+            className: 'filepond--action-retry-item-load',
+            align: 'BUTTON_PROCESS_ITEM_POSITION', // right
+        },
+        RemoveItem: {
+            label: 'GET_LABEL_BUTTON_REMOVE_ITEM',
+            action: 'REQUEST_REMOVE_ITEM',
+            icon: 'GET_ICON_REMOVE',
+            className: 'filepond--action-remove-item',
+            align: 'BUTTON_REMOVE_ITEM_POSITION', // left
+        },
+        ProcessItem: {
+            label: 'GET_LABEL_BUTTON_PROCESS_ITEM',
+            action: 'REQUEST_ITEM_PROCESSING',
+            icon: 'GET_ICON_PROCESS',
+            className: 'filepond--action-process-item',
+            align: 'BUTTON_PROCESS_ITEM_POSITION', // right
+        },
+        AbortItemProcessing: {
+            label: 'GET_LABEL_BUTTON_ABORT_ITEM_PROCESSING',
+            action: 'ABORT_ITEM_PROCESSING',
+            className: 'filepond--action-abort-item-processing',
+            align: 'BUTTON_PROCESS_ITEM_POSITION', // right
+        },
+        RetryItemProcessing: {
+            label: 'GET_LABEL_BUTTON_RETRY_ITEM_PROCESSING',
+            action: 'RETRY_ITEM_PROCESSING',
+            icon: 'GET_ICON_RETRY',
+            className: 'filepond--action-retry-item-processing',
+            align: 'BUTTON_PROCESS_ITEM_POSITION', // right
+        },
+        RevertItemProcessing: {
+            label: 'GET_LABEL_BUTTON_UNDO_ITEM_PROCESSING',
+            action: 'REQUEST_REVERT_ITEM_PROCESSING',
+            icon: 'GET_ICON_UNDO',
+            className: 'filepond--action-revert-item-processing',
+            align: 'BUTTON_PROCESS_ITEM_POSITION', // right
+        },
+    };
+
+    // make a list of buttons, we can then remove buttons from this list if they're disabled
+    var ButtonKeys = [];
+    forin(Buttons, function(key) {
+        ButtonKeys.push(key);
+    });
+
+    var calculateFileInfoOffset = function calculateFileInfoOffset(root) {
+        if (getRemoveIndicatorAligment(root) === 'right') return 0;
+        var buttonRect = root.ref.buttonRemoveItem.rect.element;
+        return buttonRect.hidden ? null : buttonRect.width + buttonRect.left;
+    };
+
+    var calculateButtonWidth = function calculateButtonWidth(root) {
+        var buttonRect = root.ref.buttonAbortItemLoad.rect.element;
+        return buttonRect.width;
+    };
+
+    // Force on full pixels so text stays crips
+    var calculateFileVerticalCenterOffset = function calculateFileVerticalCenterOffset(root) {
+        return Math.floor(root.ref.buttonRemoveItem.rect.element.height / 4);
+    };
+    var calculateFileHorizontalCenterOffset = function calculateFileHorizontalCenterOffset(root) {
+        return Math.floor(root.ref.buttonRemoveItem.rect.element.left / 2);
+    };
+
+    var getLoadIndicatorAlignment = function getLoadIndicatorAlignment(root) {
+        return root.query('GET_STYLE_LOAD_INDICATOR_POSITION');
+    };
+    var getProcessIndicatorAlignment = function getProcessIndicatorAlignment(root) {
+        return root.query('GET_STYLE_PROGRESS_INDICATOR_POSITION');
+    };
+    var getRemoveIndicatorAligment = function getRemoveIndicatorAligment(root) {
+        return root.query('GET_STYLE_BUTTON_REMOVE_ITEM_POSITION');
+    };
+
+    var DefaultStyle = {
+        buttonAbortItemLoad: { opacity: 0 },
+        buttonRetryItemLoad: { opacity: 0 },
+        buttonRemoveItem: { opacity: 0 },
+        buttonProcessItem: { opacity: 0 },
+        buttonAbortItemProcessing: { opacity: 0 },
+        buttonRetryItemProcessing: { opacity: 0 },
+        buttonRevertItemProcessing: { opacity: 0 },
+        loadProgressIndicator: { opacity: 0, align: getLoadIndicatorAlignment },
+        processProgressIndicator: { opacity: 0, align: getProcessIndicatorAlignment },
+        processingCompleteIndicator: { opacity: 0, scaleX: 0.75, scaleY: 0.75 },
+        info: { translateX: 0, translateY: 0, opacity: 0 },
+        status: { translateX: 0, translateY: 0, opacity: 0 },
+    };
+
+    var IdleStyle = {
+        buttonRemoveItem: { opacity: 1 },
+        buttonProcessItem: { opacity: 1 },
+        info: { translateX: calculateFileInfoOffset },
+        status: { translateX: calculateFileInfoOffset },
+    };
+
+    var ProcessingStyle = {
+        buttonAbortItemProcessing: { opacity: 1 },
+        processProgressIndicator: { opacity: 1 },
+        status: { opacity: 1 },
+    };
+
+    var StyleMap = {
+        DID_THROW_ITEM_INVALID: {
+            buttonRemoveItem: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+            status: { translateX: calculateFileInfoOffset, opacity: 1 },
+        },
+
+        DID_START_ITEM_LOAD: {
+            buttonAbortItemLoad: { opacity: 1 },
+            loadProgressIndicator: { opacity: 1 },
+            status: { opacity: 1 },
+        },
+
+        DID_THROW_ITEM_LOAD_ERROR: {
+            buttonRetryItemLoad: { opacity: 1 },
+            buttonRemoveItem: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+            status: { opacity: 1 },
+        },
+
+        DID_START_ITEM_REMOVE: {
+            processProgressIndicator: { opacity: 1, align: getRemoveIndicatorAligment },
+            info: { translateX: calculateFileInfoOffset },
+            status: { opacity: 0 },
+        },
+
+        DID_THROW_ITEM_REMOVE_ERROR: {
+            processProgressIndicator: { opacity: 0, align: getRemoveIndicatorAligment },
+            buttonRemoveItem: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+            status: { opacity: 1, translateX: calculateFileInfoOffset },
+        },
+
+        DID_LOAD_ITEM: IdleStyle,
+        DID_LOAD_LOCAL_ITEM: {
+            buttonRemoveItem: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+            status: { translateX: calculateFileInfoOffset },
+        },
+
+        DID_START_ITEM_PROCESSING: ProcessingStyle,
+        DID_REQUEST_ITEM_PROCESSING: ProcessingStyle,
+        DID_UPDATE_ITEM_PROCESS_PROGRESS: ProcessingStyle,
+        DID_COMPLETE_ITEM_PROCESSING: {
+            buttonRevertItemProcessing: { opacity: 1 },
+            info: { opacity: 1 },
+            status: { opacity: 1 },
+        },
+
+        DID_THROW_ITEM_PROCESSING_ERROR: {
+            buttonRemoveItem: { opacity: 1 },
+            buttonRetryItemProcessing: { opacity: 1 },
+            status: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+        },
+
+        DID_THROW_ITEM_PROCESSING_REVERT_ERROR: {
+            buttonRevertItemProcessing: { opacity: 1 },
+            status: { opacity: 1 },
+            info: { opacity: 1 },
+        },
+
+        DID_ABORT_ITEM_PROCESSING: {
+            buttonRemoveItem: { opacity: 1 },
+            buttonProcessItem: { opacity: 1 },
+            info: { translateX: calculateFileInfoOffset },
+            status: { opacity: 1 },
+        },
+
+        DID_REVERT_ITEM_PROCESSING: IdleStyle,
+    };
+
+    // complete indicator view
+    var processingCompleteIndicatorView = createView({
+        create: function create(_ref) {
+            var root = _ref.root;
+            root.element.innerHTML = root.query('GET_ICON_DONE');
+        },
+        name: 'processing-complete-indicator',
+        ignoreRect: true,
+        mixins: {
+            styles: ['scaleX', 'scaleY', 'opacity'],
+            animations: {
+                scaleX: 'spring',
+                scaleY: 'spring',
+                opacity: { type: 'tween', duration: 250 },
+            },
+        },
+    });
+
+    /**
+     * Creates the file view
+     */
+    var create$4 = function create(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+        // copy Buttons object
+        var LocalButtons = Object.keys(Buttons).reduce(function(prev, curr) {
+            prev[curr] = Object.assign({}, Buttons[curr]);
+            return prev;
+        }, {});
+        var id = props.id;
+
+        // allow reverting upload
+        var allowRevert = root.query('GET_ALLOW_REVERT');
+
+        // allow remove file
+        var allowRemove = root.query('GET_ALLOW_REMOVE');
+
+        // allow processing upload
+        var allowProcess = root.query('GET_ALLOW_PROCESS');
+
+        // is instant uploading, need this to determine the icon of the undo button
+        var instantUpload = root.query('GET_INSTANT_UPLOAD');
+
+        // is async set up
+        var isAsync = root.query('IS_ASYNC');
+
+        // should align remove item buttons
+        var alignRemoveItemButton = root.query('GET_STYLE_BUTTON_REMOVE_ITEM_ALIGN');
+
+        // enabled buttons array
+        var buttonFilter;
+        if (isAsync) {
+            if (allowProcess && !allowRevert) {
+                // only remove revert button
+                buttonFilter = function buttonFilter(key) {
+                    return !/RevertItemProcessing/.test(key);
+                };
+            } else if (!allowProcess && allowRevert) {
+                // only remove process button
+                buttonFilter = function buttonFilter(key) {
+                    return !/ProcessItem|RetryItemProcessing|AbortItemProcessing/.test(key);
+                };
+            } else if (!allowProcess && !allowRevert) {
+                // remove all process buttons
+                buttonFilter = function buttonFilter(key) {
+                    return !/Process/.test(key);
+                };
+            }
+        } else {
+            // no process controls available
+            buttonFilter = function buttonFilter(key) {
+                return !/Process/.test(key);
+            };
+        }
+
+        var enabledButtons = buttonFilter ? ButtonKeys.filter(buttonFilter) : ButtonKeys.concat();
+
+        // update icon and label for revert button when instant uploading
+        if (instantUpload && allowRevert) {
+            LocalButtons['RevertItemProcessing'].label = 'GET_LABEL_BUTTON_REMOVE_ITEM';
+            LocalButtons['RevertItemProcessing'].icon = 'GET_ICON_REMOVE';
+        }
+
+        // remove last button (revert) if not allowed
+        if (isAsync && !allowRevert) {
+            var map = StyleMap['DID_COMPLETE_ITEM_PROCESSING'];
+            map.info.translateX = calculateFileHorizontalCenterOffset;
+            map.info.translateY = calculateFileVerticalCenterOffset;
+            map.status.translateY = calculateFileVerticalCenterOffset;
+            map.processingCompleteIndicator = { opacity: 1, scaleX: 1, scaleY: 1 };
+        }
+
+        // should align center
+        if (isAsync && !allowProcess) {
+            [
+                'DID_START_ITEM_PROCESSING',
+                'DID_REQUEST_ITEM_PROCESSING',
+                'DID_UPDATE_ITEM_PROCESS_PROGRESS',
+                'DID_THROW_ITEM_PROCESSING_ERROR',
+            ].forEach(function(key) {
+                StyleMap[key].status.translateY = calculateFileVerticalCenterOffset;
+            });
+            StyleMap['DID_THROW_ITEM_PROCESSING_ERROR'].status.translateX = calculateButtonWidth;
+        }
+
+        // move remove button to right
+        if (alignRemoveItemButton && allowRevert) {
+            LocalButtons['RevertItemProcessing'].align = 'BUTTON_REMOVE_ITEM_POSITION';
+            var _map = StyleMap['DID_COMPLETE_ITEM_PROCESSING'];
+            _map.info.translateX = calculateFileInfoOffset;
+            _map.status.translateY = calculateFileVerticalCenterOffset;
+            _map.processingCompleteIndicator = { opacity: 1, scaleX: 1, scaleY: 1 };
+        }
+
+        // show/hide RemoveItem button
+        if (!allowRemove) {
+            LocalButtons['RemoveItem'].disabled = true;
+        }
+
+        // create the button views
+        forin(LocalButtons, function(key, definition) {
+            // create button
+            var buttonView = root.createChildView(fileActionButton, {
+                label: root.query(definition.label),
+                icon: root.query(definition.icon),
+                opacity: 0,
+            });
+
+            // should be appended?
+            if (enabledButtons.includes(key)) {
+                root.appendChildView(buttonView);
+            }
+
+            // toggle
+            if (definition.disabled) {
+                buttonView.element.setAttribute('disabled', 'disabled');
+                buttonView.element.setAttribute('hidden', 'hidden');
+            }
+
+            // add position attribute
+            buttonView.element.dataset.align = root.query('GET_STYLE_' + definition.align);
+
+            // add class
+            buttonView.element.classList.add(definition.className);
+
+            // handle interactions
+            buttonView.on('click', function(e) {
+                e.stopPropagation();
+                if (definition.disabled) return;
+                root.dispatch(definition.action, { query: id });
+            });
+
+            // set reference
+            root.ref['button' + key] = buttonView;
+        });
+
+        // checkmark
+        root.ref.processingCompleteIndicator = root.appendChildView(
+            root.createChildView(processingCompleteIndicatorView)
+        );
+
+        root.ref.processingCompleteIndicator.element.dataset.align = root.query(
+            'GET_STYLE_BUTTON_PROCESS_ITEM_POSITION'
+        );
+
+        // create file info view
+        root.ref.info = root.appendChildView(root.createChildView(fileInfo, { id: id }));
+
+        // create file status view
+        root.ref.status = root.appendChildView(root.createChildView(fileStatus, { id: id }));
+
+        // add progress indicators
+        var loadIndicatorView = root.appendChildView(
+            root.createChildView(progressIndicator, {
+                opacity: 0,
+                align: root.query('GET_STYLE_LOAD_INDICATOR_POSITION'),
+            })
+        );
+
+        loadIndicatorView.element.classList.add('filepond--load-indicator');
+        root.ref.loadProgressIndicator = loadIndicatorView;
+
+        var progressIndicatorView = root.appendChildView(
+            root.createChildView(progressIndicator, {
+                opacity: 0,
+                align: root.query('GET_STYLE_PROGRESS_INDICATOR_POSITION'),
+            })
+        );
+
+        progressIndicatorView.element.classList.add('filepond--process-indicator');
+        root.ref.processProgressIndicator = progressIndicatorView;
+
+        // current active styles
+        root.ref.activeStyles = [];
+    };
+
+    var write$2 = function write(_ref3) {
+        var root = _ref3.root,
+            actions = _ref3.actions,
+            props = _ref3.props;
+        // route actions
+        route({ root: root, actions: actions, props: props });
+
+        // select last state change action
+        var action = actions
+            .concat()
+            .filter(function(action) {
+                return /^DID_/.test(action.type);
+            })
+            .reverse()
+            .find(function(action) {
+                return StyleMap[action.type];
+            });
+
+        // a new action happened, let's get the matching styles
+        if (action) {
+            // define new active styles
+            root.ref.activeStyles = [];
+
+            var stylesToApply = StyleMap[action.type];
+            forin(DefaultStyle, function(name, defaultStyles) {
+                // get reference to control
+                var control = root.ref[name];
+
+                // loop over all styles for this control
+                forin(defaultStyles, function(key, defaultValue) {
+                    var value =
+                        stylesToApply[name] && typeof stylesToApply[name][key] !== 'undefined'
+                            ? stylesToApply[name][key]
+                            : defaultValue;
+                    root.ref.activeStyles.push({ control: control, key: key, value: value });
+                });
+            });
+        }
+
+        // apply active styles to element
+        root.ref.activeStyles.forEach(function(_ref4) {
+            var control = _ref4.control,
+                key = _ref4.key,
+                value = _ref4.value;
+            control[key] = typeof value === 'function' ? value(root) : value;
+        });
+    };
+
+    var route = createRoute({
+        DID_SET_LABEL_BUTTON_ABORT_ITEM_PROCESSING: function DID_SET_LABEL_BUTTON_ABORT_ITEM_PROCESSING(
+            _ref5
+        ) {
+            var root = _ref5.root,
+                action = _ref5.action;
+            root.ref.buttonAbortItemProcessing.label = action.value;
+        },
+        DID_SET_LABEL_BUTTON_ABORT_ITEM_LOAD: function DID_SET_LABEL_BUTTON_ABORT_ITEM_LOAD(_ref6) {
+            var root = _ref6.root,
+                action = _ref6.action;
+            root.ref.buttonAbortItemLoad.label = action.value;
+        },
+        DID_SET_LABEL_BUTTON_ABORT_ITEM_REMOVAL: function DID_SET_LABEL_BUTTON_ABORT_ITEM_REMOVAL(
+            _ref7
+        ) {
+            var root = _ref7.root,
+                action = _ref7.action;
+            root.ref.buttonAbortItemRemoval.label = action.value;
+        },
+        DID_REQUEST_ITEM_PROCESSING: function DID_REQUEST_ITEM_PROCESSING(_ref8) {
+            var root = _ref8.root;
+            root.ref.processProgressIndicator.spin = true;
+            root.ref.processProgressIndicator.progress = 0;
+        },
+        DID_START_ITEM_LOAD: function DID_START_ITEM_LOAD(_ref9) {
+            var root = _ref9.root;
+            root.ref.loadProgressIndicator.spin = true;
+            root.ref.loadProgressIndicator.progress = 0;
+        },
+        DID_START_ITEM_REMOVE: function DID_START_ITEM_REMOVE(_ref10) {
+            var root = _ref10.root;
+            root.ref.processProgressIndicator.spin = true;
+            root.ref.processProgressIndicator.progress = 0;
+        },
+        DID_UPDATE_ITEM_LOAD_PROGRESS: function DID_UPDATE_ITEM_LOAD_PROGRESS(_ref11) {
+            var root = _ref11.root,
+                action = _ref11.action;
+            root.ref.loadProgressIndicator.spin = false;
+            root.ref.loadProgressIndicator.progress = action.progress;
+        },
+        DID_UPDATE_ITEM_PROCESS_PROGRESS: function DID_UPDATE_ITEM_PROCESS_PROGRESS(_ref12) {
+            var root = _ref12.root,
+                action = _ref12.action;
+            root.ref.processProgressIndicator.spin = false;
+            root.ref.processProgressIndicator.progress = action.progress;
+        },
+    });
+
+    var file = createView({
+        create: create$4,
+        write: write$2,
+        didCreateView: function didCreateView(root) {
+            applyFilters('CREATE_VIEW', Object.assign({}, root, { view: root }));
+        },
+        name: 'file',
+    });
+
+    /**
+     * Creates the file view
+     */
+    var create$5 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+
+        // filename
+        root.ref.fileName = createElement$1('legend');
+        root.appendChild(root.ref.fileName);
+
+        // file appended
+        root.ref.file = root.appendChildView(root.createChildView(file, { id: props.id }));
+
+        // data has moved to data.js
+        root.ref.data = false;
+    };
+
+    /**
+     * Data storage
+     */
+    var didLoadItem = function didLoadItem(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+        // updates the legend of the fieldset so screenreaders can better group buttons
+        text(root.ref.fileName, formatFilename(root.query('GET_ITEM_NAME', props.id)));
+    };
+
+    var fileWrapper = createView({
+        create: create$5,
+        ignoreRect: true,
+        write: createRoute({
+            DID_LOAD_ITEM: didLoadItem,
+        }),
+
+        didCreateView: function didCreateView(root) {
+            applyFilters('CREATE_VIEW', Object.assign({}, root, { view: root }));
+        },
+        tag: 'fieldset',
+        name: 'file-wrapper',
+    });
+
+    var PANEL_SPRING_PROPS = { type: 'spring', damping: 0.6, mass: 7 };
+
+    var create$6 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        [
+            {
+                name: 'top',
+            },
+
+            {
+                name: 'center',
+                props: {
+                    translateY: null,
+                    scaleY: null,
+                },
+
+                mixins: {
+                    animations: {
+                        scaleY: PANEL_SPRING_PROPS,
+                    },
+
+                    styles: ['translateY', 'scaleY'],
+                },
+            },
+
+            {
+                name: 'bottom',
+                props: {
+                    translateY: null,
+                },
+
+                mixins: {
+                    animations: {
+                        translateY: PANEL_SPRING_PROPS,
+                    },
+
+                    styles: ['translateY'],
+                },
+            },
+        ].forEach(function(section) {
+            createSection(root, section, props.name);
+        });
+
+        root.element.classList.add('filepond--' + props.name);
+
+        root.ref.scalable = null;
+    };
+
+    var createSection = function createSection(root, section, className) {
+        var viewConstructor = createView({
+            name: 'panel-' + section.name + ' filepond--' + className,
+            mixins: section.mixins,
+            ignoreRectUpdate: true,
+        });
+
+        var view = root.createChildView(viewConstructor, section.props);
+
+        root.ref[section.name] = root.appendChildView(view);
+    };
+
+    var write$3 = function write(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props;
+
+        // update scalable state
+        if (root.ref.scalable === null || props.scalable !== root.ref.scalable) {
+            root.ref.scalable = isBoolean(props.scalable) ? props.scalable : true;
+            root.element.dataset.scalable = root.ref.scalable;
+        }
+
+        // no height, can't set
+        if (!props.height) return;
+
+        // get child rects
+        var topRect = root.ref.top.rect.element;
+        var bottomRect = root.ref.bottom.rect.element;
+
+        // make sure height never is smaller than bottom and top seciton heights combined (will probably never happen, but who knows)
+        var height = Math.max(topRect.height + bottomRect.height, props.height);
+
+        // offset center part
+        root.ref.center.translateY = topRect.height;
+
+        // scale center part
+        // use math ceil to prevent transparent lines because of rounding errors
+        root.ref.center.scaleY = (height - topRect.height - bottomRect.height) / 100;
+
+        // offset bottom part
+        root.ref.bottom.translateY = height - bottomRect.height;
+    };
+
+    var panel = createView({
+        name: 'panel',
+        read: function read(_ref3) {
+            var root = _ref3.root,
+                props = _ref3.props;
+            return (props.heightCurrent = root.ref.bottom.translateY);
+        },
+        write: write$3,
+        create: create$6,
+        ignoreRect: true,
+        mixins: {
+            apis: ['height', 'heightCurrent', 'scalable'],
+        },
+    });
+
+    var createDragHelper = function createDragHelper(items) {
+        var itemIds = items.map(function(item) {
+            return item.id;
+        });
+        var prevIndex = undefined;
+        return {
+            setIndex: function setIndex(index) {
+                prevIndex = index;
+            },
+            getIndex: function getIndex() {
+                return prevIndex;
+            },
+            getItemIndex: function getItemIndex(item) {
+                return itemIds.indexOf(item.id);
+            },
+        };
+    };
+
+    var ITEM_TRANSLATE_SPRING = {
+        type: 'spring',
+        stiffness: 0.75,
+        damping: 0.45,
+        mass: 10,
+    };
+
+    var ITEM_SCALE_SPRING = 'spring';
+
+    var StateMap = {
+        DID_START_ITEM_LOAD: 'busy',
+        DID_UPDATE_ITEM_LOAD_PROGRESS: 'loading',
+        DID_THROW_ITEM_INVALID: 'load-invalid',
+        DID_THROW_ITEM_LOAD_ERROR: 'load-error',
+        DID_LOAD_ITEM: 'idle',
+        DID_THROW_ITEM_REMOVE_ERROR: 'remove-error',
+        DID_START_ITEM_REMOVE: 'busy',
+        DID_START_ITEM_PROCESSING: 'busy processing',
+        DID_REQUEST_ITEM_PROCESSING: 'busy processing',
+        DID_UPDATE_ITEM_PROCESS_PROGRESS: 'processing',
+        DID_COMPLETE_ITEM_PROCESSING: 'processing-complete',
+        DID_THROW_ITEM_PROCESSING_ERROR: 'processing-error',
+        DID_THROW_ITEM_PROCESSING_REVERT_ERROR: 'processing-revert-error',
+        DID_ABORT_ITEM_PROCESSING: 'cancelled',
+        DID_REVERT_ITEM_PROCESSING: 'idle',
+    };
+
+    /**
+     * Creates the file view
+     */
+    var create$7 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+
+        // select
+        root.ref.handleClick = function(e) {
+            return root.dispatch('DID_ACTIVATE_ITEM', { id: props.id });
+        };
+
+        // set id
+        root.element.id = 'filepond--item-' + props.id;
+        root.element.addEventListener('click', root.ref.handleClick);
+
+        // file view
+        root.ref.container = root.appendChildView(
+            root.createChildView(fileWrapper, { id: props.id })
+        );
+
+        // file panel
+        root.ref.panel = root.appendChildView(root.createChildView(panel, { name: 'item-panel' }));
+
+        // default start height
+        root.ref.panel.height = null;
+
+        // by default not marked for removal
+        props.markedForRemoval = false;
+
+        // if not allowed to reorder file items, exit here
+        if (!root.query('GET_ALLOW_REORDER')) return;
+
+        // set to idle so shows grab cursor
+        root.element.dataset.dragState = 'idle';
+
+        var grab = function grab(e) {
+            if (!e.isPrimary) return;
+
+            var removedActivateListener = false;
+
+            var origin = {
+                x: e.pageX,
+                y: e.pageY,
+            };
+
+            props.dragOrigin = {
+                x: root.translateX,
+                y: root.translateY,
+            };
+
+            props.dragCenter = {
+                x: e.offsetX,
+                y: e.offsetY,
+            };
+
+            var dragState = createDragHelper(root.query('GET_ACTIVE_ITEMS'));
+
+            root.dispatch('DID_GRAB_ITEM', { id: props.id, dragState: dragState });
+
+            var drag = function drag(e) {
+                if (!e.isPrimary) return;
+
+                e.stopPropagation();
+                e.preventDefault();
+
+                props.dragOffset = {
+                    x: e.pageX - origin.x,
+                    y: e.pageY - origin.y,
+                };
+
+                // if dragged stop listening to clicks, will re-add when done dragging
+                var dist =
+                    props.dragOffset.x * props.dragOffset.x +
+                    props.dragOffset.y * props.dragOffset.y;
+                if (dist > 16 && !removedActivateListener) {
+                    removedActivateListener = true;
+                    root.element.removeEventListener('click', root.ref.handleClick);
+                }
+
+                root.dispatch('DID_DRAG_ITEM', { id: props.id, dragState: dragState });
+            };
+
+            var drop = function drop(e) {
+                if (!e.isPrimary) return;
+
+                document.removeEventListener('pointermove', drag);
+                document.removeEventListener('pointerup', drop);
+
+                props.dragOffset = {
+                    x: e.pageX - origin.x,
+                    y: e.pageY - origin.y,
+                };
+
+                root.dispatch('DID_DROP_ITEM', { id: props.id, dragState: dragState });
+
+                // start listening to clicks again
+                if (removedActivateListener) {
+                    setTimeout(function() {
+                        return root.element.addEventListener('click', root.ref.handleClick);
+                    }, 0);
+                }
+            };
+
+            document.addEventListener('pointermove', drag);
+            document.addEventListener('pointerup', drop);
+        };
+
+        root.element.addEventListener('pointerdown', grab);
+    };
+
+    var route$1 = createRoute({
+        DID_UPDATE_PANEL_HEIGHT: function DID_UPDATE_PANEL_HEIGHT(_ref2) {
+            var root = _ref2.root,
+                action = _ref2.action;
+            root.height = action.height;
+        },
+    });
+
+    var write$4 = createRoute(
+        {
+            DID_GRAB_ITEM: function DID_GRAB_ITEM(_ref3) {
+                var root = _ref3.root,
+                    props = _ref3.props;
+                props.dragOrigin = {
+                    x: root.translateX,
+                    y: root.translateY,
+                };
+            },
+            DID_DRAG_ITEM: function DID_DRAG_ITEM(_ref4) {
+                var root = _ref4.root;
+                root.element.dataset.dragState = 'drag';
+            },
+            DID_DROP_ITEM: function DID_DROP_ITEM(_ref5) {
+                var root = _ref5.root,
+                    props = _ref5.props;
+                props.dragOffset = null;
+                props.dragOrigin = null;
+                root.element.dataset.dragState = 'drop';
+            },
+        },
+        function(_ref6) {
+            var root = _ref6.root,
+                actions = _ref6.actions,
+                props = _ref6.props,
+                shouldOptimize = _ref6.shouldOptimize;
+
+            if (root.element.dataset.dragState === 'drop') {
+                if (root.scaleX <= 1) {
+                    root.element.dataset.dragState = 'idle';
+                }
+            }
+
+            // select last state change action
+            var action = actions
+                .concat()
+                .filter(function(action) {
+                    return /^DID_/.test(action.type);
+                })
+                .reverse()
+                .find(function(action) {
+                    return StateMap[action.type];
+                });
+
+            // no need to set same state twice
+            if (action && action.type !== props.currentState) {
+                // set current state
+                props.currentState = action.type;
+
+                // set state
+                root.element.dataset.filepondItemState = StateMap[props.currentState] || '';
+            }
+
+            // route actions
+            var aspectRatio =
+                root.query('GET_ITEM_PANEL_ASPECT_RATIO') || root.query('GET_PANEL_ASPECT_RATIO');
+            if (!aspectRatio) {
+                route$1({ root: root, actions: actions, props: props });
+                if (!root.height && root.ref.container.rect.element.height > 0) {
+                    root.height = root.ref.container.rect.element.height;
+                }
+            } else if (!shouldOptimize) {
+                root.height = root.rect.element.width * aspectRatio;
+            }
+
+            // sync panel height with item height
+            if (shouldOptimize) {
+                root.ref.panel.height = null;
+            }
+
+            root.ref.panel.height = root.height;
+        }
+    );
+
+    var item = createView({
+        create: create$7,
+        write: write$4,
+        destroy: function destroy(_ref7) {
+            var root = _ref7.root,
+                props = _ref7.props;
+            root.element.removeEventListener('click', root.ref.handleClick);
+            root.dispatch('RELEASE_ITEM', { query: props.id });
+        },
+        tag: 'li',
+        name: 'item',
+        mixins: {
+            apis: [
+                'id',
+                'interactionMethod',
+                'markedForRemoval',
+                'spawnDate',
+                'dragCenter',
+                'dragOrigin',
+                'dragOffset',
+            ],
+            styles: ['translateX', 'translateY', 'scaleX', 'scaleY', 'opacity', 'height'],
+
+            animations: {
+                scaleX: ITEM_SCALE_SPRING,
+                scaleY: ITEM_SCALE_SPRING,
+                translateX: ITEM_TRANSLATE_SPRING,
+                translateY: ITEM_TRANSLATE_SPRING,
+                opacity: { type: 'tween', duration: 150 },
+            },
+        },
+    });
+
+    var getItemsPerRow = function(horizontalSpace, itemWidth) {
+        // add one pixel leeway, when using percentages for item width total items can be 1.99 per row
+
+        return Math.max(1, Math.floor((horizontalSpace + 1) / itemWidth));
+    };
+
+    var getItemIndexByPosition = function getItemIndexByPosition(view, children, positionInView) {
+        if (!positionInView) return;
+
+        var horizontalSpace = view.rect.element.width;
+        // const children = view.childViews;
+        var l = children.length;
+        var last = null;
+
+        // -1, don't move items to accomodate (either add to top or bottom)
+        if (l === 0 || positionInView.top < children[0].rect.element.top) return -1;
+
+        // let's get the item width
+        var item = children[0];
+        var itemRect = item.rect.element;
+        var itemHorizontalMargin = itemRect.marginLeft + itemRect.marginRight;
+        var itemWidth = itemRect.width + itemHorizontalMargin;
+        var itemsPerRow = getItemsPerRow(horizontalSpace, itemWidth);
+
+        // stack
+        if (itemsPerRow === 1) {
+            for (var index = 0; index < l; index++) {
+                var child = children[index];
+                var childMid = child.rect.outer.top + child.rect.element.height * 0.5;
+                if (positionInView.top < childMid) {
+                    return index;
+                }
+            }
+            return l;
+        }
+
+        // grid
+        var itemVerticalMargin = itemRect.marginTop + itemRect.marginBottom;
+        var itemHeight = itemRect.height + itemVerticalMargin;
+        for (var _index = 0; _index < l; _index++) {
+            var indexX = _index % itemsPerRow;
+            var indexY = Math.floor(_index / itemsPerRow);
+
+            var offsetX = indexX * itemWidth;
+            var offsetY = indexY * itemHeight;
+
+            var itemTop = offsetY - itemRect.marginTop;
+            var itemRight = offsetX + itemWidth;
+            var itemBottom = offsetY + itemHeight + itemRect.marginBottom;
+
+            if (positionInView.top < itemBottom && positionInView.top > itemTop) {
+                if (positionInView.left < itemRight) {
+                    return _index;
+                } else if (_index !== l - 1) {
+                    last = _index;
+                } else {
+                    last = null;
+                }
+            }
+        }
+
+        if (last !== null) {
+            return last;
+        }
+
+        return l;
+    };
+
+    var dropAreaDimensions = {
+        height: 0,
+        width: 0,
+        get getHeight() {
+            return this.height;
+        },
+        set setHeight(val) {
+            if (this.height === 0 || val === 0) this.height = val;
+        },
+        get getWidth() {
+            return this.width;
+        },
+        set setWidth(val) {
+            if (this.width === 0 || val === 0) this.width = val;
+        },
+        setDimensions: function setDimensions(height, width) {
+            if (this.height === 0 || height === 0) this.height = height;
+            if (this.width === 0 || width === 0) this.width = width;
+        },
+    };
+
+    var create$8 = function create(_ref) {
+        var root = _ref.root;
+        // need to set role to list as otherwise it won't be read as a list by VoiceOver
+        attr(root.element, 'role', 'list');
+
+        root.ref.lastItemSpanwDate = Date.now();
+    };
+
+    /**
+     * Inserts a new item
+     * @param root
+     * @param action
+     */
+    var addItemView = function addItemView(_ref2) {
+        var root = _ref2.root,
+            action = _ref2.action;
+        var id = action.id,
+            index = action.index,
+            interactionMethod = action.interactionMethod;
+
+        root.ref.addIndex = index;
+
+        var now = Date.now();
+        var spawnDate = now;
+        var opacity = 1;
+
+        if (interactionMethod !== InteractionMethod.NONE) {
+            opacity = 0;
+            var cooldown = root.query('GET_ITEM_INSERT_INTERVAL');
+            var dist = now - root.ref.lastItemSpanwDate;
+            spawnDate = dist < cooldown ? now + (cooldown - dist) : now;
+        }
+
+        root.ref.lastItemSpanwDate = spawnDate;
+
+        root.appendChildView(
+            root.createChildView(
+                // view type
+                item,
+
+                // props
+                {
+                    spawnDate: spawnDate,
+                    id: id,
+                    opacity: opacity,
+                    interactionMethod: interactionMethod,
+                }
+            ),
+
+            index
+        );
+    };
+
+    var moveItem = function moveItem(item, x, y) {
+        var vx = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+        var vy = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 1;
+        // set to null to remove animation while dragging
+        if (item.dragOffset) {
+            item.translateX = null;
+            item.translateY = null;
+            item.translateX = item.dragOrigin.x + item.dragOffset.x;
+            item.translateY = item.dragOrigin.y + item.dragOffset.y;
+            item.scaleX = 1.025;
+            item.scaleY = 1.025;
+        } else {
+            item.translateX = x;
+            item.translateY = y;
+
+            if (Date.now() > item.spawnDate) {
+                // reveal element
+                if (item.opacity === 0) {
+                    introItemView(item, x, y, vx, vy);
+                }
+
+                // make sure is default scale every frame
+                item.scaleX = 1;
+                item.scaleY = 1;
+                item.opacity = 1;
+            }
+        }
+    };
+
+    var introItemView = function introItemView(item, x, y, vx, vy) {
+        if (item.interactionMethod === InteractionMethod.NONE) {
+            item.translateX = null;
+            item.translateX = x;
+            item.translateY = null;
+            item.translateY = y;
+        } else if (item.interactionMethod === InteractionMethod.DROP) {
+            item.translateX = null;
+            item.translateX = x - vx * 20;
+
+            item.translateY = null;
+            item.translateY = y - vy * 10;
+
+            item.scaleX = 0.8;
+            item.scaleY = 0.8;
+        } else if (item.interactionMethod === InteractionMethod.BROWSE) {
+            item.translateY = null;
+            item.translateY = y - 30;
+        } else if (item.interactionMethod === InteractionMethod.API) {
+            item.translateX = null;
+            item.translateX = x - 30;
+            item.translateY = null;
+        }
+    };
+
+    /**
+     * Removes an existing item
+     * @param root
+     * @param action
+     */
+    var removeItemView = function removeItemView(_ref3) {
+        var root = _ref3.root,
+            action = _ref3.action;
+        var id = action.id;
+
+        // get the view matching the given id
+        var view = root.childViews.find(function(child) {
+            return child.id === id;
+        });
+
+        // if no view found, exit
+        if (!view) {
+            return;
+        }
+
+        // animate view out of view
+        view.scaleX = 0.9;
+        view.scaleY = 0.9;
+        view.opacity = 0;
+
+        // mark for removal
+        view.markedForRemoval = true;
+    };
+
+    var getItemHeight = function getItemHeight(child) {
+        return (
+            child.rect.element.height +
+            child.rect.element.marginBottom * 0.5 +
+            child.rect.element.marginTop * 0.5
+        );
+    };
+    var getItemWidth = function getItemWidth(child) {
+        return (
+            child.rect.element.width +
+            child.rect.element.marginLeft * 0.5 +
+            child.rect.element.marginRight * 0.5
+        );
+    };
+
+    var dragItem = function dragItem(_ref4) {
+        var root = _ref4.root,
+            action = _ref4.action;
+        var id = action.id,
+            dragState = action.dragState;
+
+        // reference to item
+        var item = root.query('GET_ITEM', { id: id });
+
+        // get the view matching the given id
+        var view = root.childViews.find(function(child) {
+            return child.id === id;
+        });
+
+        var numItems = root.childViews.length;
+        var oldIndex = dragState.getItemIndex(item);
+
+        // if no view found, exit
+        if (!view) return;
+
+        var dragPosition = {
+            x: view.dragOrigin.x + view.dragOffset.x + view.dragCenter.x,
+            y: view.dragOrigin.y + view.dragOffset.y + view.dragCenter.y,
+        };
+
+        // get drag area dimensions
+        var dragHeight = getItemHeight(view);
+        var dragWidth = getItemWidth(view);
+
+        // get rows and columns (There will always be at least one row and one column if a file is present)
+        var cols = Math.floor(root.rect.outer.width / dragWidth);
+        if (cols > numItems) cols = numItems;
+
+        // rows are used to find when we have left the preview area bounding box
+        var rows = Math.floor(numItems / cols + 1);
+
+        dropAreaDimensions.setHeight = dragHeight * rows;
+        dropAreaDimensions.setWidth = dragWidth * cols;
+
+        // get new index of dragged item
+        var location = {
+            y: Math.floor(dragPosition.y / dragHeight),
+            x: Math.floor(dragPosition.x / dragWidth),
+            getGridIndex: function getGridIndex() {
+                if (
+                    dragPosition.y > dropAreaDimensions.getHeight ||
+                    dragPosition.y < 0 ||
+                    dragPosition.x > dropAreaDimensions.getWidth ||
+                    dragPosition.x < 0
+                )
+                    return oldIndex;
+                return this.y * cols + this.x;
+            },
+            getColIndex: function getColIndex() {
+                var items = root.query('GET_ACTIVE_ITEMS');
+                var visibleChildren = root.childViews.filter(function(child) {
+                    return child.rect.element.height;
+                });
+                var children = items.map(function(item) {
+                    return visibleChildren.find(function(childView) {
+                        return childView.id === item.id;
+                    });
+                });
+
+                var currentIndex = children.findIndex(function(child) {
+                    return child === view;
+                });
+                var dragHeight = getItemHeight(view);
+                var l = children.length;
+                var idx = l;
+                var childHeight = 0;
+                var childBottom = 0;
+                var childTop = 0;
+                for (var i = 0; i < l; i++) {
+                    childHeight = getItemHeight(children[i]);
+                    childTop = childBottom;
+                    childBottom = childTop + childHeight;
+                    if (dragPosition.y < childBottom) {
+                        if (currentIndex > i) {
+                            if (dragPosition.y < childTop + dragHeight) {
+                                idx = i;
+                                break;
+                            }
+                            continue;
+                        }
+                        idx = i;
+                        break;
+                    }
+                }
+                return idx;
+            },
+        };
+
+        // get new index
+        var index = cols > 1 ? location.getGridIndex() : location.getColIndex();
+        root.dispatch('MOVE_ITEM', { query: view, index: index });
+
+        // if the index of the item changed, dispatch reorder action
+        var currentIndex = dragState.getIndex();
+
+        if (currentIndex === undefined || currentIndex !== index) {
+            dragState.setIndex(index);
+
+            if (currentIndex === undefined) return;
+
+            root.dispatch('DID_REORDER_ITEMS', {
+                items: root.query('GET_ACTIVE_ITEMS'),
+                origin: oldIndex,
+                target: index,
+            });
+        }
+    };
+
+    /**
+     * Setup action routes
+     */
+    var route$2 = createRoute({
+        DID_ADD_ITEM: addItemView,
+        DID_REMOVE_ITEM: removeItemView,
+        DID_DRAG_ITEM: dragItem,
+    });
+
+    /**
+     * Write to view
+     * @param root
+     * @param actions
+     * @param props
+     */
+    var write$5 = function write(_ref5) {
+        var root = _ref5.root,
+            props = _ref5.props,
+            actions = _ref5.actions,
+            shouldOptimize = _ref5.shouldOptimize;
+        // route actions
+        route$2({ root: root, props: props, actions: actions });
+        var dragCoordinates = props.dragCoordinates;
+
+        // available space on horizontal axis
+        var horizontalSpace = root.rect.element.width;
+
+        // only draw children that have dimensions
+        var visibleChildren = root.childViews.filter(function(child) {
+            return child.rect.element.height;
+        });
+
+        // sort based on current active items
+        var children = root
+            .query('GET_ACTIVE_ITEMS')
+            .map(function(item) {
+                return visibleChildren.find(function(child) {
+                    return child.id === item.id;
+                });
+            })
+            .filter(function(item) {
+                return item;
+            });
+
+        // get index
+        var dragIndex = dragCoordinates
+            ? getItemIndexByPosition(root, children, dragCoordinates)
+            : null;
+
+        // add index is used to reserve the dropped/added item index till the actual item is rendered
+        var addIndex = root.ref.addIndex || null;
+
+        // add index no longer needed till possibly next draw
+        root.ref.addIndex = null;
+
+        var dragIndexOffset = 0;
+        var removeIndexOffset = 0;
+        var addIndexOffset = 0;
+
+        if (children.length === 0) return;
+
+        var childRect = children[0].rect.element;
+        var itemVerticalMargin = childRect.marginTop + childRect.marginBottom;
+        var itemHorizontalMargin = childRect.marginLeft + childRect.marginRight;
+        var itemWidth = childRect.width + itemHorizontalMargin;
+        var itemHeight = childRect.height + itemVerticalMargin;
+        var itemsPerRow = getItemsPerRow(horizontalSpace, itemWidth);
+
+        // stack
+        if (itemsPerRow === 1) {
+            var offsetY = 0;
+            var dragOffset = 0;
+
+            children.forEach(function(child, index) {
+                if (dragIndex) {
+                    var dist = index - dragIndex;
+                    if (dist === -2) {
+                        dragOffset = -itemVerticalMargin * 0.25;
+                    } else if (dist === -1) {
+                        dragOffset = -itemVerticalMargin * 0.75;
+                    } else if (dist === 0) {
+                        dragOffset = itemVerticalMargin * 0.75;
+                    } else if (dist === 1) {
+                        dragOffset = itemVerticalMargin * 0.25;
+                    } else {
+                        dragOffset = 0;
+                    }
+                }
+
+                if (shouldOptimize) {
+                    child.translateX = null;
+                    child.translateY = null;
+                }
+
+                if (!child.markedForRemoval) {
+                    moveItem(child, 0, offsetY + dragOffset);
+                }
+
+                var itemHeight = child.rect.element.height + itemVerticalMargin;
+
+                var visualHeight = itemHeight * (child.markedForRemoval ? child.opacity : 1);
+
+                offsetY += visualHeight;
+            });
+        }
+        // grid
+        else {
+            var prevX = 0;
+            var prevY = 0;
+
+            children.forEach(function(child, index) {
+                if (index === dragIndex) {
+                    dragIndexOffset = 1;
+                }
+
+                if (index === addIndex) {
+                    addIndexOffset += 1;
+                }
+
+                if (child.markedForRemoval && child.opacity < 0.5) {
+                    removeIndexOffset -= 1;
+                }
+
+                var visualIndex = index + addIndexOffset + dragIndexOffset + removeIndexOffset;
+
+                var indexX = visualIndex % itemsPerRow;
+                var indexY = Math.floor(visualIndex / itemsPerRow);
+
+                var offsetX = indexX * itemWidth;
+                var offsetY = indexY * itemHeight;
+
+                var vectorX = Math.sign(offsetX - prevX);
+                var vectorY = Math.sign(offsetY - prevY);
+
+                prevX = offsetX;
+                prevY = offsetY;
+
+                if (child.markedForRemoval) return;
+
+                if (shouldOptimize) {
+                    child.translateX = null;
+                    child.translateY = null;
+                }
+
+                moveItem(child, offsetX, offsetY, vectorX, vectorY);
+            });
+        }
+    };
+
+    /**
+     * Filters actions that are meant specifically for a certain child of the list
+     * @param child
+     * @param actions
+     */
+    var filterSetItemActions = function filterSetItemActions(child, actions) {
+        return actions.filter(function(action) {
+            // if action has an id, filter out actions that don't have this child id
+            if (action.data && action.data.id) {
+                return child.id === action.data.id;
+            }
+
+            // allow all other actions
+            return true;
+        });
+    };
+
+    var list = createView({
+        create: create$8,
+        write: write$5,
+        tag: 'ul',
+        name: 'list',
+        didWriteView: function didWriteView(_ref6) {
+            var root = _ref6.root;
+            root.childViews
+                .filter(function(view) {
+                    return view.markedForRemoval && view.opacity === 0 && view.resting;
+                })
+                .forEach(function(view) {
+                    view._destroy();
+                    root.removeChildView(view);
+                });
+        },
+        filterFrameActionsForChild: filterSetItemActions,
+        mixins: {
+            apis: ['dragCoordinates'],
+        },
+    });
+
+    var create$9 = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        root.ref.list = root.appendChildView(root.createChildView(list));
+        props.dragCoordinates = null;
+        props.overflowing = false;
+    };
+
+    var storeDragCoordinates = function storeDragCoordinates(_ref2) {
+        var root = _ref2.root,
+            props = _ref2.props,
+            action = _ref2.action;
+        if (!root.query('GET_ITEM_INSERT_LOCATION_FREEDOM')) return;
+        props.dragCoordinates = {
+            left: action.position.scopeLeft - root.ref.list.rect.element.left,
+            top:
+                action.position.scopeTop -
+                (root.rect.outer.top + root.rect.element.marginTop + root.rect.element.scrollTop),
+        };
+    };
+
+    var clearDragCoordinates = function clearDragCoordinates(_ref3) {
+        var props = _ref3.props;
+        props.dragCoordinates = null;
+    };
+
+    var route$3 = createRoute({
+        DID_DRAG: storeDragCoordinates,
+        DID_END_DRAG: clearDragCoordinates,
+    });
+
+    var write$6 = function write(_ref4) {
+        var root = _ref4.root,
+            props = _ref4.props,
+            actions = _ref4.actions;
+
+        // route actions
+        route$3({ root: root, props: props, actions: actions });
+
+        // current drag position
+        root.ref.list.dragCoordinates = props.dragCoordinates;
+
+        // if currently overflowing but no longer received overflow
+        if (props.overflowing && !props.overflow) {
+            props.overflowing = false;
+
+            // reset overflow state
+            root.element.dataset.state = '';
+            root.height = null;
+        }
+
+        // if is not overflowing currently but does receive overflow value
+        if (props.overflow) {
+            var newHeight = Math.round(props.overflow);
+            if (newHeight !== root.height) {
+                props.overflowing = true;
+                root.element.dataset.state = 'overflow';
+                root.height = newHeight;
+            }
+        }
+    };
+
+    var listScroller = createView({
+        create: create$9,
+        write: write$6,
+        name: 'list-scroller',
+        mixins: {
+            apis: ['overflow', 'dragCoordinates'],
+            styles: ['height', 'translateY'],
+            animations: {
+                translateY: 'spring',
+            },
+        },
+    });
+
+    var attrToggle = function attrToggle(element, name, state) {
+        var enabledValue = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '';
+        if (state) {
+            attr(element, name, enabledValue);
+        } else {
+            element.removeAttribute(name);
+        }
+    };
+
+    var resetFileInput = function resetFileInput(input) {
+        // no value, no need to reset
+        if (!input || input.value === '') {
+            return;
+        }
+
+        try {
+            // for modern browsers
+            input.value = '';
+        } catch (err) {}
+
+        // for IE10
+        if (input.value) {
+            // quickly append input to temp form and reset form
+            var form = createElement$1('form');
+            var parentNode = input.parentNode;
+            var ref = input.nextSibling;
+            form.appendChild(input);
+            form.reset();
+
+            // re-inject input where it originally was
+            if (ref) {
+                parentNode.insertBefore(input, ref);
+            } else {
+                parentNode.appendChild(input);
+            }
+        }
+    };
+
+    var create$a = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+
+        // set id so can be referenced from outside labels
+        root.element.id = 'filepond--browser-' + props.id;
+
+        // set name of element (is removed when a value is set)
+        attr(root.element, 'name', root.query('GET_NAME'));
+
+        // we have to link this element to the status element
+        attr(root.element, 'aria-controls', 'filepond--assistant-' + props.id);
+
+        // set label, we use labelled by as otherwise the screenreader does not read the "browse" text in the label (as it has tabindex: 0)
+        attr(root.element, 'aria-labelledby', 'filepond--drop-label-' + props.id);
+
+        // set configurable props
+        setAcceptedFileTypes({
+            root: root,
+            action: { value: root.query('GET_ACCEPTED_FILE_TYPES') },
+        });
+        toggleAllowMultiple({ root: root, action: { value: root.query('GET_ALLOW_MULTIPLE') } });
+        toggleDirectoryFilter({
+            root: root,
+            action: { value: root.query('GET_ALLOW_DIRECTORIES_ONLY') },
+        });
+        toggleDisabled({ root: root });
+        toggleRequired({ root: root, action: { value: root.query('GET_REQUIRED') } });
+        setCaptureMethod({ root: root, action: { value: root.query('GET_CAPTURE_METHOD') } });
+
+        // handle changes to the input field
+        root.ref.handleChange = function(e) {
+            if (!root.element.value) {
+                return;
+            }
+
+            // extract files and move value of webkitRelativePath path to _relativePath
+            var files = Array.from(root.element.files).map(function(file) {
+                file._relativePath = file.webkitRelativePath;
+                return file;
+            });
+
+            // we add a little delay so the OS file select window can move out of the way before we add our file
+            setTimeout(function() {
+                // load files
+                props.onload(files);
+
+                // reset input, it's just for exposing a method to drop files, should not retain any state
+                resetFileInput(root.element);
+            }, 250);
+        };
+
+        root.element.addEventListener('change', root.ref.handleChange);
+    };
+
+    var setAcceptedFileTypes = function setAcceptedFileTypes(_ref2) {
+        var root = _ref2.root,
+            action = _ref2.action;
+        if (!root.query('GET_ALLOW_SYNC_ACCEPT_ATTRIBUTE')) return;
+        attrToggle(
+            root.element,
+            'accept',
+            !!action.value,
+            action.value ? action.value.join(',') : ''
+        );
+    };
+
+    var toggleAllowMultiple = function toggleAllowMultiple(_ref3) {
+        var root = _ref3.root,
+            action = _ref3.action;
+        attrToggle(root.element, 'multiple', action.value);
+    };
+
+    var toggleDirectoryFilter = function toggleDirectoryFilter(_ref4) {
+        var root = _ref4.root,
+            action = _ref4.action;
+        attrToggle(root.element, 'webkitdirectory', action.value);
+    };
+
+    var toggleDisabled = function toggleDisabled(_ref5) {
+        var root = _ref5.root;
+        var isDisabled = root.query('GET_DISABLED');
+        var doesAllowBrowse = root.query('GET_ALLOW_BROWSE');
+        var disableField = isDisabled || !doesAllowBrowse;
+        attrToggle(root.element, 'disabled', disableField);
+    };
+
+    var toggleRequired = function toggleRequired(_ref6) {
+        var root = _ref6.root,
+            action = _ref6.action;
+        // want to remove required, always possible
+        if (!action.value) {
+            attrToggle(root.element, 'required', false);
+        }
+        // if want to make required, only possible when zero items
+        else if (root.query('GET_TOTAL_ITEMS') === 0) {
+            attrToggle(root.element, 'required', true);
+        }
+    };
+
+    var setCaptureMethod = function setCaptureMethod(_ref7) {
+        var root = _ref7.root,
+            action = _ref7.action;
+        attrToggle(
+            root.element,
+            'capture',
+            !!action.value,
+            action.value === true ? '' : action.value
+        );
+    };
+
+    var updateRequiredStatus = function updateRequiredStatus(_ref8) {
+        var root = _ref8.root;
+        var element = root.element;
+        // always remove the required attribute when more than zero items
+        if (root.query('GET_TOTAL_ITEMS') > 0) {
+            attrToggle(element, 'required', false);
+            attrToggle(element, 'name', false);
+        } else {
+            // add name attribute
+            attrToggle(element, 'name', true, root.query('GET_NAME'));
+
+            // remove any validation messages
+            var shouldCheckValidity = root.query('GET_CHECK_VALIDITY');
+            if (shouldCheckValidity) {
+                element.setCustomValidity('');
+            }
+
+            // we only add required if the field has been deemed required
+            if (root.query('GET_REQUIRED')) {
+                attrToggle(element, 'required', true);
+            }
+        }
+    };
+
+    var updateFieldValidityStatus = function updateFieldValidityStatus(_ref9) {
+        var root = _ref9.root;
+        var shouldCheckValidity = root.query('GET_CHECK_VALIDITY');
+        if (!shouldCheckValidity) return;
+        root.element.setCustomValidity(root.query('GET_LABEL_INVALID_FIELD'));
+    };
+
+    var browser = createView({
+        tag: 'input',
+        name: 'browser',
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        attributes: {
+            type: 'file',
+        },
+
+        create: create$a,
+        destroy: function destroy(_ref10) {
+            var root = _ref10.root;
+            root.element.removeEventListener('change', root.ref.handleChange);
+        },
+        write: createRoute({
+            DID_LOAD_ITEM: updateRequiredStatus,
+            DID_REMOVE_ITEM: updateRequiredStatus,
+            DID_THROW_ITEM_INVALID: updateFieldValidityStatus,
+
+            DID_SET_DISABLED: toggleDisabled,
+            DID_SET_ALLOW_BROWSE: toggleDisabled,
+            DID_SET_ALLOW_DIRECTORIES_ONLY: toggleDirectoryFilter,
+            DID_SET_ALLOW_MULTIPLE: toggleAllowMultiple,
+            DID_SET_ACCEPTED_FILE_TYPES: setAcceptedFileTypes,
+            DID_SET_CAPTURE_METHOD: setCaptureMethod,
+            DID_SET_REQUIRED: toggleRequired,
+        }),
+    });
+
+    var Key = {
+        ENTER: 13,
+        SPACE: 32,
+    };
+
+    var create$b = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+
+        // create the label and link it to the file browser
+        var label = createElement$1('label');
+        attr(label, 'for', 'filepond--browser-' + props.id);
+
+        // use for labeling file input (aria-labelledby on file input)
+        attr(label, 'id', 'filepond--drop-label-' + props.id);
+
+        // hide the label for screenreaders, the input element will read the contents of the label when it's focussed. If we don't set aria-hidden the screenreader will also navigate the contents of the label separately from the input.
+        attr(label, 'aria-hidden', 'true');
+
+        // handle keys
+        root.ref.handleKeyDown = function(e) {
+            var isActivationKey = e.keyCode === Key.ENTER || e.keyCode === Key.SPACE;
+            if (!isActivationKey) return;
+            // stops from triggering the element a second time
+            e.preventDefault();
+
+            // click link (will then in turn activate file input)
+            root.ref.label.click();
+        };
+
+        root.ref.handleClick = function(e) {
+            var isLabelClick = e.target === label || label.contains(e.target);
+
+            // don't want to click twice
+            if (isLabelClick) return;
+
+            // click link (will then in turn activate file input)
+            root.ref.label.click();
+        };
+
+        // attach events
+        label.addEventListener('keydown', root.ref.handleKeyDown);
+        root.element.addEventListener('click', root.ref.handleClick);
+
+        // update
+        updateLabelValue(label, props.caption);
+
+        // add!
+        root.appendChild(label);
+        root.ref.label = label;
+    };
+
+    var updateLabelValue = function updateLabelValue(label, value) {
+        label.innerHTML = value;
+        var clickable = label.querySelector('.filepond--label-action');
+        if (clickable) {
+            attr(clickable, 'tabindex', '0');
+        }
+        return value;
+    };
+
+    var dropLabel = createView({
+        name: 'drop-label',
+        ignoreRect: true,
+        create: create$b,
+        destroy: function destroy(_ref2) {
+            var root = _ref2.root;
+            root.ref.label.addEventListener('keydown', root.ref.handleKeyDown);
+            root.element.removeEventListener('click', root.ref.handleClick);
+        },
+        write: createRoute({
+            DID_SET_LABEL_IDLE: function DID_SET_LABEL_IDLE(_ref3) {
+                var root = _ref3.root,
+                    action = _ref3.action;
+                updateLabelValue(root.ref.label, action.value);
+            },
+        }),
+
+        mixins: {
+            styles: ['opacity', 'translateX', 'translateY'],
+            animations: {
+                opacity: { type: 'tween', duration: 150 },
+                translateX: 'spring',
+                translateY: 'spring',
+            },
+        },
+    });
+
+    var blob = createView({
+        name: 'drip-blob',
+        ignoreRect: true,
+        mixins: {
+            styles: ['translateX', 'translateY', 'scaleX', 'scaleY', 'opacity'],
+            animations: {
+                scaleX: 'spring',
+                scaleY: 'spring',
+                translateX: 'spring',
+                translateY: 'spring',
+                opacity: { type: 'tween', duration: 250 },
+            },
+        },
+    });
+
+    var addBlob = function addBlob(_ref) {
+        var root = _ref.root;
+        var centerX = root.rect.element.width * 0.5;
+        var centerY = root.rect.element.height * 0.5;
+
+        root.ref.blob = root.appendChildView(
+            root.createChildView(blob, {
+                opacity: 0,
+                scaleX: 2.5,
+                scaleY: 2.5,
+                translateX: centerX,
+                translateY: centerY,
+            })
+        );
+    };
+
+    var moveBlob = function moveBlob(_ref2) {
+        var root = _ref2.root,
+            action = _ref2.action;
+        if (!root.ref.blob) {
+            addBlob({ root: root });
+            return;
+        }
+
+        root.ref.blob.translateX = action.position.scopeLeft;
+        root.ref.blob.translateY = action.position.scopeTop;
+        root.ref.blob.scaleX = 1;
+        root.ref.blob.scaleY = 1;
+        root.ref.blob.opacity = 1;
+    };
+
+    var hideBlob = function hideBlob(_ref3) {
+        var root = _ref3.root;
+        if (!root.ref.blob) {
+            return;
+        }
+        root.ref.blob.opacity = 0;
+    };
+
+    var explodeBlob = function explodeBlob(_ref4) {
+        var root = _ref4.root;
+        if (!root.ref.blob) {
+            return;
+        }
+        root.ref.blob.scaleX = 2.5;
+        root.ref.blob.scaleY = 2.5;
+        root.ref.blob.opacity = 0;
+    };
+
+    var write$7 = function write(_ref5) {
+        var root = _ref5.root,
+            props = _ref5.props,
+            actions = _ref5.actions;
+        route$4({ root: root, props: props, actions: actions });
+        var blob = root.ref.blob;
+
+        if (actions.length === 0 && blob && blob.opacity === 0) {
+            root.removeChildView(blob);
+            root.ref.blob = null;
+        }
+    };
+
+    var route$4 = createRoute({
+        DID_DRAG: moveBlob,
+        DID_DROP: explodeBlob,
+        DID_END_DRAG: hideBlob,
+    });
+
+    var drip = createView({
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        name: 'drip',
+        write: write$7,
+    });
+
+    var setInputFiles = function setInputFiles(element, files) {
+        try {
+            // Create a DataTransfer instance and add a newly created file
+            var dataTransfer = new DataTransfer();
+            files.forEach(function(file) {
+                if (file instanceof File) {
+                    dataTransfer.items.add(file);
+                } else {
+                    dataTransfer.items.add(
+                        new File([file], file.name, {
+                            type: file.type,
+                        })
+                    );
+                }
+            });
+
+            // Assign the DataTransfer files list to the file input
+            element.files = dataTransfer.files;
+        } catch (err) {
+            return false;
+        }
+        return true;
+    };
+
+    var create$c = function create(_ref) {
+        var root = _ref.root;
+        return (root.ref.fields = {});
+    };
+
+    var getField = function getField(root, id) {
+        return root.ref.fields[id];
+    };
+
+    var syncFieldPositionsWithItems = function syncFieldPositionsWithItems(root) {
+        root.query('GET_ACTIVE_ITEMS').forEach(function(item) {
+            if (!root.ref.fields[item.id]) return;
+            root.element.appendChild(root.ref.fields[item.id]);
+        });
+    };
+
+    var didReorderItems = function didReorderItems(_ref2) {
+        var root = _ref2.root;
+        return syncFieldPositionsWithItems(root);
+    };
+
+    var didAddItem = function didAddItem(_ref3) {
+        var root = _ref3.root,
+            action = _ref3.action;
+        var fileItem = root.query('GET_ITEM', action.id);
+        var isLocalFile = fileItem.origin === FileOrigin.LOCAL;
+        var shouldUseFileInput = !isLocalFile && root.query('SHOULD_UPDATE_FILE_INPUT');
+        var dataContainer = createElement$1('input');
+        dataContainer.type = shouldUseFileInput ? 'file' : 'hidden';
+        dataContainer.name = root.query('GET_NAME');
+        dataContainer.disabled = root.query('GET_DISABLED');
+        root.ref.fields[action.id] = dataContainer;
+        syncFieldPositionsWithItems(root);
+    };
+
+    var didLoadItem$1 = function didLoadItem(_ref4) {
+        var root = _ref4.root,
+            action = _ref4.action;
+        var field = getField(root, action.id);
+        if (!field) return;
+
+        // store server ref in hidden input
+        if (action.serverFileReference !== null) field.value = action.serverFileReference;
+
+        // store file item in file input
+        if (!root.query('SHOULD_UPDATE_FILE_INPUT')) return;
+
+        var fileItem = root.query('GET_ITEM', action.id);
+        setInputFiles(field, [fileItem.file]);
+    };
+
+    var didPrepareOutput = function didPrepareOutput(_ref5) {
+        var root = _ref5.root,
+            action = _ref5.action;
+        // this timeout pushes the handler after 'load'
+        if (!root.query('SHOULD_UPDATE_FILE_INPUT')) return;
+        setTimeout(function() {
+            var field = getField(root, action.id);
+            if (!field) return;
+            setInputFiles(field, [action.file]);
+        }, 0);
+    };
+
+    var didSetDisabled = function didSetDisabled(_ref6) {
+        var root = _ref6.root;
+        root.element.disabled = root.query('GET_DISABLED');
+    };
+
+    var didRemoveItem = function didRemoveItem(_ref7) {
+        var root = _ref7.root,
+            action = _ref7.action;
+        var field = getField(root, action.id);
+        if (!field) return;
+        if (field.parentNode) field.parentNode.removeChild(field);
+        delete root.ref.fields[action.id];
+    };
+
+    // only runs for server files (so doesn't deal with file input)
+    var didDefineValue = function didDefineValue(_ref8) {
+        var root = _ref8.root,
+            action = _ref8.action;
+        var field = getField(root, action.id);
+        if (!field) return;
+        if (action.value === null) {
+            // clear field value
+            field.removeAttribute('value');
+        } else {
+            // set field value
+            field.value = action.value;
+        }
+        syncFieldPositionsWithItems(root);
+    };
+
+    var write$8 = createRoute({
+        DID_SET_DISABLED: didSetDisabled,
+        DID_ADD_ITEM: didAddItem,
+        DID_LOAD_ITEM: didLoadItem$1,
+        DID_REMOVE_ITEM: didRemoveItem,
+        DID_DEFINE_VALUE: didDefineValue,
+        DID_PREPARE_OUTPUT: didPrepareOutput,
+        DID_REORDER_ITEMS: didReorderItems,
+        DID_SORT_ITEMS: didReorderItems,
+    });
+
+    var data = createView({
+        tag: 'fieldset',
+        name: 'data',
+        create: create$c,
+        write: write$8,
+        ignoreRect: true,
+    });
+
+    var getRootNode = function getRootNode(element) {
+        return 'getRootNode' in element ? element.getRootNode() : document;
+    };
+
+    var images = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff'];
+    var text$1 = ['css', 'csv', 'html', 'txt'];
+    var map = {
+        zip: 'zip|compressed',
+        epub: 'application/epub+zip',
+    };
+
+    var guesstimateMimeType = function guesstimateMimeType() {
+        var extension = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        extension = extension.toLowerCase();
+        if (images.includes(extension)) {
+            return (
+                'image/' +
+                (extension === 'jpg' ? 'jpeg' : extension === 'svg' ? 'svg+xml' : extension)
+            );
+        }
+        if (text$1.includes(extension)) {
+            return 'text/' + extension;
+        }
+
+        return map[extension] || '';
+    };
+
+    var requestDataTransferItems = function requestDataTransferItems(dataTransfer) {
+        return new Promise(function(resolve, reject) {
+            // try to get links from transfer, if found we'll exit immediately (unless a file is in the dataTransfer as well, this is because Firefox could represent the file as a URL and a file object at the same time)
+            var links = getLinks(dataTransfer);
+            if (links.length && !hasFiles(dataTransfer)) {
+                return resolve(links);
+            }
+            // try to get files from the transfer
+            getFiles(dataTransfer).then(resolve);
+        });
+    };
+
+    /**
+     * Test if datatransfer has files
+     */
+    var hasFiles = function hasFiles(dataTransfer) {
+        if (dataTransfer.files) return dataTransfer.files.length > 0;
+        return false;
+    };
+
+    /**
+     * Extracts files from a DataTransfer object
+     */
+    var getFiles = function getFiles(dataTransfer) {
+        return new Promise(function(resolve, reject) {
+            // get the transfer items as promises
+            var promisedFiles = (dataTransfer.items ? Array.from(dataTransfer.items) : [])
+                // only keep file system items (files and directories)
+                .filter(function(item) {
+                    return isFileSystemItem(item);
+                })
+
+                // map each item to promise
+                .map(function(item) {
+                    return getFilesFromItem(item);
+                });
+
+            // if is empty, see if we can extract some info from the files property as a fallback
+            if (!promisedFiles.length) {
+                // TODO: test for directories (should not be allowed)
+                // Use FileReader, problem is that the files property gets lost in the process
+                resolve(dataTransfer.files ? Array.from(dataTransfer.files) : []);
+                return;
+            }
+
+            // done!
+            Promise.all(promisedFiles)
+                .then(function(returnedFileGroups) {
+                    // flatten groups
+                    var files = [];
+                    returnedFileGroups.forEach(function(group) {
+                        files.push.apply(files, group);
+                    });
+
+                    // done (filter out empty files)!
+                    resolve(
+                        files
+                            .filter(function(file) {
+                                return file;
+                            })
+                            .map(function(file) {
+                                if (!file._relativePath)
+                                    file._relativePath = file.webkitRelativePath;
+                                return file;
+                            })
+                    );
+                })
+                .catch(console.error);
+        });
+    };
+
+    var isFileSystemItem = function isFileSystemItem(item) {
+        if (isEntry(item)) {
+            var entry = getAsEntry(item);
+            if (entry) {
+                return entry.isFile || entry.isDirectory;
+            }
+        }
+        return item.kind === 'file';
+    };
+
+    var getFilesFromItem = function getFilesFromItem(item) {
+        return new Promise(function(resolve, reject) {
+            if (isDirectoryEntry(item)) {
+                getFilesInDirectory(getAsEntry(item))
+                    .then(resolve)
+                    .catch(reject);
+                return;
+            }
+
+            resolve([item.getAsFile()]);
+        });
+    };
+
+    var getFilesInDirectory = function getFilesInDirectory(entry) {
+        return new Promise(function(resolve, reject) {
+            var files = [];
+
+            // the total entries to read
+            var dirCounter = 0;
+            var fileCounter = 0;
+
+            var resolveIfDone = function resolveIfDone() {
+                if (fileCounter === 0 && dirCounter === 0) {
+                    resolve(files);
+                }
+            };
+
+            // the recursive function
+            var readEntries = function readEntries(dirEntry) {
+                dirCounter++;
+
+                var directoryReader = dirEntry.createReader();
+
+                // directories are returned in batches, we need to process all batches before we're done
+                var readBatch = function readBatch() {
+                    directoryReader.readEntries(function(entries) {
+                        if (entries.length === 0) {
+                            dirCounter--;
+                            resolveIfDone();
+                            return;
+                        }
+
+                        entries.forEach(function(entry) {
+                            // recursively read more directories
+                            if (entry.isDirectory) {
+                                readEntries(entry);
+                            } else {
+                                // read as file
+                                fileCounter++;
+
+                                entry.file(function(file) {
+                                    var correctedFile = correctMissingFileType(file);
+                                    if (entry.fullPath)
+                                        correctedFile._relativePath = entry.fullPath;
+                                    files.push(correctedFile);
+                                    fileCounter--;
+                                    resolveIfDone();
+                                });
+                            }
+                        });
+
+                        // try to get next batch of files
+                        readBatch();
+                    }, reject);
+                };
+
+                // read first batch of files
+                readBatch();
+            };
+
+            // go!
+            readEntries(entry);
+        });
+    };
+
+    var correctMissingFileType = function correctMissingFileType(file) {
+        if (file.type.length) return file;
+        var date = file.lastModifiedDate;
+        var name = file.name;
+        var type = guesstimateMimeType(getExtensionFromFilename(file.name));
+        if (!type.length) return file;
+        file = file.slice(0, file.size, type);
+        file.name = name;
+        file.lastModifiedDate = date;
+        return file;
+    };
+
+    var isDirectoryEntry = function isDirectoryEntry(item) {
+        return isEntry(item) && (getAsEntry(item) || {}).isDirectory;
+    };
+
+    var isEntry = function isEntry(item) {
+        return 'webkitGetAsEntry' in item;
+    };
+
+    var getAsEntry = function getAsEntry(item) {
+        return item.webkitGetAsEntry();
+    };
+
+    /**
+     * Extracts links from a DataTransfer object
+     */
+    var getLinks = function getLinks(dataTransfer) {
+        var links = [];
+        try {
+            // look in meta data property
+            links = getLinksFromTransferMetaData(dataTransfer);
+            if (links.length) {
+                return links;
+            }
+            links = getLinksFromTransferURLData(dataTransfer);
+        } catch (e) {
+            // nope nope nope (probably IE trouble)
+        }
+        return links;
+    };
+
+    var getLinksFromTransferURLData = function getLinksFromTransferURLData(dataTransfer) {
+        var data = dataTransfer.getData('url');
+        if (typeof data === 'string' && data.length) {
+            return [data];
+        }
+        return [];
+    };
+
+    var getLinksFromTransferMetaData = function getLinksFromTransferMetaData(dataTransfer) {
+        var data = dataTransfer.getData('text/html');
+        if (typeof data === 'string' && data.length) {
+            var matches = data.match(/src\s*=\s*"(.+?)"/);
+            if (matches) {
+                return [matches[1]];
+            }
+        }
+        return [];
+    };
+
+    var dragNDropObservers = [];
+
+    var eventPosition = function eventPosition(e) {
+        return {
+            pageLeft: e.pageX,
+            pageTop: e.pageY,
+            scopeLeft: e.offsetX || e.layerX,
+            scopeTop: e.offsetY || e.layerY,
+        };
+    };
+
+    var createDragNDropClient = function createDragNDropClient(
+        element,
+        scopeToObserve,
+        filterElement
+    ) {
+        var observer = getDragNDropObserver(scopeToObserve);
+
+        var client = {
+            element: element,
+            filterElement: filterElement,
+            state: null,
+            ondrop: function ondrop() {},
+            onenter: function onenter() {},
+            ondrag: function ondrag() {},
+            onexit: function onexit() {},
+            onload: function onload() {},
+            allowdrop: function allowdrop() {},
+        };
+
+        client.destroy = observer.addListener(client);
+
+        return client;
+    };
+
+    var getDragNDropObserver = function getDragNDropObserver(element) {
+        // see if already exists, if so, return
+        var observer = dragNDropObservers.find(function(item) {
+            return item.element === element;
+        });
+        if (observer) {
+            return observer;
+        }
+
+        // create new observer, does not yet exist for this element
+        var newObserver = createDragNDropObserver(element);
+        dragNDropObservers.push(newObserver);
+        return newObserver;
+    };
+
+    var createDragNDropObserver = function createDragNDropObserver(element) {
+        var clients = [];
+
+        var routes = {
+            dragenter: dragenter,
+            dragover: dragover,
+            dragleave: dragleave,
+            drop: drop,
+        };
+
+        var handlers = {};
+
+        forin(routes, function(event, createHandler) {
+            handlers[event] = createHandler(element, clients);
+            element.addEventListener(event, handlers[event], false);
+        });
+
+        var observer = {
+            element: element,
+            addListener: function addListener(client) {
+                // add as client
+                clients.push(client);
+
+                // return removeListener function
+                return function() {
+                    // remove client
+                    clients.splice(clients.indexOf(client), 1);
+
+                    // if no more clients, clean up observer
+                    if (clients.length === 0) {
+                        dragNDropObservers.splice(dragNDropObservers.indexOf(observer), 1);
+
+                        forin(routes, function(event) {
+                            element.removeEventListener(event, handlers[event], false);
+                        });
+                    }
+                };
+            },
+        };
+
+        return observer;
+    };
+
+    var elementFromPoint = function elementFromPoint(root, point) {
+        if (!('elementFromPoint' in root)) {
+            root = document;
+        }
+        return root.elementFromPoint(point.x, point.y);
+    };
+
+    var isEventTarget = function isEventTarget(e, target) {
+        // get root
+        var root = getRootNode(target);
+
+        // get element at position
+        // if root is not actual shadow DOM and does not have elementFromPoint method, use the one on document
+        var elementAtPosition = elementFromPoint(root, {
+            x: e.pageX - window.pageXOffset,
+            y: e.pageY - window.pageYOffset,
+        });
+
+        // test if target is the element or if one of its children is
+        return elementAtPosition === target || target.contains(elementAtPosition);
+    };
+
+    var initialTarget = null;
+
+    var setDropEffect = function setDropEffect(dataTransfer, effect) {
+        // is in try catch as IE11 will throw error if not
+        try {
+            dataTransfer.dropEffect = effect;
+        } catch (e) {}
+    };
+
+    var dragenter = function dragenter(root, clients) {
+        return function(e) {
+            e.preventDefault();
+
+            initialTarget = e.target;
+
+            clients.forEach(function(client) {
+                var element = client.element,
+                    onenter = client.onenter;
+
+                if (isEventTarget(e, element)) {
+                    client.state = 'enter';
+
+                    // fire enter event
+                    onenter(eventPosition(e));
+                }
+            });
+        };
+    };
+
+    var dragover = function dragover(root, clients) {
+        return function(e) {
+            e.preventDefault();
+
+            var dataTransfer = e.dataTransfer;
+
+            requestDataTransferItems(dataTransfer).then(function(items) {
+                var overDropTarget = false;
+
+                clients.some(function(client) {
+                    var filterElement = client.filterElement,
+                        element = client.element,
+                        onenter = client.onenter,
+                        onexit = client.onexit,
+                        ondrag = client.ondrag,
+                        allowdrop = client.allowdrop;
+
+                    // by default we can drop
+                    setDropEffect(dataTransfer, 'copy');
+
+                    // allow transfer of these items
+                    var allowsTransfer = allowdrop(items);
+
+                    // only used when can be dropped on page
+                    if (!allowsTransfer) {
+                        setDropEffect(dataTransfer, 'none');
+                        return;
+                    }
+
+                    // targetting this client
+                    if (isEventTarget(e, element)) {
+                        overDropTarget = true;
+
+                        // had no previous state, means we are entering this client
+                        if (client.state === null) {
+                            client.state = 'enter';
+                            onenter(eventPosition(e));
+                            return;
+                        }
+
+                        // now over element (no matter if it allows the drop or not)
+                        client.state = 'over';
+
+                        // needs to allow transfer
+                        if (filterElement && !allowsTransfer) {
+                            setDropEffect(dataTransfer, 'none');
+                            return;
+                        }
+
+                        // dragging
+                        ondrag(eventPosition(e));
+                    } else {
+                        // should be over an element to drop
+                        if (filterElement && !overDropTarget) {
+                            setDropEffect(dataTransfer, 'none');
+                        }
+
+                        // might have just left this client?
+                        if (client.state) {
+                            client.state = null;
+                            onexit(eventPosition(e));
+                        }
+                    }
+                });
+            });
+        };
+    };
+
+    var drop = function drop(root, clients) {
+        return function(e) {
+            e.preventDefault();
+
+            var dataTransfer = e.dataTransfer;
+
+            requestDataTransferItems(dataTransfer).then(function(items) {
+                clients.forEach(function(client) {
+                    var filterElement = client.filterElement,
+                        element = client.element,
+                        ondrop = client.ondrop,
+                        onexit = client.onexit,
+                        allowdrop = client.allowdrop;
+
+                    client.state = null;
+
+                    // if we're filtering on element we need to be over the element to drop
+                    if (filterElement && !isEventTarget(e, element)) return;
+
+                    // no transfer for this client
+                    if (!allowdrop(items)) return onexit(eventPosition(e));
+
+                    // we can drop these items on this client
+                    ondrop(eventPosition(e), items);
+                });
+            });
+        };
+    };
+
+    var dragleave = function dragleave(root, clients) {
+        return function(e) {
+            if (initialTarget !== e.target) {
+                return;
+            }
+
+            clients.forEach(function(client) {
+                var onexit = client.onexit;
+
+                client.state = null;
+
+                onexit(eventPosition(e));
+            });
+        };
+    };
+
+    var createHopper = function createHopper(scope, validateItems, options) {
+        // is now hopper scope
+        scope.classList.add('filepond--hopper');
+
+        // shortcuts
+        var catchesDropsOnPage = options.catchesDropsOnPage,
+            requiresDropOnElement = options.requiresDropOnElement,
+            _options$filterItems = options.filterItems,
+            filterItems =
+                _options$filterItems === void 0
+                    ? function(items) {
+                          return items;
+                      }
+                    : _options$filterItems;
+
+        // create a dnd client
+        var client = createDragNDropClient(
+            scope,
+            catchesDropsOnPage ? document.documentElement : scope,
+            requiresDropOnElement
+        );
+
+        // current client state
+        var lastState = '';
+        var currentState = '';
+
+        // determines if a file may be dropped
+        client.allowdrop = function(items) {
+            // TODO: if we can, throw error to indicate the items cannot by dropped
+
+            return validateItems(filterItems(items));
+        };
+
+        client.ondrop = function(position, items) {
+            var filteredItems = filterItems(items);
+
+            if (!validateItems(filteredItems)) {
+                api.ondragend(position);
+                return;
+            }
+
+            currentState = 'drag-drop';
+
+            api.onload(filteredItems, position);
+        };
+
+        client.ondrag = function(position) {
+            api.ondrag(position);
+        };
+
+        client.onenter = function(position) {
+            currentState = 'drag-over';
+
+            api.ondragstart(position);
+        };
+
+        client.onexit = function(position) {
+            currentState = 'drag-exit';
+
+            api.ondragend(position);
+        };
+
+        var api = {
+            updateHopperState: function updateHopperState() {
+                if (lastState !== currentState) {
+                    scope.dataset.hopperState = currentState;
+                    lastState = currentState;
+                }
+            },
+            onload: function onload() {},
+            ondragstart: function ondragstart() {},
+            ondrag: function ondrag() {},
+            ondragend: function ondragend() {},
+            destroy: function destroy() {
+                // destroy client
+                client.destroy();
+            },
+        };
+
+        return api;
+    };
+
+    var listening = false;
+    var listeners$1 = [];
+
+    var handlePaste = function handlePaste(e) {
+        // if is pasting in input or textarea and the target is outside of a filepond scope, ignore
+        var activeEl = document.activeElement;
+        if (activeEl && /textarea|input/i.test(activeEl.nodeName)) {
+            // test textarea or input is contained in filepond root
+            var inScope = false;
+            var element = activeEl;
+            while (element !== document.body) {
+                if (element.classList.contains('filepond--root')) {
+                    inScope = true;
+                    break;
+                }
+                element = element.parentNode;
+            }
+
+            if (!inScope) return;
+        }
+
+        requestDataTransferItems(e.clipboardData).then(function(files) {
+            // no files received
+            if (!files.length) {
+                return;
+            }
+
+            // notify listeners of received files
+            listeners$1.forEach(function(listener) {
+                return listener(files);
+            });
+        });
+    };
+
+    var listen = function listen(cb) {
+        // can't add twice
+        if (listeners$1.includes(cb)) {
+            return;
+        }
+
+        // add initial listener
+        listeners$1.push(cb);
+
+        // setup paste listener for entire page
+        if (listening) {
+            return;
+        }
+
+        listening = true;
+        document.addEventListener('paste', handlePaste);
+    };
+
+    var unlisten = function unlisten(listener) {
+        arrayRemove(listeners$1, listeners$1.indexOf(listener));
+
+        // clean up
+        if (listeners$1.length === 0) {
+            document.removeEventListener('paste', handlePaste);
+            listening = false;
+        }
+    };
+
+    var createPaster = function createPaster() {
+        var cb = function cb(files) {
+            api.onload(files);
+        };
+
+        var api = {
+            destroy: function destroy() {
+                unlisten(cb);
+            },
+            onload: function onload() {},
+        };
+
+        listen(cb);
+
+        return api;
+    };
+
+    /**
+     * Creates the file view
+     */
+    var create$d = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        root.element.id = 'filepond--assistant-' + props.id;
+        attr(root.element, 'role', 'status');
+        attr(root.element, 'aria-live', 'polite');
+        attr(root.element, 'aria-relevant', 'additions');
+    };
+
+    var addFilesNotificationTimeout = null;
+    var notificationClearTimeout = null;
+
+    var filenames = [];
+
+    var assist = function assist(root, message) {
+        root.element.textContent = message;
+    };
+
+    var clear$1 = function clear(root) {
+        root.element.textContent = '';
+    };
+
+    var listModified = function listModified(root, filename, label) {
+        var total = root.query('GET_TOTAL_ITEMS');
+        assist(
+            root,
+            label +
+                ' ' +
+                filename +
+                ', ' +
+                total +
+                ' ' +
+                (total === 1
+                    ? root.query('GET_LABEL_FILE_COUNT_SINGULAR')
+                    : root.query('GET_LABEL_FILE_COUNT_PLURAL'))
+        );
+
+        // clear group after set amount of time so the status is not read twice
+        clearTimeout(notificationClearTimeout);
+        notificationClearTimeout = setTimeout(function() {
+            clear$1(root);
+        }, 1500);
+    };
+
+    var isUsingFilePond = function isUsingFilePond(root) {
+        return root.element.parentNode.contains(document.activeElement);
+    };
+
+    var itemAdded = function itemAdded(_ref2) {
+        var root = _ref2.root,
+            action = _ref2.action;
+        if (!isUsingFilePond(root)) {
+            return;
+        }
+
+        root.element.textContent = '';
+        var item = root.query('GET_ITEM', action.id);
+        filenames.push(item.filename);
+
+        clearTimeout(addFilesNotificationTimeout);
+        addFilesNotificationTimeout = setTimeout(function() {
+            listModified(root, filenames.join(', '), root.query('GET_LABEL_FILE_ADDED'));
+
+            filenames.length = 0;
+        }, 750);
+    };
+
+    var itemRemoved = function itemRemoved(_ref3) {
+        var root = _ref3.root,
+            action = _ref3.action;
+        if (!isUsingFilePond(root)) {
+            return;
+        }
+
+        var item = action.item;
+        listModified(root, item.filename, root.query('GET_LABEL_FILE_REMOVED'));
+    };
+
+    var itemProcessed = function itemProcessed(_ref4) {
+        var root = _ref4.root,
+            action = _ref4.action;
+        // will also notify the user when FilePond is not being used, as the user might be occupied with other activities while uploading a file
+
+        var item = root.query('GET_ITEM', action.id);
+        var filename = item.filename;
+        var label = root.query('GET_LABEL_FILE_PROCESSING_COMPLETE');
+
+        assist(root, filename + ' ' + label);
+    };
+
+    var itemProcessedUndo = function itemProcessedUndo(_ref5) {
+        var root = _ref5.root,
+            action = _ref5.action;
+        var item = root.query('GET_ITEM', action.id);
+        var filename = item.filename;
+        var label = root.query('GET_LABEL_FILE_PROCESSING_ABORTED');
+
+        assist(root, filename + ' ' + label);
+    };
+
+    var itemError = function itemError(_ref6) {
+        var root = _ref6.root,
+            action = _ref6.action;
+        var item = root.query('GET_ITEM', action.id);
+        var filename = item.filename;
+
+        // will also notify the user when FilePond is not being used, as the user might be occupied with other activities while uploading a file
+
+        assist(root, action.status.main + ' ' + filename + ' ' + action.status.sub);
+    };
+
+    var assistant = createView({
+        create: create$d,
+        ignoreRect: true,
+        ignoreRectUpdate: true,
+        write: createRoute({
+            DID_LOAD_ITEM: itemAdded,
+            DID_REMOVE_ITEM: itemRemoved,
+            DID_COMPLETE_ITEM_PROCESSING: itemProcessed,
+
+            DID_ABORT_ITEM_PROCESSING: itemProcessedUndo,
+            DID_REVERT_ITEM_PROCESSING: itemProcessedUndo,
+
+            DID_THROW_ITEM_REMOVE_ERROR: itemError,
+            DID_THROW_ITEM_LOAD_ERROR: itemError,
+            DID_THROW_ITEM_INVALID: itemError,
+            DID_THROW_ITEM_PROCESSING_ERROR: itemError,
+        }),
+
+        tag: 'span',
+        name: 'assistant',
+    });
+
+    var toCamels = function toCamels(string) {
+        var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '-';
+        return string.replace(new RegExp(separator + '.', 'g'), function(sub) {
+            return sub.charAt(1).toUpperCase();
+        });
+    };
+
+    var debounce = function debounce(func) {
+        var interval = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 16;
+        var immidiateOnly =
+            arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+        var last = Date.now();
+        var timeout = null;
+
+        return function() {
+            for (
+                var _len = arguments.length, args = new Array(_len), _key = 0;
+                _key < _len;
+                _key++
+            ) {
+                args[_key] = arguments[_key];
+            }
+            clearTimeout(timeout);
+
+            var dist = Date.now() - last;
+
+            var fn = function fn() {
+                last = Date.now();
+                func.apply(void 0, args);
+            };
+
+            if (dist < interval) {
+                // we need to delay by the difference between interval and dist
+                // for example: if distance is 10 ms and interval is 16 ms,
+                // we need to wait an additional 6ms before calling the function)
+                if (!immidiateOnly) {
+                    timeout = setTimeout(fn, interval - dist);
+                }
+            } else {
+                // go!
+                fn();
+            }
+        };
+    };
+
+    var MAX_FILES_LIMIT = 1000000;
+
+    var prevent = function prevent(e) {
+        return e.preventDefault();
+    };
+
+    var create$e = function create(_ref) {
+        var root = _ref.root,
+            props = _ref.props;
+        // Add id
+        var id = root.query('GET_ID');
+        if (id) {
+            root.element.id = id;
+        }
+
+        // Add className
+        var className = root.query('GET_CLASS_NAME');
+        if (className) {
+            className
+                .split(' ')
+                .filter(function(name) {
+                    return name.length;
+                })
+                .forEach(function(name) {
+                    root.element.classList.add(name);
+                });
+        }
+
+        // Field label
+        root.ref.label = root.appendChildView(
+            root.createChildView(
+                dropLabel,
+                Object.assign({}, props, {
+                    translateY: null,
+                    caption: root.query('GET_LABEL_IDLE'),
+                })
+            )
+        );
+
+        // List of items
+        root.ref.list = root.appendChildView(
+            root.createChildView(listScroller, { translateY: null })
+        );
+
+        // Background panel
+        root.ref.panel = root.appendChildView(root.createChildView(panel, { name: 'panel-root' }));
+
+        // Assistant notifies assistive tech when content changes
+        root.ref.assistant = root.appendChildView(
+            root.createChildView(assistant, Object.assign({}, props))
+        );
+
+        // Data
+        root.ref.data = root.appendChildView(root.createChildView(data, Object.assign({}, props)));
+
+        // Measure (tests if fixed height was set)
+        // DOCTYPE needs to be set for this to work
+        root.ref.measure = createElement$1('div');
+        root.ref.measure.style.height = '100%';
+        root.element.appendChild(root.ref.measure);
+
+        // information on the root height or fixed height status
+        root.ref.bounds = null;
+
+        // apply initial style properties
+        root.query('GET_STYLES')
+            .filter(function(style) {
+                return !isEmpty(style.value);
+            })
+            .map(function(_ref2) {
+                var name = _ref2.name,
+                    value = _ref2.value;
+                root.element.dataset[name] = value;
+            });
+
+        // determine if width changed
+        root.ref.widthPrevious = null;
+        root.ref.widthUpdated = debounce(function() {
+            root.ref.updateHistory = [];
+            root.dispatch('DID_RESIZE_ROOT');
+        }, 250);
+
+        // history of updates
+        root.ref.previousAspectRatio = null;
+        root.ref.updateHistory = [];
+
+        // prevent scrolling and zooming on iOS (only if supports pointer events, for then we can enable reorder)
+        var canHover = window.matchMedia('(pointer: fine) and (hover: hover)').matches;
+        var hasPointerEvents = 'PointerEvent' in window;
+        if (root.query('GET_ALLOW_REORDER') && hasPointerEvents && !canHover) {
+            root.element.addEventListener('touchmove', prevent, { passive: false });
+            root.element.addEventListener('gesturestart', prevent);
+        }
+
+        // add credits
+        var credits = root.query('GET_CREDITS');
+        var hasCredits = credits.length === 2;
+        if (hasCredits) {
+            var frag = document.createElement('a');
+            frag.className = 'filepond--credits';
+            frag.setAttribute('aria-hidden', 'true');
+            frag.href = credits[0];
+            frag.tabindex = -1;
+            frag.target = '_blank';
+            frag.rel = 'noopener noreferrer';
+            frag.textContent = credits[1];
+            root.element.appendChild(frag);
+            root.ref.credits = frag;
+        }
+    };
+
+    var write$9 = function write(_ref3) {
+        var root = _ref3.root,
+            props = _ref3.props,
+            actions = _ref3.actions;
+        // route actions
+        route$5({ root: root, props: props, actions: actions });
+
+        // apply style properties
+        actions
+            .filter(function(action) {
+                return /^DID_SET_STYLE_/.test(action.type);
+            })
+            .filter(function(action) {
+                return !isEmpty(action.data.value);
+            })
+            .map(function(_ref4) {
+                var type = _ref4.type,
+                    data = _ref4.data;
+                var name = toCamels(type.substring(8).toLowerCase(), '_');
+                root.element.dataset[name] = data.value;
+                root.invalidateLayout();
+            });
+
+        if (root.rect.element.hidden) return;
+
+        if (root.rect.element.width !== root.ref.widthPrevious) {
+            root.ref.widthPrevious = root.rect.element.width;
+            root.ref.widthUpdated();
+        }
+
+        // get box bounds, we do this only once
+        var bounds = root.ref.bounds;
+        if (!bounds) {
+            bounds = root.ref.bounds = calculateRootBoundingBoxHeight(root);
+
+            // destroy measure element
+            root.element.removeChild(root.ref.measure);
+            root.ref.measure = null;
+        }
+
+        // get quick references to various high level parts of the upload tool
+        var _root$ref = root.ref,
+            hopper = _root$ref.hopper,
+            label = _root$ref.label,
+            list = _root$ref.list,
+            panel = _root$ref.panel;
+
+        // sets correct state to hopper scope
+        if (hopper) {
+            hopper.updateHopperState();
+        }
+
+        // bool to indicate if we're full or not
+        var aspectRatio = root.query('GET_PANEL_ASPECT_RATIO');
+        var isMultiItem = root.query('GET_ALLOW_MULTIPLE');
+        var totalItems = root.query('GET_TOTAL_ITEMS');
+        var maxItems = isMultiItem ? root.query('GET_MAX_FILES') || MAX_FILES_LIMIT : 1;
+        var atMaxCapacity = totalItems === maxItems;
+
+        // action used to add item
+        var addAction = actions.find(function(action) {
+            return action.type === 'DID_ADD_ITEM';
+        });
+
+        // if reached max capacity and we've just reached it
+        if (atMaxCapacity && addAction) {
+            // get interaction type
+            var interactionMethod = addAction.data.interactionMethod;
+
+            // hide label
+            label.opacity = 0;
+
+            if (isMultiItem) {
+                label.translateY = -40;
+            } else {
+                if (interactionMethod === InteractionMethod.API) {
+                    label.translateX = 40;
+                } else if (interactionMethod === InteractionMethod.BROWSE) {
+                    label.translateY = 40;
+                } else {
+                    label.translateY = 30;
+                }
+            }
+        } else if (!atMaxCapacity) {
+            label.opacity = 1;
+            label.translateX = 0;
+            label.translateY = 0;
+        }
+
+        var listItemMargin = calculateListItemMargin(root);
+
+        var listHeight = calculateListHeight(root);
+
+        var labelHeight = label.rect.element.height;
+        var currentLabelHeight = !isMultiItem || atMaxCapacity ? 0 : labelHeight;
+
+        var listMarginTop = atMaxCapacity ? list.rect.element.marginTop : 0;
+        var listMarginBottom = totalItems === 0 ? 0 : list.rect.element.marginBottom;
+
+        var visualHeight =
+            currentLabelHeight + listMarginTop + listHeight.visual + listMarginBottom;
+        var boundsHeight =
+            currentLabelHeight + listMarginTop + listHeight.bounds + listMarginBottom;
+
+        // link list to label bottom position
+        list.translateY =
+            Math.max(0, currentLabelHeight - list.rect.element.marginTop) - listItemMargin.top;
+
+        if (aspectRatio) {
+            // fixed aspect ratio
+
+            // calculate height based on width
+            var width = root.rect.element.width;
+            var height = width * aspectRatio;
+
+            // clear history if aspect ratio has changed
+            if (aspectRatio !== root.ref.previousAspectRatio) {
+                root.ref.previousAspectRatio = aspectRatio;
+                root.ref.updateHistory = [];
+            }
+
+            // remember this width
+            var history = root.ref.updateHistory;
+            history.push(width);
+
+            var MAX_BOUNCES = 2;
+            if (history.length > MAX_BOUNCES * 2) {
+                var l = history.length;
+                var bottom = l - 10;
+                var bounces = 0;
+                for (var i = l; i >= bottom; i--) {
+                    if (history[i] === history[i - 2]) {
+                        bounces++;
+                    }
+
+                    if (bounces >= MAX_BOUNCES) {
+                        // dont adjust height
+                        return;
+                    }
+                }
+            }
+
+            // fix height of panel so it adheres to aspect ratio
+            panel.scalable = false;
+            panel.height = height;
+
+            // available height for list
+            var listAvailableHeight =
+                // the height of the panel minus the label height
+                height -
+                currentLabelHeight -
+                // the room we leave open between the end of the list and the panel bottom
+                (listMarginBottom - listItemMargin.bottom) -
+                // if we're full we need to leave some room between the top of the panel and the list
+                (atMaxCapacity ? listMarginTop : 0);
+
+            if (listHeight.visual > listAvailableHeight) {
+                list.overflow = listAvailableHeight;
+            } else {
+                list.overflow = null;
+            }
+
+            // set container bounds (so pushes siblings downwards)
+            root.height = height;
+        } else if (bounds.fixedHeight) {
+            // fixed height
+
+            // fix height of panel
+            panel.scalable = false;
+
+            // available height for list
+            var _listAvailableHeight =
+                // the height of the panel minus the label height
+                bounds.fixedHeight -
+                currentLabelHeight -
+                // the room we leave open between the end of the list and the panel bottom
+                (listMarginBottom - listItemMargin.bottom) -
+                // if we're full we need to leave some room between the top of the panel and the list
+                (atMaxCapacity ? listMarginTop : 0);
+
+            // set list height
+            if (listHeight.visual > _listAvailableHeight) {
+                list.overflow = _listAvailableHeight;
+            } else {
+                list.overflow = null;
+            }
+
+            // no need to set container bounds as these are handles by CSS fixed height
+        } else if (bounds.cappedHeight) {
+            // max-height
+
+            // not a fixed height panel
+            var isCappedHeight = visualHeight >= bounds.cappedHeight;
+            var panelHeight = Math.min(bounds.cappedHeight, visualHeight);
+            panel.scalable = true;
+            panel.height = isCappedHeight
+                ? panelHeight
+                : panelHeight - listItemMargin.top - listItemMargin.bottom;
+
+            // available height for list
+            var _listAvailableHeight2 =
+                // the height of the panel minus the label height
+                panelHeight -
+                currentLabelHeight -
+                // the room we leave open between the end of the list and the panel bottom
+                (listMarginBottom - listItemMargin.bottom) -
+                // if we're full we need to leave some room between the top of the panel and the list
+                (atMaxCapacity ? listMarginTop : 0);
+
+            // set list height (if is overflowing)
+            if (visualHeight > bounds.cappedHeight && listHeight.visual > _listAvailableHeight2) {
+                list.overflow = _listAvailableHeight2;
+            } else {
+                list.overflow = null;
+            }
+
+            // set container bounds (so pushes siblings downwards)
+            root.height = Math.min(
+                bounds.cappedHeight,
+                boundsHeight - listItemMargin.top - listItemMargin.bottom
+            );
+        } else {
+            // flexible height
+
+            // not a fixed height panel
+            var itemMargin = totalItems > 0 ? listItemMargin.top + listItemMargin.bottom : 0;
+            panel.scalable = true;
+            panel.height = Math.max(labelHeight, visualHeight - itemMargin);
+
+            // set container bounds (so pushes siblings downwards)
+            root.height = Math.max(labelHeight, boundsHeight - itemMargin);
+        }
+
+        // move credits to bottom
+        if (root.ref.credits && panel.heightCurrent)
+            root.ref.credits.style.transform = 'translateY(' + panel.heightCurrent + 'px)';
+    };
+
+    var calculateListItemMargin = function calculateListItemMargin(root) {
+        var item = root.ref.list.childViews[0].childViews[0];
+        return item
+            ? {
+                  top: item.rect.element.marginTop,
+                  bottom: item.rect.element.marginBottom,
+              }
+            : {
+                  top: 0,
+                  bottom: 0,
+              };
+    };
+
+    var calculateListHeight = function calculateListHeight(root) {
+        var visual = 0;
+        var bounds = 0;
+
+        // get file list reference
+        var scrollList = root.ref.list;
+        var itemList = scrollList.childViews[0];
+        var visibleChildren = itemList.childViews.filter(function(child) {
+            return child.rect.element.height;
+        });
+        var children = root
+            .query('GET_ACTIVE_ITEMS')
+            .map(function(item) {
+                return visibleChildren.find(function(child) {
+                    return child.id === item.id;
+                });
+            })
+            .filter(function(item) {
+                return item;
+            });
+
+        // no children, done!
+        if (children.length === 0) return { visual: visual, bounds: bounds };
+
+        var horizontalSpace = itemList.rect.element.width;
+        var dragIndex = getItemIndexByPosition(itemList, children, scrollList.dragCoordinates);
+
+        var childRect = children[0].rect.element;
+
+        var itemVerticalMargin = childRect.marginTop + childRect.marginBottom;
+        var itemHorizontalMargin = childRect.marginLeft + childRect.marginRight;
+
+        var itemWidth = childRect.width + itemHorizontalMargin;
+        var itemHeight = childRect.height + itemVerticalMargin;
+
+        var newItem = typeof dragIndex !== 'undefined' && dragIndex >= 0 ? 1 : 0;
+        var removedItem = children.find(function(child) {
+            return child.markedForRemoval && child.opacity < 0.45;
+        })
+            ? -1
+            : 0;
+        var verticalItemCount = children.length + newItem + removedItem;
+        var itemsPerRow = getItemsPerRow(horizontalSpace, itemWidth);
+
+        // stack
+        if (itemsPerRow === 1) {
+            children.forEach(function(item) {
+                var height = item.rect.element.height + itemVerticalMargin;
+                bounds += height;
+                visual += height * item.opacity;
+            });
+        }
+        // grid
+        else {
+            bounds = Math.ceil(verticalItemCount / itemsPerRow) * itemHeight;
+            visual = bounds;
+        }
+
+        return { visual: visual, bounds: bounds };
+    };
+
+    var calculateRootBoundingBoxHeight = function calculateRootBoundingBoxHeight(root) {
+        var height = root.ref.measureHeight || null;
+        var cappedHeight = parseInt(root.style.maxHeight, 10) || null;
+        var fixedHeight = height === 0 ? null : height;
+
+        return {
+            cappedHeight: cappedHeight,
+            fixedHeight: fixedHeight,
+        };
+    };
+
+    var exceedsMaxFiles = function exceedsMaxFiles(root, items) {
+        var allowReplace = root.query('GET_ALLOW_REPLACE');
+        var allowMultiple = root.query('GET_ALLOW_MULTIPLE');
+        var totalItems = root.query('GET_TOTAL_ITEMS');
+        var maxItems = root.query('GET_MAX_FILES');
+
+        // total amount of items being dragged
+        var totalBrowseItems = items.length;
+
+        // if does not allow multiple items and dragging more than one item
+        if (!allowMultiple && totalBrowseItems > 1) {
+            root.dispatch('DID_THROW_MAX_FILES', {
+                source: items,
+                error: createResponse('warning', 0, 'Max files'),
+            });
+
+            return true;
+        }
+
+        // limit max items to one if not allowed to drop multiple items
+        maxItems = allowMultiple ? maxItems : 1;
+
+        if (!allowMultiple && allowReplace) {
+            // There is only one item, so there is room to replace or add an item
+            return false;
+        }
+
+        // no more room?
+        var hasMaxItems = isInt(maxItems);
+        if (hasMaxItems && totalItems + totalBrowseItems > maxItems) {
+            root.dispatch('DID_THROW_MAX_FILES', {
+                source: items,
+                error: createResponse('warning', 0, 'Max files'),
+            });
+
+            return true;
+        }
+
+        return false;
+    };
+
+    var getDragIndex = function getDragIndex(list, children, position) {
+        var itemList = list.childViews[0];
+        return getItemIndexByPosition(itemList, children, {
+            left: position.scopeLeft - itemList.rect.element.left,
+            top:
+                position.scopeTop -
+                (list.rect.outer.top + list.rect.element.marginTop + list.rect.element.scrollTop),
+        });
+    };
+
+    /**
+     * Enable or disable file drop functionality
+     */
+    var toggleDrop = function toggleDrop(root) {
+        var isAllowed = root.query('GET_ALLOW_DROP');
+        var isDisabled = root.query('GET_DISABLED');
+        var enabled = isAllowed && !isDisabled;
+        if (enabled && !root.ref.hopper) {
+            var hopper = createHopper(
+                root.element,
+                function(items) {
+                    // allow quick validation of dropped items
+                    var beforeDropFile =
+                        root.query('GET_BEFORE_DROP_FILE') ||
+                        function() {
+                            return true;
+                        };
+
+                    // all items should be validated by all filters as valid
+                    var dropValidation = root.query('GET_DROP_VALIDATION');
+                    return dropValidation
+                        ? items.every(function(item) {
+                              return (
+                                  applyFilters('ALLOW_HOPPER_ITEM', item, {
+                                      query: root.query,
+                                  }).every(function(result) {
+                                      return result === true;
+                                  }) && beforeDropFile(item)
+                              );
+                          })
+                        : true;
+                },
+                {
+                    filterItems: function filterItems(items) {
+                        var ignoredFiles = root.query('GET_IGNORED_FILES');
+                        return items.filter(function(item) {
+                            if (isFile(item)) {
+                                return !ignoredFiles.includes(item.name.toLowerCase());
+                            }
+                            return true;
+                        });
+                    },
+                    catchesDropsOnPage: root.query('GET_DROP_ON_PAGE'),
+                    requiresDropOnElement: root.query('GET_DROP_ON_ELEMENT'),
+                }
+            );
+
+            hopper.onload = function(items, position) {
+                // get item children elements and sort based on list sort
+                var list = root.ref.list.childViews[0];
+                var visibleChildren = list.childViews.filter(function(child) {
+                    return child.rect.element.height;
+                });
+                var children = root
+                    .query('GET_ACTIVE_ITEMS')
+                    .map(function(item) {
+                        return visibleChildren.find(function(child) {
+                            return child.id === item.id;
+                        });
+                    })
+                    .filter(function(item) {
+                        return item;
+                    });
+
+                applyFilterChain('ADD_ITEMS', items, { dispatch: root.dispatch }).then(function(
+                    queue
+                ) {
+                    // these files don't fit so stop here
+                    if (exceedsMaxFiles(root, queue)) return false;
+
+                    // go
+                    root.dispatch('ADD_ITEMS', {
+                        items: queue,
+                        index: getDragIndex(root.ref.list, children, position),
+                        interactionMethod: InteractionMethod.DROP,
+                    });
+                });
+
+                root.dispatch('DID_DROP', { position: position });
+
+                root.dispatch('DID_END_DRAG', { position: position });
+            };
+
+            hopper.ondragstart = function(position) {
+                root.dispatch('DID_START_DRAG', { position: position });
+            };
+
+            hopper.ondrag = debounce(function(position) {
+                root.dispatch('DID_DRAG', { position: position });
+            });
+
+            hopper.ondragend = function(position) {
+                root.dispatch('DID_END_DRAG', { position: position });
+            };
+
+            root.ref.hopper = hopper;
+
+            root.ref.drip = root.appendChildView(root.createChildView(drip));
+        } else if (!enabled && root.ref.hopper) {
+            root.ref.hopper.destroy();
+            root.ref.hopper = null;
+            root.removeChildView(root.ref.drip);
+        }
+    };
+
+    /**
+     * Enable or disable browse functionality
+     */
+    var toggleBrowse = function toggleBrowse(root, props) {
+        var isAllowed = root.query('GET_ALLOW_BROWSE');
+        var isDisabled = root.query('GET_DISABLED');
+        var enabled = isAllowed && !isDisabled;
+        if (enabled && !root.ref.browser) {
+            root.ref.browser = root.appendChildView(
+                root.createChildView(
+                    browser,
+                    Object.assign({}, props, {
+                        onload: function onload(items) {
+                            applyFilterChain('ADD_ITEMS', items, {
+                                dispatch: root.dispatch,
+                            }).then(function(queue) {
+                                // these files don't fit so stop here
+                                if (exceedsMaxFiles(root, queue)) return false;
+
+                                // add items!
+                                root.dispatch('ADD_ITEMS', {
+                                    items: queue,
+                                    index: -1,
+                                    interactionMethod: InteractionMethod.BROWSE,
+                                });
+                            });
+                        },
+                    })
+                ),
+
+                0
+            );
+        } else if (!enabled && root.ref.browser) {
+            root.removeChildView(root.ref.browser);
+            root.ref.browser = null;
+        }
+    };
+
+    /**
+     * Enable or disable paste functionality
+     */
+    var togglePaste = function togglePaste(root) {
+        var isAllowed = root.query('GET_ALLOW_PASTE');
+        var isDisabled = root.query('GET_DISABLED');
+        var enabled = isAllowed && !isDisabled;
+        if (enabled && !root.ref.paster) {
+            root.ref.paster = createPaster();
+            root.ref.paster.onload = function(items) {
+                applyFilterChain('ADD_ITEMS', items, { dispatch: root.dispatch }).then(function(
+                    queue
+                ) {
+                    // these files don't fit so stop here
+                    if (exceedsMaxFiles(root, queue)) return false;
+
+                    // add items!
+                    root.dispatch('ADD_ITEMS', {
+                        items: queue,
+                        index: -1,
+                        interactionMethod: InteractionMethod.PASTE,
+                    });
+                });
+            };
+        } else if (!enabled && root.ref.paster) {
+            root.ref.paster.destroy();
+            root.ref.paster = null;
+        }
+    };
+
+    /**
+     * Route actions
+     */
+    var route$5 = createRoute({
+        DID_SET_ALLOW_BROWSE: function DID_SET_ALLOW_BROWSE(_ref5) {
+            var root = _ref5.root,
+                props = _ref5.props;
+            toggleBrowse(root, props);
+        },
+        DID_SET_ALLOW_DROP: function DID_SET_ALLOW_DROP(_ref6) {
+            var root = _ref6.root;
+            toggleDrop(root);
+        },
+        DID_SET_ALLOW_PASTE: function DID_SET_ALLOW_PASTE(_ref7) {
+            var root = _ref7.root;
+            togglePaste(root);
+        },
+        DID_SET_DISABLED: function DID_SET_DISABLED(_ref8) {
+            var root = _ref8.root,
+                props = _ref8.props;
+            toggleDrop(root);
+            togglePaste(root);
+            toggleBrowse(root, props);
+            var isDisabled = root.query('GET_DISABLED');
+            if (isDisabled) {
+                root.element.dataset.disabled = 'disabled';
+            } else {
+                // delete root.element.dataset.disabled; <= this does not work on iOS 10
+                root.element.removeAttribute('data-disabled');
+            }
+        },
+    });
+
+    var root = createView({
+        name: 'root',
+        read: function read(_ref9) {
+            var root = _ref9.root;
+            if (root.ref.measure) {
+                root.ref.measureHeight = root.ref.measure.offsetHeight;
+            }
+        },
+        create: create$e,
+        write: write$9,
+        destroy: function destroy(_ref10) {
+            var root = _ref10.root;
+            if (root.ref.paster) {
+                root.ref.paster.destroy();
+            }
+            if (root.ref.hopper) {
+                root.ref.hopper.destroy();
+            }
+            root.element.removeEventListener('touchmove', prevent);
+            root.element.removeEventListener('gesturestart', prevent);
+        },
+        mixins: {
+            styles: ['height'],
+        },
+    });
+
+    // creates the app
+    var createApp = function createApp() {
+        var initialOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        // let element
+        var originalElement = null;
+
+        // get default options
+        var defaultOptions = getOptions();
+
+        // create the data store, this will contain all our app info
+        var store = createStore(
+            // initial state (should be serializable)
+            createInitialState(defaultOptions),
+
+            // queries
+            [queries, createOptionQueries(defaultOptions)],
+
+            // action handlers
+            [actions, createOptionActions(defaultOptions)]
+        );
+
+        // set initial options
+        store.dispatch('SET_OPTIONS', { options: initialOptions });
+
+        // kick thread if visibility changes
+        var visibilityHandler = function visibilityHandler() {
+            if (document.hidden) return;
+            store.dispatch('KICK');
+        };
+        document.addEventListener('visibilitychange', visibilityHandler);
+
+        // re-render on window resize start and finish
+        var resizeDoneTimer = null;
+        var isResizing = false;
+        var isResizingHorizontally = false;
+        var initialWindowWidth = null;
+        var currentWindowWidth = null;
+        var resizeHandler = function resizeHandler() {
+            if (!isResizing) {
+                isResizing = true;
+            }
+            clearTimeout(resizeDoneTimer);
+            resizeDoneTimer = setTimeout(function() {
+                isResizing = false;
+                initialWindowWidth = null;
+                currentWindowWidth = null;
+                if (isResizingHorizontally) {
+                    isResizingHorizontally = false;
+                    store.dispatch('DID_STOP_RESIZE');
+                }
+            }, 500);
+        };
+        window.addEventListener('resize', resizeHandler);
+
+        // render initial view
+        var view = root(store, { id: getUniqueId() });
+
+        //
+        // PRIVATE API -------------------------------------------------------------------------------------
+        //
+        var isResting = false;
+        var isHidden = false;
+
+        var readWriteApi = {
+            // necessary for update loop
+
+            /**
+             * Reads from dom (never call manually)
+             * @private
+             */
+            _read: function _read() {
+                // test if we're resizing horizontally
+                // TODO: see if we can optimize this by measuring root rect
+                if (isResizing) {
+                    currentWindowWidth = window.innerWidth;
+                    if (!initialWindowWidth) {
+                        initialWindowWidth = currentWindowWidth;
+                    }
+
+                    if (!isResizingHorizontally && currentWindowWidth !== initialWindowWidth) {
+                        store.dispatch('DID_START_RESIZE');
+                        isResizingHorizontally = true;
+                    }
+                }
+
+                if (isHidden && isResting) {
+                    // test if is no longer hidden
+                    isResting = view.element.offsetParent === null;
+                }
+
+                // if resting, no need to read as numbers will still all be correct
+                if (isResting) return;
+
+                // read view data
+                view._read();
+
+                // if is hidden we need to know so we exit rest mode when revealed
+                isHidden = view.rect.element.hidden;
+            },
+
+            /**
+             * Writes to dom (never call manually)
+             * @private
+             */
+            _write: function _write(ts) {
+                // get all actions from store
+                var actions = store
+                    .processActionQueue()
+
+                    // filter out set actions (these will automatically trigger DID_SET)
+                    .filter(function(action) {
+                        return !/^SET_/.test(action.type);
+                    });
+
+                // if was idling and no actions stop here
+                if (isResting && !actions.length) return;
+
+                // some actions might trigger events
+                routeActionsToEvents(actions);
+
+                // update the view
+                isResting = view._write(ts, actions, isResizingHorizontally);
+
+                // will clean up all archived items
+                removeReleasedItems(store.query('GET_ITEMS'));
+
+                // now idling
+                if (isResting) {
+                    store.processDispatchQueue();
+                }
+            },
+        };
+
+        //
+        // EXPOSE EVENTS -------------------------------------------------------------------------------------
+        //
+        var createEvent = function createEvent(name) {
+            return function(data) {
+                // create default event
+                var event = {
+                    type: name,
+                };
+
+                // no data to add
+                if (!data) {
+                    return event;
+                }
+
+                // copy relevant props
+                if (data.hasOwnProperty('error')) {
+                    event.error = data.error ? Object.assign({}, data.error) : null;
+                }
+
+                if (data.status) {
+                    event.status = Object.assign({}, data.status);
+                }
+
+                if (data.file) {
+                    event.output = data.file;
+                }
+
+                // only source is available, else add item if possible
+                if (data.source) {
+                    event.file = data.source;
+                } else if (data.item || data.id) {
+                    var item = data.item ? data.item : store.query('GET_ITEM', data.id);
+                    event.file = item ? createItemAPI(item) : null;
+                }
+
+                // map all items in a possible items array
+                if (data.items) {
+                    event.items = data.items.map(createItemAPI);
+                }
+
+                // if this is a progress event add the progress amount
+                if (/progress/.test(name)) {
+                    event.progress = data.progress;
+                }
+
+                // copy relevant props
+                if (data.hasOwnProperty('origin') && data.hasOwnProperty('target')) {
+                    event.origin = data.origin;
+                    event.target = data.target;
+                }
+
+                return event;
+            };
+        };
+
+        var eventRoutes = {
+            DID_DESTROY: createEvent('destroy'),
+
+            DID_INIT: createEvent('init'),
+
+            DID_THROW_MAX_FILES: createEvent('warning'),
+
+            DID_INIT_ITEM: createEvent('initfile'),
+            DID_START_ITEM_LOAD: createEvent('addfilestart'),
+            DID_UPDATE_ITEM_LOAD_PROGRESS: createEvent('addfileprogress'),
+            DID_LOAD_ITEM: createEvent('addfile'),
+
+            DID_THROW_ITEM_INVALID: [createEvent('error'), createEvent('addfile')],
+
+            DID_THROW_ITEM_LOAD_ERROR: [createEvent('error'), createEvent('addfile')],
+
+            DID_THROW_ITEM_REMOVE_ERROR: [createEvent('error'), createEvent('removefile')],
+
+            DID_PREPARE_OUTPUT: createEvent('preparefile'),
+
+            DID_START_ITEM_PROCESSING: createEvent('processfilestart'),
+            DID_UPDATE_ITEM_PROCESS_PROGRESS: createEvent('processfileprogress'),
+            DID_ABORT_ITEM_PROCESSING: createEvent('processfileabort'),
+            DID_COMPLETE_ITEM_PROCESSING: createEvent('processfile'),
+            DID_COMPLETE_ITEM_PROCESSING_ALL: createEvent('processfiles'),
+            DID_REVERT_ITEM_PROCESSING: createEvent('processfilerevert'),
+
+            DID_THROW_ITEM_PROCESSING_ERROR: [createEvent('error'), createEvent('processfile')],
+
+            DID_REMOVE_ITEM: createEvent('removefile'),
+
+            DID_UPDATE_ITEMS: createEvent('updatefiles'),
+
+            DID_ACTIVATE_ITEM: createEvent('activatefile'),
+
+            DID_REORDER_ITEMS: createEvent('reorderfiles'),
+        };
+
+        var exposeEvent = function exposeEvent(event) {
+            // create event object to be dispatched
+            var detail = Object.assign({ pond: exports }, event);
+            delete detail.type;
+            view.element.dispatchEvent(
+                new CustomEvent('FilePond:' + event.type, {
+                    // event info
+                    detail: detail,
+
+                    // event behaviour
+                    bubbles: true,
+                    cancelable: true,
+                    composed: true, // triggers listeners outside of shadow root
+                })
+            );
+
+            // event object to params used for `on()` event handlers and callbacks `oninit()`
+            var params = [];
+
+            // if is possible error event, make it the first param
+            if (event.hasOwnProperty('error')) {
+                params.push(event.error);
+            }
+
+            // file is always section
+            if (event.hasOwnProperty('file')) {
+                params.push(event.file);
+            }
+
+            // append other props
+            var filtered = ['type', 'error', 'file'];
+            Object.keys(event)
+                .filter(function(key) {
+                    return !filtered.includes(key);
+                })
+                .forEach(function(key) {
+                    return params.push(event[key]);
+                });
+
+            // on(type, () => { })
+            exports.fire.apply(exports, [event.type].concat(params));
+
+            // oninit = () => {}
+            var handler = store.query('GET_ON' + event.type.toUpperCase());
+            if (handler) {
+                handler.apply(void 0, params);
+            }
+        };
+
+        var routeActionsToEvents = function routeActionsToEvents(actions) {
+            if (!actions.length) return;
+            actions
+                .filter(function(action) {
+                    return eventRoutes[action.type];
+                })
+                .forEach(function(action) {
+                    var routes = eventRoutes[action.type];
+                    (Array.isArray(routes) ? routes : [routes]).forEach(function(route) {
+                        // this isn't fantastic, but because of the stacking of settimeouts plugins can handle the did_load before the did_init
+                        if (action.type === 'DID_INIT_ITEM') {
+                            exposeEvent(route(action.data));
+                        } else {
+                            setTimeout(function() {
+                                exposeEvent(route(action.data));
+                            }, 0);
+                        }
+                    });
+                });
+        };
+
+        //
+        // PUBLIC API -------------------------------------------------------------------------------------
+        //
+        var setOptions = function setOptions(options) {
+            return store.dispatch('SET_OPTIONS', { options: options });
+        };
+
+        var getFile = function getFile(query) {
+            return store.query('GET_ACTIVE_ITEM', query);
+        };
+
+        var prepareFile = function prepareFile(query) {
+            return new Promise(function(resolve, reject) {
+                store.dispatch('REQUEST_ITEM_PREPARE', {
+                    query: query,
+                    success: function success(item) {
+                        resolve(item);
+                    },
+                    failure: function failure(error) {
+                        reject(error);
+                    },
+                });
+            });
+        };
+
+        var addFile = function addFile(source) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+            return new Promise(function(resolve, reject) {
+                addFiles([{ source: source, options: options }], { index: options.index })
+                    .then(function(items) {
+                        return resolve(items && items[0]);
+                    })
+                    .catch(reject);
+            });
+        };
+
+        var isFilePondFile = function isFilePondFile(obj) {
+            return obj.file && obj.id;
+        };
+
+        var removeFile = function removeFile(query, options) {
+            // if only passed options
+            if (typeof query === 'object' && !isFilePondFile(query) && !options) {
+                options = query;
+                query = undefined;
+            }
+
+            // request item removal
+            store.dispatch('REMOVE_ITEM', Object.assign({}, options, { query: query }));
+
+            // see if item has been removed
+            return store.query('GET_ACTIVE_ITEM', query) === null;
+        };
+
+        var addFiles = function addFiles() {
+            for (
+                var _len = arguments.length, args = new Array(_len), _key = 0;
+                _key < _len;
+                _key++
+            ) {
+                args[_key] = arguments[_key];
+            }
+            return new Promise(function(resolve, reject) {
+                var sources = [];
+                var options = {};
+
+                // user passed a sources array
+                if (isArray(args[0])) {
+                    sources.push.apply(sources, args[0]);
+                    Object.assign(options, args[1] || {});
+                } else {
+                    // user passed sources as arguments, last one might be options object
+                    var lastArgument = args[args.length - 1];
+                    if (typeof lastArgument === 'object' && !(lastArgument instanceof Blob)) {
+                        Object.assign(options, args.pop());
+                    }
+
+                    // add rest to sources
+                    sources.push.apply(sources, args);
+                }
+
+                store.dispatch('ADD_ITEMS', {
+                    items: sources,
+                    index: options.index,
+                    interactionMethod: InteractionMethod.API,
+                    success: resolve,
+                    failure: reject,
+                });
+            });
+        };
+
+        var getFiles = function getFiles() {
+            return store.query('GET_ACTIVE_ITEMS');
+        };
+
+        var processFile = function processFile(query) {
+            return new Promise(function(resolve, reject) {
+                store.dispatch('REQUEST_ITEM_PROCESSING', {
+                    query: query,
+                    success: function success(item) {
+                        resolve(item);
+                    },
+                    failure: function failure(error) {
+                        reject(error);
+                    },
+                });
+            });
+        };
+
+        var prepareFiles = function prepareFiles() {
+            for (
+                var _len2 = arguments.length, args = new Array(_len2), _key2 = 0;
+                _key2 < _len2;
+                _key2++
+            ) {
+                args[_key2] = arguments[_key2];
+            }
+            var queries = Array.isArray(args[0]) ? args[0] : args;
+            var items = queries.length ? queries : getFiles();
+            return Promise.all(items.map(prepareFile));
+        };
+
+        var processFiles = function processFiles() {
+            for (
+                var _len3 = arguments.length, args = new Array(_len3), _key3 = 0;
+                _key3 < _len3;
+                _key3++
+            ) {
+                args[_key3] = arguments[_key3];
+            }
+            var queries = Array.isArray(args[0]) ? args[0] : args;
+            if (!queries.length) {
+                var files = getFiles().filter(function(item) {
+                    return (
+                        !(item.status === ItemStatus.IDLE && item.origin === FileOrigin.LOCAL) &&
+                        item.status !== ItemStatus.PROCESSING &&
+                        item.status !== ItemStatus.PROCESSING_COMPLETE &&
+                        item.status !== ItemStatus.PROCESSING_REVERT_ERROR
+                    );
+                });
+
+                return Promise.all(files.map(processFile));
+            }
+            return Promise.all(queries.map(processFile));
+        };
+
+        var removeFiles = function removeFiles() {
+            for (
+                var _len4 = arguments.length, args = new Array(_len4), _key4 = 0;
+                _key4 < _len4;
+                _key4++
+            ) {
+                args[_key4] = arguments[_key4];
+            }
+
+            var queries = Array.isArray(args[0]) ? args[0] : args;
+
+            var options;
+            if (typeof queries[queries.length - 1] === 'object') {
+                options = queries.pop();
+            } else if (Array.isArray(args[0])) {
+                options = args[1];
+            }
+
+            var files = getFiles();
+
+            if (!queries.length)
+                return Promise.all(
+                    files.map(function(file) {
+                        return removeFile(file, options);
+                    })
+                );
+
+            // when removing by index the indexes shift after each file removal so we need to convert indexes to ids
+            var mappedQueries = queries
+                .map(function(query) {
+                    return isNumber(query) ? (files[query] ? files[query].id : null) : query;
+                })
+                .filter(function(query) {
+                    return query;
+                });
+
+            return mappedQueries.map(function(q) {
+                return removeFile(q, options);
+            });
+        };
+
+        var exports = Object.assign(
+            {},
+
+            on(),
+            {},
+
+            readWriteApi,
+            {},
+
+            createOptionAPI(store, defaultOptions),
+            {
+                /**
+                 * Override options defined in options object
+                 * @param options
+                 */
+                setOptions: setOptions,
+
+                /**
+                 * Load the given file
+                 * @param source - the source of the file (either a File, base64 data uri or url)
+                 * @param options - object, { index: 0 }
+                 */
+                addFile: addFile,
+
+                /**
+                 * Load the given files
+                 * @param sources - the sources of the files to load
+                 * @param options - object, { index: 0 }
+                 */
+                addFiles: addFiles,
+
+                /**
+                 * Returns the file objects matching the given query
+                 * @param query { string, number, null }
+                 */
+                getFile: getFile,
+
+                /**
+                 * Upload file with given name
+                 * @param query { string, number, null  }
+                 */
+                processFile: processFile,
+
+                /**
+                 * Request prepare output for file with given name
+                 * @param query { string, number, null  }
+                 */
+                prepareFile: prepareFile,
+
+                /**
+                 * Removes a file by its name
+                 * @param query { string, number, null  }
+                 */
+                removeFile: removeFile,
+
+                /**
+                 * Moves a file to a new location in the files list
+                 */
+                moveFile: function moveFile(query, index) {
+                    return store.dispatch('MOVE_ITEM', { query: query, index: index });
+                },
+
+                /**
+                 * Returns all files (wrapped in public api)
+                 */
+                getFiles: getFiles,
+
+                /**
+                 * Starts uploading all files
+                 */
+                processFiles: processFiles,
+
+                /**
+                 * Clears all files from the files list
+                 */
+                removeFiles: removeFiles,
+
+                /**
+                 * Starts preparing output of all files
+                 */
+                prepareFiles: prepareFiles,
+
+                /**
+                 * Sort list of files
+                 */
+                sort: function sort(compare) {
+                    return store.dispatch('SORT', { compare: compare });
+                },
+
+                /**
+                 * Browse the file system for a file
+                 */
+                browse: function browse() {
+                    // needs to be trigger directly as user action needs to be traceable (is not traceable in requestAnimationFrame)
+                    var input = view.element.querySelector('input[type=file]');
+                    if (input) {
+                        input.click();
+                    }
+                },
+
+                /**
+                 * Destroys the app
+                 */
+                destroy: function destroy() {
+                    // request destruction
+                    exports.fire('destroy', view.element);
+
+                    // stop active processes (file uploads, fetches, stuff like that)
+                    // loop over items and depending on states call abort for ongoing processes
+                    store.dispatch('ABORT_ALL');
+
+                    // destroy view
+                    view._destroy();
+
+                    // stop listening to resize
+                    window.removeEventListener('resize', resizeHandler);
+
+                    // stop listening to the visiblitychange event
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+
+                    // dispatch destroy
+                    store.dispatch('DID_DESTROY');
+                },
+
+                /**
+                 * Inserts the plugin before the target element
+                 */
+                insertBefore: function insertBefore$1(element) {
+                    return insertBefore(view.element, element);
+                },
+
+                /**
+                 * Inserts the plugin after the target element
+                 */
+                insertAfter: function insertAfter$1(element) {
+                    return insertAfter(view.element, element);
+                },
+
+                /**
+                 * Appends the plugin to the target element
+                 */
+                appendTo: function appendTo(element) {
+                    return element.appendChild(view.element);
+                },
+
+                /**
+                 * Replaces an element with the app
+                 */
+                replaceElement: function replaceElement(element) {
+                    // insert the app before the element
+                    insertBefore(view.element, element);
+
+                    // remove the original element
+                    element.parentNode.removeChild(element);
+
+                    // remember original element
+                    originalElement = element;
+                },
+
+                /**
+                 * Restores the original element
+                 */
+                restoreElement: function restoreElement() {
+                    if (!originalElement) {
+                        return; // no element to restore
+                    }
+
+                    // restore original element
+                    insertAfter(originalElement, view.element);
+
+                    // remove our element
+                    view.element.parentNode.removeChild(view.element);
+
+                    // remove reference
+                    originalElement = null;
+                },
+
+                /**
+                 * Returns true if the app root is attached to given element
+                 * @param element
+                 */
+                isAttachedTo: function isAttachedTo(element) {
+                    return view.element === element || originalElement === element;
+                },
+
+                /**
+                 * Returns the root element
+                 */
+                element: {
+                    get: function get() {
+                        return view.element;
+                    },
+                },
+
+                /**
+                 * Returns the current pond status
+                 */
+                status: {
+                    get: function get() {
+                        return store.query('GET_STATUS');
+                    },
+                },
+            }
+        );
+
+        // Done!
+        store.dispatch('DID_INIT');
+
+        // create actual api object
+        return createObject(exports);
+    };
+
+    var createAppObject = function createAppObject() {
+        var customOptions = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        // default options
+        var defaultOptions = {};
+        forin(getOptions(), function(key, value) {
+            defaultOptions[key] = value[0];
+        });
+
+        // set app options
+        var app = createApp(
+            Object.assign(
+                {},
+
+                defaultOptions,
+                {},
+
+                customOptions
+            )
+        );
+
+        // return the plugin instance
+        return app;
+    };
+
+    var lowerCaseFirstLetter = function lowerCaseFirstLetter(string) {
+        return string.charAt(0).toLowerCase() + string.slice(1);
+    };
+
+    var attributeNameToPropertyName = function attributeNameToPropertyName(attributeName) {
+        return toCamels(attributeName.replace(/^data-/, ''));
+    };
+
+    var mapObject = function mapObject(object, propertyMap) {
+        // remove unwanted
+        forin(propertyMap, function(selector, mapping) {
+            forin(object, function(property, value) {
+                // create regexp shortcut
+                var selectorRegExp = new RegExp(selector);
+
+                // tests if
+                var matches = selectorRegExp.test(property);
+
+                // no match, skip
+                if (!matches) {
+                    return;
+                }
+
+                // if there's a mapping, the original property is always removed
+                delete object[property];
+
+                // should only remove, we done!
+                if (mapping === false) {
+                    return;
+                }
+
+                // move value to new property
+                if (isString(mapping)) {
+                    object[mapping] = value;
+                    return;
+                }
+
+                // move to group
+                var group = mapping.group;
+                if (isObject(mapping) && !object[group]) {
+                    object[group] = {};
+                }
+
+                object[group][lowerCaseFirstLetter(property.replace(selectorRegExp, ''))] = value;
+            });
+
+            // do submapping
+            if (mapping.mapping) {
+                mapObject(object[mapping.group], mapping.mapping);
+            }
+        });
+    };
+
+    var getAttributesAsObject = function getAttributesAsObject(node) {
+        var attributeMapping =
+            arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        // turn attributes into object
+        var attributes = [];
+        forin(node.attributes, function(index) {
+            attributes.push(node.attributes[index]);
+        });
+
+        var output = attributes
+            .filter(function(attribute) {
+                return attribute.name;
+            })
+            .reduce(function(obj, attribute) {
+                var value = attr(node, attribute.name);
+
+                obj[attributeNameToPropertyName(attribute.name)] =
+                    value === attribute.name ? true : value;
+                return obj;
+            }, {});
+
+        // do mapping of object properties
+        mapObject(output, attributeMapping);
+
+        return output;
+    };
+
+    var createAppAtElement = function createAppAtElement(element) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        // how attributes of the input element are mapped to the options for the plugin
+        var attributeMapping = {
+            // translate to other name
+            '^class$': 'className',
+            '^multiple$': 'allowMultiple',
+            '^capture$': 'captureMethod',
+            '^webkitdirectory$': 'allowDirectoriesOnly',
+
+            // group under single property
+            '^server': {
+                group: 'server',
+                mapping: {
+                    '^process': {
+                        group: 'process',
+                    },
+
+                    '^revert': {
+                        group: 'revert',
+                    },
+
+                    '^fetch': {
+                        group: 'fetch',
+                    },
+
+                    '^restore': {
+                        group: 'restore',
+                    },
+
+                    '^load': {
+                        group: 'load',
+                    },
+                },
+            },
+
+            // don't include in object
+            '^type$': false,
+            '^files$': false,
+        };
+
+        // add additional option translators
+        applyFilters('SET_ATTRIBUTE_TO_OPTION_MAP', attributeMapping);
+
+        // create final options object by setting options object and then overriding options supplied on element
+        var mergedOptions = Object.assign({}, options);
+
+        var attributeOptions = getAttributesAsObject(
+            element.nodeName === 'FIELDSET' ? element.querySelector('input[type=file]') : element,
+            attributeMapping
+        );
+
+        // merge with options object
+        Object.keys(attributeOptions).forEach(function(key) {
+            if (isObject(attributeOptions[key])) {
+                if (!isObject(mergedOptions[key])) {
+                    mergedOptions[key] = {};
+                }
+                Object.assign(mergedOptions[key], attributeOptions[key]);
+            } else {
+                mergedOptions[key] = attributeOptions[key];
+            }
+        });
+
+        // if parent is a fieldset, get files from parent by selecting all input fields that are not file upload fields
+        // these will then be automatically set to the initial files
+        mergedOptions.files = (options.files || []).concat(
+            Array.from(element.querySelectorAll('input:not([type=file])')).map(function(input) {
+                return {
+                    source: input.value,
+                    options: {
+                        type: input.dataset.type,
+                    },
+                };
+            })
+        );
+
+        // build plugin
+        var app = createAppObject(mergedOptions);
+
+        // add already selected files
+        if (element.files) {
+            Array.from(element.files).forEach(function(file) {
+                app.addFile(file);
+            });
+        }
+
+        // replace the target element
+        app.replaceElement(element);
+
+        // expose
+        return app;
+    };
+
+    // if an element is passed, we create the instance at that element, if not, we just create an up object
+    var createApp$1 = function createApp() {
+        return isNode(arguments.length <= 0 ? undefined : arguments[0])
+            ? createAppAtElement.apply(void 0, arguments)
+            : createAppObject.apply(void 0, arguments);
+    };
+
+    var PRIVATE_METHODS = ['fire', '_read', '_write'];
+
+    var createAppAPI = function createAppAPI(app) {
+        var api = {};
+
+        copyObjectPropertiesToObject(app, api, PRIVATE_METHODS);
+
+        return api;
+    };
+
+    /**
+     * Replaces placeholders in given string with replacements
+     * @param string - "Foo {bar}""
+     * @param replacements - { "bar": 10 }
+     */
+    var replaceInString = function replaceInString(string, replacements) {
+        return string.replace(/(?:{([a-zA-Z]+)})/g, function(match, group) {
+            return replacements[group];
+        });
+    };
+
+    var createWorker = function createWorker(fn) {
+        var workerBlob = new Blob(['(', fn.toString(), ')()'], {
+            type: 'application/javascript',
+        });
+
+        var workerURL = URL.createObjectURL(workerBlob);
+        var worker = new Worker(workerURL);
+
+        return {
+            transfer: function transfer(message, cb) {},
+            post: function post(message, cb, transferList) {
+                var id = getUniqueId();
+
+                worker.onmessage = function(e) {
+                    if (e.data.id === id) {
+                        cb(e.data.message);
+                    }
+                };
+
+                worker.postMessage(
+                    {
+                        id: id,
+                        message: message,
+                    },
+
+                    transferList
+                );
+            },
+            terminate: function terminate() {
+                worker.terminate();
+                URL.revokeObjectURL(workerURL);
+            },
+        };
+    };
+
+    var loadImage = function loadImage(url) {
+        return new Promise(function(resolve, reject) {
+            var img = new Image();
+            img.onload = function() {
+                resolve(img);
+            };
+            img.onerror = function(e) {
+                reject(e);
+            };
+            img.src = url;
+        });
+    };
+
+    var renameFile = function renameFile(file, name) {
+        var renamedFile = file.slice(0, file.size, file.type);
+        renamedFile.lastModifiedDate = file.lastModifiedDate;
+        renamedFile.name = name;
+        return renamedFile;
+    };
+
+    var copyFile = function copyFile(file) {
+        return renameFile(file, file.name);
+    };
+
+    // already registered plugins (can't register twice)
+    var registeredPlugins = [];
+
+    // pass utils to plugin
+    var createAppPlugin = function createAppPlugin(plugin) {
+        // already registered
+        if (registeredPlugins.includes(plugin)) {
+            return;
+        }
+
+        // remember this plugin
+        registeredPlugins.push(plugin);
+
+        // setup!
+        var pluginOutline = plugin({
+            addFilter: addFilter,
+            utils: {
+                Type: Type,
+                forin: forin,
+                isString: isString,
+                isFile: isFile,
+                toNaturalFileSize: toNaturalFileSize,
+                replaceInString: replaceInString,
+                getExtensionFromFilename: getExtensionFromFilename,
+                getFilenameWithoutExtension: getFilenameWithoutExtension,
+                guesstimateMimeType: guesstimateMimeType,
+                getFileFromBlob: getFileFromBlob,
+                getFilenameFromURL: getFilenameFromURL,
+                createRoute: createRoute,
+                createWorker: createWorker,
+                createView: createView,
+                createItemAPI: createItemAPI,
+                loadImage: loadImage,
+                copyFile: copyFile,
+                renameFile: renameFile,
+                createBlob: createBlob,
+                applyFilterChain: applyFilterChain,
+                text: text,
+                getNumericAspectRatioFromString: getNumericAspectRatioFromString,
+            },
+
+            views: {
+                fileActionButton: fileActionButton,
+            },
+        });
+
+        // add plugin options to default options
+        extendDefaultOptions(pluginOutline.options);
+    };
+
+    // feature detection used by supported() method
+    var isOperaMini = function isOperaMini() {
+        return Object.prototype.toString.call(window.operamini) === '[object OperaMini]';
+    };
+    var hasPromises = function hasPromises() {
+        return 'Promise' in window;
+    };
+    var hasBlobSlice = function hasBlobSlice() {
+        return 'slice' in Blob.prototype;
+    };
+    var hasCreateObjectURL = function hasCreateObjectURL() {
+        return 'URL' in window && 'createObjectURL' in window.URL;
+    };
+    var hasVisibility = function hasVisibility() {
+        return 'visibilityState' in document;
+    };
+    var hasTiming = function hasTiming() {
+        return 'performance' in window;
+    }; // iOS 8.x
+    var hasCSSSupports = function hasCSSSupports() {
+        return 'supports' in (window.CSS || {});
+    }; // use to detect Safari 9+
+    var isIE11 = function isIE11() {
+        return /MSIE|Trident/.test(window.navigator.userAgent);
+    };
+
+    var supported = (function() {
+        // Runs immediately and then remembers result for subsequent calls
+        var isSupported =
+            // Has to be a browser
+            isBrowser() &&
+            // Can't run on Opera Mini due to lack of everything
+            !isOperaMini() &&
+            // Require these APIs to feature detect a modern browser
+            hasVisibility() &&
+            hasPromises() &&
+            hasBlobSlice() &&
+            hasCreateObjectURL() &&
+            hasTiming() &&
+            // doesn't need CSSSupports but is a good way to detect Safari 9+ (we do want to support IE11 though)
+            (hasCSSSupports() || isIE11());
+
+        return function() {
+            return isSupported;
+        };
+    })();
+
+    /**
+     * Plugin internal state (over all instances)
+     */
+    var state = {
+        // active app instances, used to redraw the apps and to find the later
+        apps: [],
+    };
+
+    // plugin name
+    var name = 'filepond';
+
+    /**
+     * Public Plugin methods
+     */
+    var fn = function fn() {};
+    exports.Status = {};
+    exports.FileStatus = {};
+    exports.FileOrigin = {};
+    exports.OptionTypes = {};
+    exports.create = fn;
+    exports.destroy = fn;
+    exports.parse = fn;
+    exports.find = fn;
+    exports.registerPlugin = fn;
+    exports.getOptions = fn;
+    exports.setOptions = fn;
+
+    // if not supported, no API
+    if (supported()) {
+        // start painter and fire load event
+        createPainter(
+            function() {
+                state.apps.forEach(function(app) {
+                    return app._read();
+                });
+            },
+            function(ts) {
+                state.apps.forEach(function(app) {
+                    return app._write(ts);
+                });
+            }
+        );
+
+        // fire loaded event so we know when FilePond is available
+        var dispatch = function dispatch() {
+            // let others know we have area ready
+            document.dispatchEvent(
+                new CustomEvent('FilePond:loaded', {
+                    detail: {
+                        supported: supported,
+                        create: exports.create,
+                        destroy: exports.destroy,
+                        parse: exports.parse,
+                        find: exports.find,
+                        registerPlugin: exports.registerPlugin,
+                        setOptions: exports.setOptions,
+                    },
+                })
+            );
+
+            // clean up event
+            document.removeEventListener('DOMContentLoaded', dispatch);
+        };
+
+        if (document.readyState !== 'loading') {
+            // move to back of execution queue, FilePond should have been exported by then
+            setTimeout(function() {
+                return dispatch();
+            }, 0);
+        } else {
+            document.addEventListener('DOMContentLoaded', dispatch);
+        }
+
+        // updates the OptionTypes object based on the current options
+        var updateOptionTypes = function updateOptionTypes() {
+            return forin(getOptions(), function(key, value) {
+                exports.OptionTypes[key] = value[1];
+            });
+        };
+
+        exports.Status = Object.assign({}, Status);
+        exports.FileOrigin = Object.assign({}, FileOrigin);
+        exports.FileStatus = Object.assign({}, ItemStatus);
+
+        exports.OptionTypes = {};
+        updateOptionTypes();
+
+        // create method, creates apps and adds them to the app array
+        exports.create = function create() {
+            var app = createApp$1.apply(void 0, arguments);
+            app.on('destroy', exports.destroy);
+            state.apps.push(app);
+            return createAppAPI(app);
+        };
+
+        // destroys apps and removes them from the app array
+        exports.destroy = function destroy(hook) {
+            // returns true if the app was destroyed successfully
+            var indexToRemove = state.apps.findIndex(function(app) {
+                return app.isAttachedTo(hook);
+            });
+            if (indexToRemove >= 0) {
+                // remove from apps
+                var app = state.apps.splice(indexToRemove, 1)[0];
+
+                // restore original dom element
+                app.restoreElement();
+
+                return true;
+            }
+
+            return false;
+        };
+
+        // parses the given context for plugins (does not include the context element itself)
+        exports.parse = function parse(context) {
+            // get all possible hooks
+            var matchedHooks = Array.from(context.querySelectorAll('.' + name));
+
+            // filter out already active hooks
+            var newHooks = matchedHooks.filter(function(newHook) {
+                return !state.apps.find(function(app) {
+                    return app.isAttachedTo(newHook);
+                });
+            });
+
+            // create new instance for each hook
+            return newHooks.map(function(hook) {
+                return exports.create(hook);
+            });
+        };
+
+        // returns an app based on the given element hook
+        exports.find = function find(hook) {
+            var app = state.apps.find(function(app) {
+                return app.isAttachedTo(hook);
+            });
+            if (!app) {
+                return null;
+            }
+            return createAppAPI(app);
+        };
+
+        // adds a plugin extension
+        exports.registerPlugin = function registerPlugin() {
+            for (
+                var _len = arguments.length, plugins = new Array(_len), _key = 0;
+                _key < _len;
+                _key++
+            ) {
+                plugins[_key] = arguments[_key];
+            }
+
+            // register plugins
+            plugins.forEach(createAppPlugin);
+
+            // update OptionTypes, each plugin might have extended the default options
+            updateOptionTypes();
+        };
+
+        exports.getOptions = function getOptions$1() {
+            var opts = {};
+            forin(getOptions(), function(key, value) {
+                opts[key] = value[0];
+            });
+            return opts;
+        };
+
+        exports.setOptions = function setOptions$1(opts) {
+            if (isObject(opts)) {
+                // update existing plugins
+                state.apps.forEach(function(app) {
+                    app.setOptions(opts);
+                });
+
+                // override defaults
+                setOptions(opts);
+            }
+
+            // return new options
+            return exports.getOptions();
+        };
+    }
+
+    exports.supported = supported;
+
+    Object.defineProperty(exports, '__esModule', { value: true });
+});
+
 
 /***/ }),
 
@@ -39166,10 +52394,10 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
-/***/ "./node_modules/@fortawesome/fontawesome-free/css/all.css":
-/*!****************************************************************!*\
-  !*** ./node_modules/@fortawesome/fontawesome-free/css/all.css ***!
-  \****************************************************************/
+/***/ "./node_modules/filepond/dist/filepond.min.css":
+/*!*****************************************************!*\
+  !*** ./node_modules/filepond/dist/filepond.min.css ***!
+  \*****************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -39177,9 +52405,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_all_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./all.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/@fortawesome/fontawesome-free/css/all.css");
+/* harmony import */ var _css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_filepond_min_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./filepond.min.css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/filepond/dist/filepond.min.css");
 
             
 
@@ -39188,11 +52416,41 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_all_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_filepond_min_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_all_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_filepond_min_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_style_index_0_id_aa48f8de_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_style_index_0_id_aa48f8de_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_style_index_0_id_aa48f8de_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -39226,6 +52484,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_style_index_0_id_602a0e61_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_style_index_0_id_602a0e61_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_style_index_0_id_602a0e61_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
 /***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css ***!
@@ -39253,6 +52541,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadListComponent_vue_vue_type_style_index_0_id_527b7863_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_style_index_0_id_4d7ab2ec_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_style_index_0_id_4d7ab2ec_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_style_index_0_id_4d7ab2ec_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -39535,6 +52853,4200 @@ module.exports = function (list, options) {
 
 /***/ }),
 
+/***/ "./node_modules/sweetalert2/dist/sweetalert2.all.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/sweetalert2/dist/sweetalert2.all.js ***!
+  \**********************************************************/
+/***/ (function(module) {
+
+/*!
+* sweetalert2 v11.7.12
+* Released under the MIT License.
+*/
+(function (global, factory) {
+   true ? module.exports = factory() :
+  0;
+})(this, (function () { 'use strict';
+
+  const RESTORE_FOCUS_TIMEOUT = 100;
+
+  /** @type {GlobalState} */
+  const globalState = {};
+  const focusPreviousActiveElement = () => {
+    if (globalState.previousActiveElement instanceof HTMLElement) {
+      globalState.previousActiveElement.focus();
+      globalState.previousActiveElement = null;
+    } else if (document.body) {
+      document.body.focus();
+    }
+  };
+
+  /**
+   * Restore previous active (focused) element
+   *
+   * @param {boolean} returnFocus
+   * @returns {Promise<void>}
+   */
+  const restoreActiveElement = returnFocus => {
+    return new Promise(resolve => {
+      if (!returnFocus) {
+        return resolve();
+      }
+      const x = window.scrollX;
+      const y = window.scrollY;
+      globalState.restoreFocusTimeout = setTimeout(() => {
+        focusPreviousActiveElement();
+        resolve();
+      }, RESTORE_FOCUS_TIMEOUT); // issues/900
+
+      window.scrollTo(x, y);
+    });
+  };
+
+  /**
+   * This module contains `WeakMap`s for each effectively-"private  property" that a `Swal` has.
+   * For example, to set the private property "foo" of `this` to "bar", you can `privateProps.foo.set(this, 'bar')`
+   * This is the approach that Babel will probably take to implement private methods/fields
+   *   https://github.com/tc39/proposal-private-methods
+   *   https://github.com/babel/babel/pull/7555
+   * Once we have the changes from that PR in Babel, and our core class fits reasonable in *one module*
+   *   then we can use that language feature.
+   */
+
+  var privateProps = {
+    promise: new WeakMap(),
+    innerParams: new WeakMap(),
+    domCache: new WeakMap()
+  };
+
+  const swalPrefix = 'swal2-';
+
+  /**
+   * @typedef
+   * { | 'container'
+   *   | 'shown'
+   *   | 'height-auto'
+   *   | 'iosfix'
+   *   | 'popup'
+   *   | 'modal'
+   *   | 'no-backdrop'
+   *   | 'no-transition'
+   *   | 'toast'
+   *   | 'toast-shown'
+   *   | 'show'
+   *   | 'hide'
+   *   | 'close'
+   *   | 'title'
+   *   | 'html-container'
+   *   | 'actions'
+   *   | 'confirm'
+   *   | 'deny'
+   *   | 'cancel'
+   *   | 'default-outline'
+   *   | 'footer'
+   *   | 'icon'
+   *   | 'icon-content'
+   *   | 'image'
+   *   | 'input'
+   *   | 'file'
+   *   | 'range'
+   *   | 'select'
+   *   | 'radio'
+   *   | 'checkbox'
+   *   | 'label'
+   *   | 'textarea'
+   *   | 'inputerror'
+   *   | 'input-label'
+   *   | 'validation-message'
+   *   | 'progress-steps'
+   *   | 'active-progress-step'
+   *   | 'progress-step'
+   *   | 'progress-step-line'
+   *   | 'loader'
+   *   | 'loading'
+   *   | 'styled'
+   *   | 'top'
+   *   | 'top-start'
+   *   | 'top-end'
+   *   | 'top-left'
+   *   | 'top-right'
+   *   | 'center'
+   *   | 'center-start'
+   *   | 'center-end'
+   *   | 'center-left'
+   *   | 'center-right'
+   *   | 'bottom'
+   *   | 'bottom-start'
+   *   | 'bottom-end'
+   *   | 'bottom-left'
+   *   | 'bottom-right'
+   *   | 'grow-row'
+   *   | 'grow-column'
+   *   | 'grow-fullscreen'
+   *   | 'rtl'
+   *   | 'timer-progress-bar'
+   *   | 'timer-progress-bar-container'
+   *   | 'scrollbar-measure'
+   *   | 'icon-success'
+   *   | 'icon-warning'
+   *   | 'icon-info'
+   *   | 'icon-question'
+   *   | 'icon-error'
+   * } SwalClass
+   * @typedef {Record<SwalClass, string>} SwalClasses
+   */
+
+  /**
+   * @typedef {'success' | 'warning' | 'info' | 'question' | 'error'} SwalIcon
+   * @typedef {Record<SwalIcon, string>} SwalIcons
+   */
+
+  /** @type {SwalClass[]} */
+  const classNames = ['container', 'shown', 'height-auto', 'iosfix', 'popup', 'modal', 'no-backdrop', 'no-transition', 'toast', 'toast-shown', 'show', 'hide', 'close', 'title', 'html-container', 'actions', 'confirm', 'deny', 'cancel', 'default-outline', 'footer', 'icon', 'icon-content', 'image', 'input', 'file', 'range', 'select', 'radio', 'checkbox', 'label', 'textarea', 'inputerror', 'input-label', 'validation-message', 'progress-steps', 'active-progress-step', 'progress-step', 'progress-step-line', 'loader', 'loading', 'styled', 'top', 'top-start', 'top-end', 'top-left', 'top-right', 'center', 'center-start', 'center-end', 'center-left', 'center-right', 'bottom', 'bottom-start', 'bottom-end', 'bottom-left', 'bottom-right', 'grow-row', 'grow-column', 'grow-fullscreen', 'rtl', 'timer-progress-bar', 'timer-progress-bar-container', 'scrollbar-measure', 'icon-success', 'icon-warning', 'icon-info', 'icon-question', 'icon-error'];
+  const swalClasses = classNames.reduce((acc, className) => {
+    acc[className] = swalPrefix + className;
+    return acc;
+  }, /** @type {SwalClasses} */{});
+
+  /** @type {SwalIcon[]} */
+  const icons = ['success', 'warning', 'info', 'question', 'error'];
+  const iconTypes = icons.reduce((acc, icon) => {
+    acc[icon] = swalPrefix + icon;
+    return acc;
+  }, /** @type {SwalIcons} */{});
+
+  const consolePrefix = 'SweetAlert2:';
+
+  /**
+   * Capitalize the first letter of a string
+   *
+   * @param {string} str
+   * @returns {string}
+   */
+  const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
+
+  /**
+   * Standardize console warnings
+   *
+   * @param {string | string[]} message
+   */
+  const warn = message => {
+    console.warn(`${consolePrefix} ${typeof message === 'object' ? message.join(' ') : message}`);
+  };
+
+  /**
+   * Standardize console errors
+   *
+   * @param {string} message
+   */
+  const error = message => {
+    console.error(`${consolePrefix} ${message}`);
+  };
+
+  /**
+   * Private global state for `warnOnce`
+   *
+   * @type {string[]}
+   * @private
+   */
+  const previousWarnOnceMessages = [];
+
+  /**
+   * Show a console warning, but only if it hasn't already been shown
+   *
+   * @param {string} message
+   */
+  const warnOnce = message => {
+    if (!previousWarnOnceMessages.includes(message)) {
+      previousWarnOnceMessages.push(message);
+      warn(message);
+    }
+  };
+
+  /**
+   * Show a one-time console warning about deprecated params/methods
+   *
+   * @param {string} deprecatedParam
+   * @param {string} useInstead
+   */
+  const warnAboutDeprecation = (deprecatedParam, useInstead) => {
+    warnOnce(`"${deprecatedParam}" is deprecated and will be removed in the next major release. Please use "${useInstead}" instead.`);
+  };
+
+  /**
+   * If `arg` is a function, call it (with no arguments or context) and return the result.
+   * Otherwise, just pass the value through
+   *
+   * @param {Function | any} arg
+   * @returns {any}
+   */
+  const callIfFunction = arg => typeof arg === 'function' ? arg() : arg;
+
+  /**
+   * @param {any} arg
+   * @returns {boolean}
+   */
+  const hasToPromiseFn = arg => arg && typeof arg.toPromise === 'function';
+
+  /**
+   * @param {any} arg
+   * @returns {Promise<any>}
+   */
+  const asPromise = arg => hasToPromiseFn(arg) ? arg.toPromise() : Promise.resolve(arg);
+
+  /**
+   * @param {any} arg
+   * @returns {boolean}
+   */
+  const isPromise = arg => arg && Promise.resolve(arg) === arg;
+
+  /**
+   * Gets the popup container which contains the backdrop and the popup itself.
+   *
+   * @returns {HTMLElement | null}
+   */
+  const getContainer = () => document.body.querySelector(`.${swalClasses.container}`);
+
+  /**
+   * @param {string} selectorString
+   * @returns {HTMLElement | null}
+   */
+  const elementBySelector = selectorString => {
+    const container = getContainer();
+    return container ? container.querySelector(selectorString) : null;
+  };
+
+  /**
+   * @param {string} className
+   * @returns {HTMLElement | null}
+   */
+  const elementByClass = className => {
+    return elementBySelector(`.${className}`);
+  };
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getPopup = () => elementByClass(swalClasses.popup);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getIcon = () => elementByClass(swalClasses.icon);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getIconContent = () => elementByClass(swalClasses['icon-content']);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getTitle = () => elementByClass(swalClasses.title);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getHtmlContainer = () => elementByClass(swalClasses['html-container']);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getImage = () => elementByClass(swalClasses.image);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getProgressSteps = () => elementByClass(swalClasses['progress-steps']);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getValidationMessage = () => elementByClass(swalClasses['validation-message']);
+
+  /**
+   * @returns {HTMLButtonElement | null}
+   */
+  const getConfirmButton = () => /** @type {HTMLButtonElement} */elementBySelector(`.${swalClasses.actions} .${swalClasses.confirm}`);
+
+  /**
+   * @returns {HTMLButtonElement | null}
+   */
+  const getCancelButton = () => /** @type {HTMLButtonElement} */elementBySelector(`.${swalClasses.actions} .${swalClasses.cancel}`);
+
+  /**
+   * @returns {HTMLButtonElement | null}
+   */
+  const getDenyButton = () => /** @type {HTMLButtonElement} */elementBySelector(`.${swalClasses.actions} .${swalClasses.deny}`);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getInputLabel = () => elementByClass(swalClasses['input-label']);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getLoader = () => elementBySelector(`.${swalClasses.loader}`);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getActions = () => elementByClass(swalClasses.actions);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getFooter = () => elementByClass(swalClasses.footer);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getTimerProgressBar = () => elementByClass(swalClasses['timer-progress-bar']);
+
+  /**
+   * @returns {HTMLElement | null}
+   */
+  const getCloseButton = () => elementByClass(swalClasses.close);
+
+  // https://github.com/jkup/focusable/blob/master/index.js
+  const focusable = `
+  a[href],
+  area[href],
+  input:not([disabled]),
+  select:not([disabled]),
+  textarea:not([disabled]),
+  button:not([disabled]),
+  iframe,
+  object,
+  embed,
+  [tabindex="0"],
+  [contenteditable],
+  audio[controls],
+  video[controls],
+  summary
+`;
+  /**
+   * @returns {HTMLElement[]}
+   */
+  const getFocusableElements = () => {
+    /** @type {NodeListOf<HTMLElement>} */
+    const focusableElementsWithTabindex = getPopup().querySelectorAll('[tabindex]:not([tabindex="-1"]):not([tabindex="0"])');
+    const focusableElementsWithTabindexSorted = Array.from(focusableElementsWithTabindex)
+    // sort according to tabindex
+    .sort((a, b) => {
+      const tabindexA = parseInt(a.getAttribute('tabindex'));
+      const tabindexB = parseInt(b.getAttribute('tabindex'));
+      if (tabindexA > tabindexB) {
+        return 1;
+      } else if (tabindexA < tabindexB) {
+        return -1;
+      }
+      return 0;
+    });
+
+    /** @type {NodeListOf<HTMLElement>} */
+    const otherFocusableElements = getPopup().querySelectorAll(focusable);
+    const otherFocusableElementsFiltered = Array.from(otherFocusableElements).filter(el => el.getAttribute('tabindex') !== '-1');
+    return [...new Set(focusableElementsWithTabindexSorted.concat(otherFocusableElementsFiltered))].filter(el => isVisible$1(el));
+  };
+
+  /**
+   * @returns {boolean}
+   */
+  const isModal = () => {
+    return hasClass(document.body, swalClasses.shown) && !hasClass(document.body, swalClasses['toast-shown']) && !hasClass(document.body, swalClasses['no-backdrop']);
+  };
+
+  /**
+   * @returns {boolean}
+   */
+  const isToast = () => {
+    return getPopup() && hasClass(getPopup(), swalClasses.toast);
+  };
+
+  /**
+   * @returns {boolean}
+   */
+  const isLoading = () => {
+    return getPopup().hasAttribute('data-loading');
+  };
+
+  /**
+   * Securely set innerHTML of an element
+   * https://github.com/sweetalert2/sweetalert2/issues/1926
+   *
+   * @param {HTMLElement} elem
+   * @param {string} html
+   */
+  const setInnerHtml = (elem, html) => {
+    elem.textContent = '';
+    if (html) {
+      const parser = new DOMParser();
+      const parsed = parser.parseFromString(html, `text/html`);
+      Array.from(parsed.querySelector('head').childNodes).forEach(child => {
+        elem.appendChild(child);
+      });
+      Array.from(parsed.querySelector('body').childNodes).forEach(child => {
+        if (child instanceof HTMLVideoElement || child instanceof HTMLAudioElement) {
+          elem.appendChild(child.cloneNode(true)); // https://github.com/sweetalert2/sweetalert2/issues/2507
+        } else {
+          elem.appendChild(child);
+        }
+      });
+    }
+  };
+
+  /**
+   * @param {HTMLElement} elem
+   * @param {string} className
+   * @returns {boolean}
+   */
+  const hasClass = (elem, className) => {
+    if (!className) {
+      return false;
+    }
+    const classList = className.split(/\s+/);
+    for (let i = 0; i < classList.length; i++) {
+      if (!elem.classList.contains(classList[i])) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  /**
+   * @param {HTMLElement} elem
+   * @param {SweetAlertOptions} params
+   */
+  const removeCustomClasses = (elem, params) => {
+    Array.from(elem.classList).forEach(className => {
+      if (!Object.values(swalClasses).includes(className) && !Object.values(iconTypes).includes(className) && !Object.values(params.showClass).includes(className)) {
+        elem.classList.remove(className);
+      }
+    });
+  };
+
+  /**
+   * @param {HTMLElement} elem
+   * @param {SweetAlertOptions} params
+   * @param {string} className
+   */
+  const applyCustomClass = (elem, params, className) => {
+    removeCustomClasses(elem, params);
+    if (params.customClass && params.customClass[className]) {
+      if (typeof params.customClass[className] !== 'string' && !params.customClass[className].forEach) {
+        warn(`Invalid type of customClass.${className}! Expected string or iterable object, got "${typeof params.customClass[className]}"`);
+        return;
+      }
+      addClass(elem, params.customClass[className]);
+    }
+  };
+
+  /**
+   * @param {HTMLElement} popup
+   * @param {import('./renderers/renderInput').InputClass} inputClass
+   * @returns {HTMLInputElement | null}
+   */
+  const getInput$1 = (popup, inputClass) => {
+    if (!inputClass) {
+      return null;
+    }
+    switch (inputClass) {
+      case 'select':
+      case 'textarea':
+      case 'file':
+        return popup.querySelector(`.${swalClasses.popup} > .${swalClasses[inputClass]}`);
+      case 'checkbox':
+        return popup.querySelector(`.${swalClasses.popup} > .${swalClasses.checkbox} input`);
+      case 'radio':
+        return popup.querySelector(`.${swalClasses.popup} > .${swalClasses.radio} input:checked`) || popup.querySelector(`.${swalClasses.popup} > .${swalClasses.radio} input:first-child`);
+      case 'range':
+        return popup.querySelector(`.${swalClasses.popup} > .${swalClasses.range} input`);
+      default:
+        return popup.querySelector(`.${swalClasses.popup} > .${swalClasses.input}`);
+    }
+  };
+
+  /**
+   * @param {HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement} input
+   */
+  const focusInput = input => {
+    input.focus();
+
+    // place cursor at end of text in text input
+    if (input.type !== 'file') {
+      // http://stackoverflow.com/a/2345915
+      const val = input.value;
+      input.value = '';
+      input.value = val;
+    }
+  };
+
+  /**
+   * @param {HTMLElement | HTMLElement[] | null} target
+   * @param {string | string[] | readonly string[]} classList
+   * @param {boolean} condition
+   */
+  const toggleClass = (target, classList, condition) => {
+    if (!target || !classList) {
+      return;
+    }
+    if (typeof classList === 'string') {
+      classList = classList.split(/\s+/).filter(Boolean);
+    }
+    classList.forEach(className => {
+      if (Array.isArray(target)) {
+        target.forEach(elem => {
+          condition ? elem.classList.add(className) : elem.classList.remove(className);
+        });
+      } else {
+        condition ? target.classList.add(className) : target.classList.remove(className);
+      }
+    });
+  };
+
+  /**
+   * @param {HTMLElement | HTMLElement[] | null} target
+   * @param {string | string[] | readonly string[]} classList
+   */
+  const addClass = (target, classList) => {
+    toggleClass(target, classList, true);
+  };
+
+  /**
+   * @param {HTMLElement | HTMLElement[] | null} target
+   * @param {string | string[] | readonly string[]} classList
+   */
+  const removeClass = (target, classList) => {
+    toggleClass(target, classList, false);
+  };
+
+  /**
+   * Get direct child of an element by class name
+   *
+   * @param {HTMLElement} elem
+   * @param {string} className
+   * @returns {HTMLElement | undefined}
+   */
+  const getDirectChildByClass = (elem, className) => {
+    const children = Array.from(elem.children);
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      if (child instanceof HTMLElement && hasClass(child, className)) {
+        return child;
+      }
+    }
+  };
+
+  /**
+   * @param {HTMLElement} elem
+   * @param {string} property
+   * @param {*} value
+   */
+  const applyNumericalStyle = (elem, property, value) => {
+    if (value === `${parseInt(value)}`) {
+      value = parseInt(value);
+    }
+    if (value || parseInt(value) === 0) {
+      elem.style[property] = typeof value === 'number' ? `${value}px` : value;
+    } else {
+      elem.style.removeProperty(property);
+    }
+  };
+
+  /**
+   * @param {HTMLElement | null} elem
+   * @param {string} display
+   */
+  const show = function (elem) {
+    let display = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'flex';
+    elem && (elem.style.display = display);
+  };
+
+  /**
+   * @param {HTMLElement | null} elem
+   */
+  const hide = elem => {
+    elem && (elem.style.display = 'none');
+  };
+
+  /**
+   * @param {HTMLElement} parent
+   * @param {string} selector
+   * @param {string} property
+   * @param {string} value
+   */
+  const setStyle = (parent, selector, property, value) => {
+    /** @type {HTMLElement} */
+    const el = parent.querySelector(selector);
+    if (el) {
+      el.style[property] = value;
+    }
+  };
+
+  /**
+   * @param {HTMLElement} elem
+   * @param {any} condition
+   * @param {string} display
+   */
+  const toggle = function (elem, condition) {
+    let display = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'flex';
+    condition ? show(elem, display) : hide(elem);
+  };
+
+  /**
+   * borrowed from jquery $(elem).is(':visible') implementation
+   *
+   * @param {HTMLElement} elem
+   * @returns {boolean}
+   */
+  const isVisible$1 = elem => !!(elem && (elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length));
+
+  /**
+   * @returns {boolean}
+   */
+  const allButtonsAreHidden = () => !isVisible$1(getConfirmButton()) && !isVisible$1(getDenyButton()) && !isVisible$1(getCancelButton());
+
+  /**
+   * @param {HTMLElement} elem
+   * @returns {boolean}
+   */
+  const isScrollable = elem => !!(elem.scrollHeight > elem.clientHeight);
+
+  /**
+   * borrowed from https://stackoverflow.com/a/46352119
+   *
+   * @param {HTMLElement} elem
+   * @returns {boolean}
+   */
+  const hasCssAnimation = elem => {
+    const style = window.getComputedStyle(elem);
+    const animDuration = parseFloat(style.getPropertyValue('animation-duration') || '0');
+    const transDuration = parseFloat(style.getPropertyValue('transition-duration') || '0');
+    return animDuration > 0 || transDuration > 0;
+  };
+
+  /**
+   * @param {number} timer
+   * @param {boolean} reset
+   */
+  const animateTimerProgressBar = function (timer) {
+    let reset = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+    const timerProgressBar = getTimerProgressBar();
+    if (isVisible$1(timerProgressBar)) {
+      if (reset) {
+        timerProgressBar.style.transition = 'none';
+        timerProgressBar.style.width = '100%';
+      }
+      setTimeout(() => {
+        timerProgressBar.style.transition = `width ${timer / 1000}s linear`;
+        timerProgressBar.style.width = '0%';
+      }, 10);
+    }
+  };
+  const stopTimerProgressBar = () => {
+    const timerProgressBar = getTimerProgressBar();
+    const timerProgressBarWidth = parseInt(window.getComputedStyle(timerProgressBar).width);
+    timerProgressBar.style.removeProperty('transition');
+    timerProgressBar.style.width = '100%';
+    const timerProgressBarFullWidth = parseInt(window.getComputedStyle(timerProgressBar).width);
+    const timerProgressBarPercent = timerProgressBarWidth / timerProgressBarFullWidth * 100;
+    timerProgressBar.style.width = `${timerProgressBarPercent}%`;
+  };
+
+  /**
+   * Detect Node env
+   *
+   * @returns {boolean}
+   */
+  const isNodeEnv = () => typeof window === 'undefined' || typeof document === 'undefined';
+
+  const sweetHTML = `
+ <div aria-labelledby="${swalClasses.title}" aria-describedby="${swalClasses['html-container']}" class="${swalClasses.popup}" tabindex="-1">
+   <button type="button" class="${swalClasses.close}"></button>
+   <ul class="${swalClasses['progress-steps']}"></ul>
+   <div class="${swalClasses.icon}"></div>
+   <img class="${swalClasses.image}" />
+   <h2 class="${swalClasses.title}" id="${swalClasses.title}"></h2>
+   <div class="${swalClasses['html-container']}" id="${swalClasses['html-container']}"></div>
+   <input class="${swalClasses.input}" />
+   <input type="file" class="${swalClasses.file}" />
+   <div class="${swalClasses.range}">
+     <input type="range" />
+     <output></output>
+   </div>
+   <select class="${swalClasses.select}"></select>
+   <div class="${swalClasses.radio}"></div>
+   <label for="${swalClasses.checkbox}" class="${swalClasses.checkbox}">
+     <input type="checkbox" />
+     <span class="${swalClasses.label}"></span>
+   </label>
+   <textarea class="${swalClasses.textarea}"></textarea>
+   <div class="${swalClasses['validation-message']}" id="${swalClasses['validation-message']}"></div>
+   <div class="${swalClasses.actions}">
+     <div class="${swalClasses.loader}"></div>
+     <button type="button" class="${swalClasses.confirm}"></button>
+     <button type="button" class="${swalClasses.deny}"></button>
+     <button type="button" class="${swalClasses.cancel}"></button>
+   </div>
+   <div class="${swalClasses.footer}"></div>
+   <div class="${swalClasses['timer-progress-bar-container']}">
+     <div class="${swalClasses['timer-progress-bar']}"></div>
+   </div>
+ </div>
+`.replace(/(^|\n)\s*/g, '');
+
+  /**
+   * @returns {boolean}
+   */
+  const resetOldContainer = () => {
+    const oldContainer = getContainer();
+    if (!oldContainer) {
+      return false;
+    }
+    oldContainer.remove();
+    removeClass([document.documentElement, document.body], [swalClasses['no-backdrop'], swalClasses['toast-shown'], swalClasses['has-column']]);
+    return true;
+  };
+  const resetValidationMessage$1 = () => {
+    globalState.currentInstance.resetValidationMessage();
+  };
+  const addInputChangeListeners = () => {
+    const popup = getPopup();
+    const input = getDirectChildByClass(popup, swalClasses.input);
+    const file = getDirectChildByClass(popup, swalClasses.file);
+    /** @type {HTMLInputElement} */
+    const range = popup.querySelector(`.${swalClasses.range} input`);
+    /** @type {HTMLOutputElement} */
+    const rangeOutput = popup.querySelector(`.${swalClasses.range} output`);
+    const select = getDirectChildByClass(popup, swalClasses.select);
+    /** @type {HTMLInputElement} */
+    const checkbox = popup.querySelector(`.${swalClasses.checkbox} input`);
+    const textarea = getDirectChildByClass(popup, swalClasses.textarea);
+    input.oninput = resetValidationMessage$1;
+    file.onchange = resetValidationMessage$1;
+    select.onchange = resetValidationMessage$1;
+    checkbox.onchange = resetValidationMessage$1;
+    textarea.oninput = resetValidationMessage$1;
+    range.oninput = () => {
+      resetValidationMessage$1();
+      rangeOutput.value = range.value;
+    };
+    range.onchange = () => {
+      resetValidationMessage$1();
+      rangeOutput.value = range.value;
+    };
+  };
+
+  /**
+   * @param {string | HTMLElement} target
+   * @returns {HTMLElement}
+   */
+  const getTarget = target => typeof target === 'string' ? document.querySelector(target) : target;
+
+  /**
+   * @param {SweetAlertOptions} params
+   */
+  const setupAccessibility = params => {
+    const popup = getPopup();
+    popup.setAttribute('role', params.toast ? 'alert' : 'dialog');
+    popup.setAttribute('aria-live', params.toast ? 'polite' : 'assertive');
+    if (!params.toast) {
+      popup.setAttribute('aria-modal', 'true');
+    }
+  };
+
+  /**
+   * @param {HTMLElement} targetElement
+   */
+  const setupRTL = targetElement => {
+    if (window.getComputedStyle(targetElement).direction === 'rtl') {
+      addClass(getContainer(), swalClasses.rtl);
+    }
+  };
+
+  /**
+   * Add modal + backdrop + no-war message for Russians to DOM
+   *
+   * @param {SweetAlertOptions} params
+   */
+  const init = params => {
+    // Clean up the old popup container if it exists
+    const oldContainerExisted = resetOldContainer();
+
+    /* istanbul ignore if */
+    if (isNodeEnv()) {
+      error('SweetAlert2 requires document to initialize');
+      return;
+    }
+    const container = document.createElement('div');
+    container.className = swalClasses.container;
+    if (oldContainerExisted) {
+      addClass(container, swalClasses['no-transition']);
+    }
+    setInnerHtml(container, sweetHTML);
+    const targetElement = getTarget(params.target);
+    targetElement.appendChild(container);
+    setupAccessibility(params);
+    setupRTL(targetElement);
+    addInputChangeListeners();
+  };
+
+  /**
+   * @param {HTMLElement | object | string} param
+   * @param {HTMLElement} target
+   */
+  const parseHtmlToContainer = (param, target) => {
+    // DOM element
+    if (param instanceof HTMLElement) {
+      target.appendChild(param);
+    }
+
+    // Object
+    else if (typeof param === 'object') {
+      handleObject(param, target);
+    }
+
+    // Plain string
+    else if (param) {
+      setInnerHtml(target, param);
+    }
+  };
+
+  /**
+   * @param {object} param
+   * @param {HTMLElement} target
+   */
+  const handleObject = (param, target) => {
+    // JQuery element(s)
+    if (param.jquery) {
+      handleJqueryElem(target, param);
+    }
+
+    // For other objects use their string representation
+    else {
+      setInnerHtml(target, param.toString());
+    }
+  };
+
+  /**
+   * @param {HTMLElement} target
+   * @param {HTMLElement} elem
+   */
+  const handleJqueryElem = (target, elem) => {
+    target.textContent = '';
+    if (0 in elem) {
+      for (let i = 0; (i in elem); i++) {
+        target.appendChild(elem[i].cloneNode(true));
+      }
+    } else {
+      target.appendChild(elem.cloneNode(true));
+    }
+  };
+
+  /**
+   * @returns {'webkitAnimationEnd' | 'animationend' | false}
+   */
+  const animationEndEvent = (() => {
+    // Prevent run in Node env
+    /* istanbul ignore if */
+    if (isNodeEnv()) {
+      return false;
+    }
+    const testEl = document.createElement('div');
+    const transEndEventNames = {
+      WebkitAnimation: 'webkitAnimationEnd',
+      // Chrome, Safari and Opera
+      animation: 'animationend' // Standard syntax
+    };
+
+    for (const i in transEndEventNames) {
+      if (Object.prototype.hasOwnProperty.call(transEndEventNames, i) && typeof testEl.style[i] !== 'undefined') {
+        return transEndEventNames[i];
+      }
+    }
+    return false;
+  })();
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderActions = (instance, params) => {
+    const actions = getActions();
+    const loader = getLoader();
+
+    // Actions (buttons) wrapper
+    if (!params.showConfirmButton && !params.showDenyButton && !params.showCancelButton) {
+      hide(actions);
+    } else {
+      show(actions);
+    }
+
+    // Custom class
+    applyCustomClass(actions, params, 'actions');
+
+    // Render all the buttons
+    renderButtons(actions, loader, params);
+
+    // Loader
+    setInnerHtml(loader, params.loaderHtml);
+    applyCustomClass(loader, params, 'loader');
+  };
+
+  /**
+   * @param {HTMLElement} actions
+   * @param {HTMLElement} loader
+   * @param {SweetAlertOptions} params
+   */
+  function renderButtons(actions, loader, params) {
+    const confirmButton = getConfirmButton();
+    const denyButton = getDenyButton();
+    const cancelButton = getCancelButton();
+
+    // Render buttons
+    renderButton(confirmButton, 'confirm', params);
+    renderButton(denyButton, 'deny', params);
+    renderButton(cancelButton, 'cancel', params);
+    handleButtonsStyling(confirmButton, denyButton, cancelButton, params);
+    if (params.reverseButtons) {
+      if (params.toast) {
+        actions.insertBefore(cancelButton, confirmButton);
+        actions.insertBefore(denyButton, confirmButton);
+      } else {
+        actions.insertBefore(cancelButton, loader);
+        actions.insertBefore(denyButton, loader);
+        actions.insertBefore(confirmButton, loader);
+      }
+    }
+  }
+
+  /**
+   * @param {HTMLElement} confirmButton
+   * @param {HTMLElement} denyButton
+   * @param {HTMLElement} cancelButton
+   * @param {SweetAlertOptions} params
+   */
+  function handleButtonsStyling(confirmButton, denyButton, cancelButton, params) {
+    if (!params.buttonsStyling) {
+      removeClass([confirmButton, denyButton, cancelButton], swalClasses.styled);
+      return;
+    }
+    addClass([confirmButton, denyButton, cancelButton], swalClasses.styled);
+
+    // Buttons background colors
+    if (params.confirmButtonColor) {
+      confirmButton.style.backgroundColor = params.confirmButtonColor;
+      addClass(confirmButton, swalClasses['default-outline']);
+    }
+    if (params.denyButtonColor) {
+      denyButton.style.backgroundColor = params.denyButtonColor;
+      addClass(denyButton, swalClasses['default-outline']);
+    }
+    if (params.cancelButtonColor) {
+      cancelButton.style.backgroundColor = params.cancelButtonColor;
+      addClass(cancelButton, swalClasses['default-outline']);
+    }
+  }
+
+  /**
+   * @param {HTMLElement} button
+   * @param {'confirm' | 'deny' | 'cancel'} buttonType
+   * @param {SweetAlertOptions} params
+   */
+  function renderButton(button, buttonType, params) {
+    toggle(button, params[`show${capitalizeFirstLetter(buttonType)}Button`], 'inline-block');
+    setInnerHtml(button, params[`${buttonType}ButtonText`]); // Set caption text
+    button.setAttribute('aria-label', params[`${buttonType}ButtonAriaLabel`]); // ARIA label
+
+    // Add buttons custom classes
+    button.className = swalClasses[buttonType];
+    applyCustomClass(button, params, `${buttonType}Button`);
+    addClass(button, params[`${buttonType}ButtonClass`]);
+  }
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderCloseButton = (instance, params) => {
+    const closeButton = getCloseButton();
+    if (!closeButton) {
+      return;
+    }
+    setInnerHtml(closeButton, params.closeButtonHtml || '');
+
+    // Custom class
+    applyCustomClass(closeButton, params, 'closeButton');
+    toggle(closeButton, params.showCloseButton);
+    closeButton.setAttribute('aria-label', params.closeButtonAriaLabel || '');
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderContainer = (instance, params) => {
+    const container = getContainer();
+    if (!container) {
+      return;
+    }
+    handleBackdropParam(container, params.backdrop);
+    handlePositionParam(container, params.position);
+    handleGrowParam(container, params.grow);
+
+    // Custom class
+    applyCustomClass(container, params, 'container');
+  };
+
+  /**
+   * @param {HTMLElement} container
+   * @param {SweetAlertOptions['backdrop']} backdrop
+   */
+  function handleBackdropParam(container, backdrop) {
+    if (typeof backdrop === 'string') {
+      container.style.background = backdrop;
+    } else if (!backdrop) {
+      addClass([document.documentElement, document.body], swalClasses['no-backdrop']);
+    }
+  }
+
+  /**
+   * @param {HTMLElement} container
+   * @param {SweetAlertOptions['position']} position
+   */
+  function handlePositionParam(container, position) {
+    if (position in swalClasses) {
+      addClass(container, swalClasses[position]);
+    } else {
+      warn('The "position" parameter is not valid, defaulting to "center"');
+      addClass(container, swalClasses.center);
+    }
+  }
+
+  /**
+   * @param {HTMLElement} container
+   * @param {SweetAlertOptions['grow']} grow
+   */
+  function handleGrowParam(container, grow) {
+    if (grow && typeof grow === 'string') {
+      const growClass = `grow-${grow}`;
+      if (growClass in swalClasses) {
+        addClass(container, swalClasses[growClass]);
+      }
+    }
+  }
+
+  /// <reference path="../../../../sweetalert2.d.ts"/>
+
+
+  /** @type {InputClass[]} */
+  const inputClasses = ['input', 'file', 'range', 'select', 'radio', 'checkbox', 'textarea'];
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderInput = (instance, params) => {
+    const popup = getPopup();
+    const innerParams = privateProps.innerParams.get(instance);
+    const rerender = !innerParams || params.input !== innerParams.input;
+    inputClasses.forEach(inputClass => {
+      const inputContainer = getDirectChildByClass(popup, swalClasses[inputClass]);
+
+      // set attributes
+      setAttributes(inputClass, params.inputAttributes);
+
+      // set class
+      inputContainer.className = swalClasses[inputClass];
+      if (rerender) {
+        hide(inputContainer);
+      }
+    });
+    if (params.input) {
+      if (rerender) {
+        showInput(params);
+      }
+      // set custom class
+      setCustomClass(params);
+    }
+  };
+
+  /**
+   * @param {SweetAlertOptions} params
+   */
+  const showInput = params => {
+    if (!renderInputType[params.input]) {
+      error(`Unexpected type of input! Expected "text", "email", "password", "number", "tel", "select", "radio", "checkbox", "textarea", "file" or "url", got "${params.input}"`);
+      return;
+    }
+    const inputContainer = getInputContainer(params.input);
+    const input = renderInputType[params.input](inputContainer, params);
+    show(inputContainer);
+
+    // input autofocus
+    if (params.inputAutoFocus) {
+      setTimeout(() => {
+        focusInput(input);
+      });
+    }
+  };
+
+  /**
+   * @param {HTMLInputElement} input
+   */
+  const removeAttributes = input => {
+    for (let i = 0; i < input.attributes.length; i++) {
+      const attrName = input.attributes[i].name;
+      if (!['type', 'value', 'style'].includes(attrName)) {
+        input.removeAttribute(attrName);
+      }
+    }
+  };
+
+  /**
+   * @param {InputClass} inputClass
+   * @param {SweetAlertOptions['inputAttributes']} inputAttributes
+   */
+  const setAttributes = (inputClass, inputAttributes) => {
+    const input = getInput$1(getPopup(), inputClass);
+    if (!input) {
+      return;
+    }
+    removeAttributes(input);
+    for (const attr in inputAttributes) {
+      input.setAttribute(attr, inputAttributes[attr]);
+    }
+  };
+
+  /**
+   * @param {SweetAlertOptions} params
+   */
+  const setCustomClass = params => {
+    const inputContainer = getInputContainer(params.input);
+    if (typeof params.customClass === 'object') {
+      addClass(inputContainer, params.customClass.input);
+    }
+  };
+
+  /**
+   * @param {HTMLInputElement | HTMLTextAreaElement} input
+   * @param {SweetAlertOptions} params
+   */
+  const setInputPlaceholder = (input, params) => {
+    if (!input.placeholder || params.inputPlaceholder) {
+      input.placeholder = params.inputPlaceholder;
+    }
+  };
+
+  /**
+   * @param {Input} input
+   * @param {Input} prependTo
+   * @param {SweetAlertOptions} params
+   */
+  const setInputLabel = (input, prependTo, params) => {
+    if (params.inputLabel) {
+      input.id = swalClasses.input;
+      const label = document.createElement('label');
+      const labelClass = swalClasses['input-label'];
+      label.setAttribute('for', input.id);
+      label.className = labelClass;
+      if (typeof params.customClass === 'object') {
+        addClass(label, params.customClass.inputLabel);
+      }
+      label.innerText = params.inputLabel;
+      prependTo.insertAdjacentElement('beforebegin', label);
+    }
+  };
+
+  /**
+   * @param {SweetAlertOptions['input']} inputType
+   * @returns {HTMLElement}
+   */
+  const getInputContainer = inputType => {
+    return getDirectChildByClass(getPopup(), swalClasses[inputType] || swalClasses.input);
+  };
+
+  /**
+   * @param {HTMLInputElement | HTMLOutputElement | HTMLTextAreaElement} input
+   * @param {SweetAlertOptions['inputValue']} inputValue
+   */
+  const checkAndSetInputValue = (input, inputValue) => {
+    if (['string', 'number'].includes(typeof inputValue)) {
+      input.value = `${inputValue}`;
+    } else if (!isPromise(inputValue)) {
+      warn(`Unexpected type of inputValue! Expected "string", "number" or "Promise", got "${typeof inputValue}"`);
+    }
+  };
+
+  /** @type {Record<string, (input: Input | HTMLElement, params: SweetAlertOptions) => Input>} */
+  const renderInputType = {};
+
+  /**
+   * @param {HTMLInputElement} input
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLInputElement}
+   */
+  renderInputType.text = renderInputType.email = renderInputType.password = renderInputType.number = renderInputType.tel = renderInputType.url = (input, params) => {
+    checkAndSetInputValue(input, params.inputValue);
+    setInputLabel(input, input, params);
+    setInputPlaceholder(input, params);
+    input.type = params.input;
+    return input;
+  };
+
+  /**
+   * @param {HTMLInputElement} input
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLInputElement}
+   */
+  renderInputType.file = (input, params) => {
+    setInputLabel(input, input, params);
+    setInputPlaceholder(input, params);
+    return input;
+  };
+
+  /**
+   * @param {HTMLInputElement} range
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLInputElement}
+   */
+  renderInputType.range = (range, params) => {
+    const rangeInput = range.querySelector('input');
+    const rangeOutput = range.querySelector('output');
+    checkAndSetInputValue(rangeInput, params.inputValue);
+    rangeInput.type = params.input;
+    checkAndSetInputValue(rangeOutput, params.inputValue);
+    setInputLabel(rangeInput, range, params);
+    return range;
+  };
+
+  /**
+   * @param {HTMLSelectElement} select
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLSelectElement}
+   */
+  renderInputType.select = (select, params) => {
+    select.textContent = '';
+    if (params.inputPlaceholder) {
+      const placeholder = document.createElement('option');
+      setInnerHtml(placeholder, params.inputPlaceholder);
+      placeholder.value = '';
+      placeholder.disabled = true;
+      placeholder.selected = true;
+      select.appendChild(placeholder);
+    }
+    setInputLabel(select, select, params);
+    return select;
+  };
+
+  /**
+   * @param {HTMLInputElement} radio
+   * @returns {HTMLInputElement}
+   */
+  renderInputType.radio = radio => {
+    radio.textContent = '';
+    return radio;
+  };
+
+  /**
+   * @param {HTMLLabelElement} checkboxContainer
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLInputElement}
+   */
+  renderInputType.checkbox = (checkboxContainer, params) => {
+    const checkbox = getInput$1(getPopup(), 'checkbox');
+    checkbox.value = '1';
+    checkbox.id = swalClasses.checkbox;
+    checkbox.checked = Boolean(params.inputValue);
+    const label = checkboxContainer.querySelector('span');
+    setInnerHtml(label, params.inputPlaceholder);
+    return checkbox;
+  };
+
+  /**
+   * @param {HTMLTextAreaElement} textarea
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLTextAreaElement}
+   */
+  renderInputType.textarea = (textarea, params) => {
+    checkAndSetInputValue(textarea, params.inputValue);
+    setInputPlaceholder(textarea, params);
+    setInputLabel(textarea, textarea, params);
+
+    /**
+     * @param {HTMLElement} el
+     * @returns {number}
+     */
+    const getMargin = el => parseInt(window.getComputedStyle(el).marginLeft) + parseInt(window.getComputedStyle(el).marginRight);
+
+    // https://github.com/sweetalert2/sweetalert2/issues/2291
+    setTimeout(() => {
+      // https://github.com/sweetalert2/sweetalert2/issues/1699
+      if ('MutationObserver' in window) {
+        const initialPopupWidth = parseInt(window.getComputedStyle(getPopup()).width);
+        const textareaResizeHandler = () => {
+          const textareaWidth = textarea.offsetWidth + getMargin(textarea);
+          if (textareaWidth > initialPopupWidth) {
+            getPopup().style.width = `${textareaWidth}px`;
+          } else {
+            getPopup().style.width = null;
+          }
+        };
+        new MutationObserver(textareaResizeHandler).observe(textarea, {
+          attributes: true,
+          attributeFilter: ['style']
+        });
+      }
+    });
+    return textarea;
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderContent = (instance, params) => {
+    const htmlContainer = getHtmlContainer();
+    if (!htmlContainer) {
+      return;
+    }
+    applyCustomClass(htmlContainer, params, 'htmlContainer');
+
+    // Content as HTML
+    if (params.html) {
+      parseHtmlToContainer(params.html, htmlContainer);
+      show(htmlContainer, 'block');
+    }
+
+    // Content as plain text
+    else if (params.text) {
+      htmlContainer.textContent = params.text;
+      show(htmlContainer, 'block');
+    }
+
+    // No content
+    else {
+      hide(htmlContainer);
+    }
+    renderInput(instance, params);
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderFooter = (instance, params) => {
+    const footer = getFooter();
+    if (!footer) {
+      return;
+    }
+    toggle(footer, params.footer);
+    if (params.footer) {
+      parseHtmlToContainer(params.footer, footer);
+    }
+
+    // Custom class
+    applyCustomClass(footer, params, 'footer');
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderIcon = (instance, params) => {
+    const innerParams = privateProps.innerParams.get(instance);
+    const icon = getIcon();
+
+    // if the given icon already rendered, apply the styling without re-rendering the icon
+    if (innerParams && params.icon === innerParams.icon) {
+      // Custom or default content
+      setContent(icon, params);
+      applyStyles(icon, params);
+      return;
+    }
+    if (!params.icon && !params.iconHtml) {
+      hide(icon);
+      return;
+    }
+    if (params.icon && Object.keys(iconTypes).indexOf(params.icon) === -1) {
+      error(`Unknown icon! Expected "success", "error", "warning", "info" or "question", got "${params.icon}"`);
+      hide(icon);
+      return;
+    }
+    show(icon);
+
+    // Custom or default content
+    setContent(icon, params);
+    applyStyles(icon, params);
+
+    // Animate icon
+    addClass(icon, params.showClass.icon);
+  };
+
+  /**
+   * @param {HTMLElement} icon
+   * @param {SweetAlertOptions} params
+   */
+  const applyStyles = (icon, params) => {
+    for (const iconType in iconTypes) {
+      if (params.icon !== iconType) {
+        removeClass(icon, iconTypes[iconType]);
+      }
+    }
+    addClass(icon, iconTypes[params.icon]);
+
+    // Icon color
+    setColor(icon, params);
+
+    // Success icon background color
+    adjustSuccessIconBackgroundColor();
+
+    // Custom class
+    applyCustomClass(icon, params, 'icon');
+  };
+
+  // Adjust success icon background color to match the popup background color
+  const adjustSuccessIconBackgroundColor = () => {
+    const popup = getPopup();
+    const popupBackgroundColor = window.getComputedStyle(popup).getPropertyValue('background-color');
+    /** @type {NodeListOf<HTMLElement>} */
+    const successIconParts = popup.querySelectorAll('[class^=swal2-success-circular-line], .swal2-success-fix');
+    for (let i = 0; i < successIconParts.length; i++) {
+      successIconParts[i].style.backgroundColor = popupBackgroundColor;
+    }
+  };
+  const successIconHtml = `
+  <div class="swal2-success-circular-line-left"></div>
+  <span class="swal2-success-line-tip"></span> <span class="swal2-success-line-long"></span>
+  <div class="swal2-success-ring"></div> <div class="swal2-success-fix"></div>
+  <div class="swal2-success-circular-line-right"></div>
+`;
+  const errorIconHtml = `
+  <span class="swal2-x-mark">
+    <span class="swal2-x-mark-line-left"></span>
+    <span class="swal2-x-mark-line-right"></span>
+  </span>
+`;
+
+  /**
+   * @param {HTMLElement} icon
+   * @param {SweetAlertOptions} params
+   */
+  const setContent = (icon, params) => {
+    let oldContent = icon.innerHTML;
+    let newContent;
+    if (params.iconHtml) {
+      newContent = iconContent(params.iconHtml);
+    } else if (params.icon === 'success') {
+      newContent = successIconHtml;
+      oldContent = oldContent.replace(/ style=".*?"/g, ''); // undo adjustSuccessIconBackgroundColor()
+    } else if (params.icon === 'error') {
+      newContent = errorIconHtml;
+    } else {
+      const defaultIconHtml = {
+        question: '?',
+        warning: '!',
+        info: 'i'
+      };
+      newContent = iconContent(defaultIconHtml[params.icon]);
+    }
+    if (oldContent.trim() !== newContent.trim()) {
+      setInnerHtml(icon, newContent);
+    }
+  };
+
+  /**
+   * @param {HTMLElement} icon
+   * @param {SweetAlertOptions} params
+   */
+  const setColor = (icon, params) => {
+    if (!params.iconColor) {
+      return;
+    }
+    icon.style.color = params.iconColor;
+    icon.style.borderColor = params.iconColor;
+    for (const sel of ['.swal2-success-line-tip', '.swal2-success-line-long', '.swal2-x-mark-line-left', '.swal2-x-mark-line-right']) {
+      setStyle(icon, sel, 'backgroundColor', params.iconColor);
+    }
+    setStyle(icon, '.swal2-success-ring', 'borderColor', params.iconColor);
+  };
+
+  /**
+   * @param {string} content
+   * @returns {string}
+   */
+  const iconContent = content => `<div class="${swalClasses['icon-content']}">${content}</div>`;
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderImage = (instance, params) => {
+    const image = getImage();
+    if (!image) {
+      return;
+    }
+    if (!params.imageUrl) {
+      hide(image);
+      return;
+    }
+    show(image, '');
+
+    // Src, alt
+    image.setAttribute('src', params.imageUrl);
+    image.setAttribute('alt', params.imageAlt || '');
+
+    // Width, height
+    applyNumericalStyle(image, 'width', params.imageWidth);
+    applyNumericalStyle(image, 'height', params.imageHeight);
+
+    // Class
+    image.className = swalClasses.image;
+    applyCustomClass(image, params, 'image');
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderPopup = (instance, params) => {
+    const container = getContainer();
+    const popup = getPopup();
+    if (!container || !popup) {
+      return;
+    }
+
+    // Width
+    // https://github.com/sweetalert2/sweetalert2/issues/2170
+    if (params.toast) {
+      applyNumericalStyle(container, 'width', params.width);
+      popup.style.width = '100%';
+      const loader = getLoader();
+      loader && popup.insertBefore(loader, getIcon());
+    } else {
+      applyNumericalStyle(popup, 'width', params.width);
+    }
+
+    // Padding
+    applyNumericalStyle(popup, 'padding', params.padding);
+
+    // Color
+    if (params.color) {
+      popup.style.color = params.color;
+    }
+
+    // Background
+    if (params.background) {
+      popup.style.background = params.background;
+    }
+    hide(getValidationMessage());
+
+    // Classes
+    addClasses$1(popup, params);
+  };
+
+  /**
+   * @param {HTMLElement} popup
+   * @param {SweetAlertOptions} params
+   */
+  const addClasses$1 = (popup, params) => {
+    const showClass = params.showClass || {};
+    // Default Class + showClass when updating Swal.update({})
+    popup.className = `${swalClasses.popup} ${isVisible$1(popup) ? showClass.popup : ''}`;
+    if (params.toast) {
+      addClass([document.documentElement, document.body], swalClasses['toast-shown']);
+      addClass(popup, swalClasses.toast);
+    } else {
+      addClass(popup, swalClasses.modal);
+    }
+
+    // Custom class
+    applyCustomClass(popup, params, 'popup');
+    if (typeof params.customClass === 'string') {
+      addClass(popup, params.customClass);
+    }
+
+    // Icon class (#1842)
+    if (params.icon) {
+      addClass(popup, swalClasses[`icon-${params.icon}`]);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderProgressSteps = (instance, params) => {
+    const progressStepsContainer = getProgressSteps();
+    if (!progressStepsContainer) {
+      return;
+    }
+    const {
+      progressSteps,
+      currentProgressStep
+    } = params;
+    if (!progressSteps || progressSteps.length === 0 || currentProgressStep === undefined) {
+      hide(progressStepsContainer);
+      return;
+    }
+    show(progressStepsContainer);
+    progressStepsContainer.textContent = '';
+    if (currentProgressStep >= progressSteps.length) {
+      warn('Invalid currentProgressStep parameter, it should be less than progressSteps.length ' + '(currentProgressStep like JS arrays starts from 0)');
+    }
+    progressSteps.forEach((step, index) => {
+      const stepEl = createStepElement(step);
+      progressStepsContainer.appendChild(stepEl);
+      if (index === currentProgressStep) {
+        addClass(stepEl, swalClasses['active-progress-step']);
+      }
+      if (index !== progressSteps.length - 1) {
+        const lineEl = createLineElement(params);
+        progressStepsContainer.appendChild(lineEl);
+      }
+    });
+  };
+
+  /**
+   * @param {string} step
+   * @returns {HTMLLIElement}
+   */
+  const createStepElement = step => {
+    const stepEl = document.createElement('li');
+    addClass(stepEl, swalClasses['progress-step']);
+    setInnerHtml(stepEl, step);
+    return stepEl;
+  };
+
+  /**
+   * @param {SweetAlertOptions} params
+   * @returns {HTMLLIElement}
+   */
+  const createLineElement = params => {
+    const lineEl = document.createElement('li');
+    addClass(lineEl, swalClasses['progress-step-line']);
+    if (params.progressStepsDistance) {
+      applyNumericalStyle(lineEl, 'width', params.progressStepsDistance);
+    }
+    return lineEl;
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const renderTitle = (instance, params) => {
+    const title = getTitle();
+    if (!title) {
+      return;
+    }
+    toggle(title, params.title || params.titleText, 'block');
+    if (params.title) {
+      parseHtmlToContainer(params.title, title);
+    }
+    if (params.titleText) {
+      title.innerText = params.titleText;
+    }
+
+    // Custom class
+    applyCustomClass(title, params, 'title');
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const render = (instance, params) => {
+    renderPopup(instance, params);
+    renderContainer(instance, params);
+    renderProgressSteps(instance, params);
+    renderIcon(instance, params);
+    renderImage(instance, params);
+    renderTitle(instance, params);
+    renderCloseButton(instance, params);
+    renderContent(instance, params);
+    renderActions(instance, params);
+    renderFooter(instance, params);
+    const popup = getPopup();
+    if (typeof params.didRender === 'function' && popup) {
+      params.didRender(popup);
+    }
+  };
+
+  /*
+   * Global function to determine if SweetAlert2 popup is shown
+   */
+  const isVisible = () => {
+    return isVisible$1(getPopup());
+  };
+
+  /*
+   * Global function to click 'Confirm' button
+   */
+  const clickConfirm = () => getConfirmButton() && getConfirmButton().click();
+
+  /*
+   * Global function to click 'Deny' button
+   */
+  const clickDeny = () => getDenyButton() && getDenyButton().click();
+
+  /*
+   * Global function to click 'Cancel' button
+   */
+  const clickCancel = () => getCancelButton() && getCancelButton().click();
+
+  /** @typedef {'cancel' | 'backdrop' | 'close' | 'esc' | 'timer'} DismissReason */
+
+  /** @type {Record<DismissReason, DismissReason>} */
+  const DismissReason = Object.freeze({
+    cancel: 'cancel',
+    backdrop: 'backdrop',
+    close: 'close',
+    esc: 'esc',
+    timer: 'timer'
+  });
+
+  /**
+   * @param {GlobalState} globalState
+   */
+  const removeKeydownHandler = globalState => {
+    if (globalState.keydownTarget && globalState.keydownHandlerAdded) {
+      globalState.keydownTarget.removeEventListener('keydown', globalState.keydownHandler, {
+        capture: globalState.keydownListenerCapture
+      });
+      globalState.keydownHandlerAdded = false;
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {GlobalState} globalState
+   * @param {SweetAlertOptions} innerParams
+   * @param {*} dismissWith
+   */
+  const addKeydownHandler = (instance, globalState, innerParams, dismissWith) => {
+    removeKeydownHandler(globalState);
+    if (!innerParams.toast) {
+      globalState.keydownHandler = e => keydownHandler(instance, e, dismissWith);
+      globalState.keydownTarget = innerParams.keydownListenerCapture ? window : getPopup();
+      globalState.keydownListenerCapture = innerParams.keydownListenerCapture;
+      globalState.keydownTarget.addEventListener('keydown', globalState.keydownHandler, {
+        capture: globalState.keydownListenerCapture
+      });
+      globalState.keydownHandlerAdded = true;
+    }
+  };
+
+  /**
+   * @param {number} index
+   * @param {number} increment
+   */
+  const setFocus = (index, increment) => {
+    const focusableElements = getFocusableElements();
+    // search for visible elements and select the next possible match
+    if (focusableElements.length) {
+      index = index + increment;
+
+      // rollover to first item
+      if (index === focusableElements.length) {
+        index = 0;
+
+        // go to last item
+      } else if (index === -1) {
+        index = focusableElements.length - 1;
+      }
+      focusableElements[index].focus();
+      return;
+    }
+    // no visible focusable elements, focus the popup
+    getPopup().focus();
+  };
+  const arrowKeysNextButton = ['ArrowRight', 'ArrowDown'];
+  const arrowKeysPreviousButton = ['ArrowLeft', 'ArrowUp'];
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {KeyboardEvent} event
+   * @param {Function} dismissWith
+   */
+  const keydownHandler = (instance, event, dismissWith) => {
+    const innerParams = privateProps.innerParams.get(instance);
+    if (!innerParams) {
+      return; // This instance has already been destroyed
+    }
+
+    // Ignore keydown during IME composition
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/keydown_event#ignoring_keydown_during_ime_composition
+    // https://github.com/sweetalert2/sweetalert2/issues/720
+    // https://github.com/sweetalert2/sweetalert2/issues/2406
+    if (event.isComposing || event.keyCode === 229) {
+      return;
+    }
+    if (innerParams.stopKeydownPropagation) {
+      event.stopPropagation();
+    }
+
+    // ENTER
+    if (event.key === 'Enter') {
+      handleEnter(instance, event, innerParams);
+    }
+
+    // TAB
+    else if (event.key === 'Tab') {
+      handleTab(event);
+    }
+
+    // ARROWS - switch focus between buttons
+    else if ([...arrowKeysNextButton, ...arrowKeysPreviousButton].includes(event.key)) {
+      handleArrows(event.key);
+    }
+
+    // ESC
+    else if (event.key === 'Escape') {
+      handleEsc(event, innerParams, dismissWith);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {KeyboardEvent} event
+   * @param {SweetAlertOptions} innerParams
+   */
+  const handleEnter = (instance, event, innerParams) => {
+    // https://github.com/sweetalert2/sweetalert2/issues/2386
+    if (!callIfFunction(innerParams.allowEnterKey)) {
+      return;
+    }
+    if (event.target && instance.getInput() && event.target instanceof HTMLElement && event.target.outerHTML === instance.getInput().outerHTML) {
+      if (['textarea', 'file'].includes(innerParams.input)) {
+        return; // do not submit
+      }
+
+      clickConfirm();
+      event.preventDefault();
+    }
+  };
+
+  /**
+   * @param {KeyboardEvent} event
+   */
+  const handleTab = event => {
+    const targetElement = event.target;
+    const focusableElements = getFocusableElements();
+    let btnIndex = -1;
+    for (let i = 0; i < focusableElements.length; i++) {
+      if (targetElement === focusableElements[i]) {
+        btnIndex = i;
+        break;
+      }
+    }
+
+    // Cycle to the next button
+    if (!event.shiftKey) {
+      setFocus(btnIndex, 1);
+    }
+
+    // Cycle to the prev button
+    else {
+      setFocus(btnIndex, -1);
+    }
+    event.stopPropagation();
+    event.preventDefault();
+  };
+
+  /**
+   * @param {string} key
+   */
+  const handleArrows = key => {
+    const confirmButton = getConfirmButton();
+    const denyButton = getDenyButton();
+    const cancelButton = getCancelButton();
+    /** @type HTMLElement[] */
+    const buttons = [confirmButton, denyButton, cancelButton];
+    if (document.activeElement instanceof HTMLElement && !buttons.includes(document.activeElement)) {
+      return;
+    }
+    const sibling = arrowKeysNextButton.includes(key) ? 'nextElementSibling' : 'previousElementSibling';
+    let buttonToFocus = document.activeElement;
+    for (let i = 0; i < getActions().children.length; i++) {
+      buttonToFocus = buttonToFocus[sibling];
+      if (!buttonToFocus) {
+        return;
+      }
+      if (buttonToFocus instanceof HTMLButtonElement && isVisible$1(buttonToFocus)) {
+        break;
+      }
+    }
+    if (buttonToFocus instanceof HTMLButtonElement) {
+      buttonToFocus.focus();
+    }
+  };
+
+  /**
+   * @param {KeyboardEvent} event
+   * @param {SweetAlertOptions} innerParams
+   * @param {Function} dismissWith
+   */
+  const handleEsc = (event, innerParams, dismissWith) => {
+    if (callIfFunction(innerParams.allowEscapeKey)) {
+      event.preventDefault();
+      dismissWith(DismissReason.esc);
+    }
+  };
+
+  /**
+   * This module contains `WeakMap`s for each effectively-"private  property" that a `Swal` has.
+   * For example, to set the private property "foo" of `this` to "bar", you can `privateProps.foo.set(this, 'bar')`
+   * This is the approach that Babel will probably take to implement private methods/fields
+   *   https://github.com/tc39/proposal-private-methods
+   *   https://github.com/babel/babel/pull/7555
+   * Once we have the changes from that PR in Babel, and our core class fits reasonable in *one module*
+   *   then we can use that language feature.
+   */
+
+  var privateMethods = {
+    swalPromiseResolve: new WeakMap(),
+    swalPromiseReject: new WeakMap()
+  };
+
+  // From https://developer.paciellogroup.com/blog/2018/06/the-current-state-of-modal-dialog-accessibility/
+  // Adding aria-hidden="true" to elements outside of the active modal dialog ensures that
+  // elements not within the active modal dialog will not be surfaced if a user opens a screen
+  // reader’s list of elements (headings, form controls, landmarks, etc.) in the document.
+
+  const setAriaHidden = () => {
+    const bodyChildren = Array.from(document.body.children);
+    bodyChildren.forEach(el => {
+      if (el === getContainer() || el.contains(getContainer())) {
+        return;
+      }
+      if (el.hasAttribute('aria-hidden')) {
+        el.setAttribute('data-previous-aria-hidden', el.getAttribute('aria-hidden') || '');
+      }
+      el.setAttribute('aria-hidden', 'true');
+    });
+  };
+  const unsetAriaHidden = () => {
+    const bodyChildren = Array.from(document.body.children);
+    bodyChildren.forEach(el => {
+      if (el.hasAttribute('data-previous-aria-hidden')) {
+        el.setAttribute('aria-hidden', el.getAttribute('data-previous-aria-hidden') || '');
+        el.removeAttribute('data-previous-aria-hidden');
+      } else {
+        el.removeAttribute('aria-hidden');
+      }
+    });
+  };
+
+  /* istanbul ignore file */
+
+  // Fix iOS scrolling http://stackoverflow.com/q/39626302
+
+  const iOSfix = () => {
+    const iOS =
+    // @ts-ignore
+    /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    if (iOS && !hasClass(document.body, swalClasses.iosfix)) {
+      const offset = document.body.scrollTop;
+      document.body.style.top = `${offset * -1}px`;
+      addClass(document.body, swalClasses.iosfix);
+      lockBodyScroll();
+      addBottomPaddingForTallPopups();
+    }
+  };
+
+  /**
+   * https://github.com/sweetalert2/sweetalert2/issues/1948
+   */
+  const addBottomPaddingForTallPopups = () => {
+    const ua = navigator.userAgent;
+    const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+    const webkit = !!ua.match(/WebKit/i);
+    const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
+    if (iOSSafari) {
+      const bottomPanelHeight = 44;
+      if (getPopup().scrollHeight > window.innerHeight - bottomPanelHeight) {
+        getContainer().style.paddingBottom = `${bottomPanelHeight}px`;
+      }
+    }
+  };
+
+  /**
+   * https://github.com/sweetalert2/sweetalert2/issues/1246
+   */
+  const lockBodyScroll = () => {
+    const container = getContainer();
+    let preventTouchMove;
+    /**
+     * @param {TouchEvent} event
+     */
+    container.ontouchstart = event => {
+      preventTouchMove = shouldPreventTouchMove(event);
+    };
+    /**
+     * @param {TouchEvent} event
+     */
+    container.ontouchmove = event => {
+      if (preventTouchMove) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+  };
+
+  /**
+   * @param {TouchEvent} event
+   * @returns {boolean}
+   */
+  const shouldPreventTouchMove = event => {
+    const target = event.target;
+    const container = getContainer();
+    if (isStylus(event) || isZoom(event)) {
+      return false;
+    }
+    if (target === container) {
+      return true;
+    }
+    if (!isScrollable(container) && target instanceof HTMLElement && target.tagName !== 'INPUT' &&
+    // #1603
+    target.tagName !== 'TEXTAREA' &&
+    // #2266
+    !(isScrollable(getHtmlContainer()) &&
+    // #1944
+    getHtmlContainer().contains(target))) {
+      return true;
+    }
+    return false;
+  };
+
+  /**
+   * https://github.com/sweetalert2/sweetalert2/issues/1786
+   *
+   * @param {*} event
+   * @returns {boolean}
+   */
+  const isStylus = event => {
+    return event.touches && event.touches.length && event.touches[0].touchType === 'stylus';
+  };
+
+  /**
+   * https://github.com/sweetalert2/sweetalert2/issues/1891
+   *
+   * @param {TouchEvent} event
+   * @returns {boolean}
+   */
+  const isZoom = event => {
+    return event.touches && event.touches.length > 1;
+  };
+  const undoIOSfix = () => {
+    if (hasClass(document.body, swalClasses.iosfix)) {
+      const offset = parseInt(document.body.style.top, 10);
+      removeClass(document.body, swalClasses.iosfix);
+      document.body.style.top = '';
+      document.body.scrollTop = offset * -1;
+    }
+  };
+
+  /**
+   * Measure scrollbar width for padding body during modal show/hide
+   * https://github.com/twbs/bootstrap/blob/master/js/src/modal.js
+   *
+   * @returns {number}
+   */
+  const measureScrollbar = () => {
+    const scrollDiv = document.createElement('div');
+    scrollDiv.className = swalClasses['scrollbar-measure'];
+    document.body.appendChild(scrollDiv);
+    const scrollbarWidth = scrollDiv.getBoundingClientRect().width - scrollDiv.clientWidth;
+    document.body.removeChild(scrollDiv);
+    return scrollbarWidth;
+  };
+
+  /**
+   * Remember state in cases where opening and handling a modal will fiddle with it.
+   * @type {number | null}
+   */
+  let previousBodyPadding = null;
+  const fixScrollbar = () => {
+    // for queues, do not do this more than once
+    if (previousBodyPadding !== null) {
+      return;
+    }
+    // if the body has overflow
+    if (document.body.scrollHeight > window.innerHeight) {
+      // add padding so the content doesn't shift after removal of scrollbar
+      previousBodyPadding = parseInt(window.getComputedStyle(document.body).getPropertyValue('padding-right'));
+      document.body.style.paddingRight = `${previousBodyPadding + measureScrollbar()}px`;
+    }
+  };
+  const undoScrollbar = () => {
+    if (previousBodyPadding !== null) {
+      document.body.style.paddingRight = `${previousBodyPadding}px`;
+      previousBodyPadding = null;
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {HTMLElement} container
+   * @param {boolean} returnFocus
+   * @param {Function} didClose
+   */
+  function removePopupAndResetState(instance, container, returnFocus, didClose) {
+    if (isToast()) {
+      triggerDidCloseAndDispose(instance, didClose);
+    } else {
+      restoreActiveElement(returnFocus).then(() => triggerDidCloseAndDispose(instance, didClose));
+      removeKeydownHandler(globalState);
+    }
+    const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+    // workaround for #2088
+    // for some reason removing the container in Safari will scroll the document to bottom
+    if (isSafari) {
+      container.setAttribute('style', 'display:none !important');
+      container.removeAttribute('class');
+      container.innerHTML = '';
+    } else {
+      container.remove();
+    }
+    if (isModal()) {
+      undoScrollbar();
+      undoIOSfix();
+      unsetAriaHidden();
+    }
+    removeBodyClasses();
+  }
+
+  /**
+   * Remove SweetAlert2 classes from body
+   */
+  function removeBodyClasses() {
+    removeClass([document.documentElement, document.body], [swalClasses.shown, swalClasses['height-auto'], swalClasses['no-backdrop'], swalClasses['toast-shown']]);
+  }
+
+  /**
+   * Instance method to close sweetAlert
+   *
+   * @param {any} resolveValue
+   */
+  function close(resolveValue) {
+    resolveValue = prepareResolveValue(resolveValue);
+    const swalPromiseResolve = privateMethods.swalPromiseResolve.get(this);
+    const didClose = triggerClosePopup(this);
+    if (this.isAwaitingPromise) {
+      // A swal awaiting for a promise (after a click on Confirm or Deny) cannot be dismissed anymore #2335
+      if (!resolveValue.isDismissed) {
+        handleAwaitingPromise(this);
+        swalPromiseResolve(resolveValue);
+      }
+    } else if (didClose) {
+      // Resolve Swal promise
+      swalPromiseResolve(resolveValue);
+    }
+  }
+  const triggerClosePopup = instance => {
+    const popup = getPopup();
+    if (!popup) {
+      return false;
+    }
+    const innerParams = privateProps.innerParams.get(instance);
+    if (!innerParams || hasClass(popup, innerParams.hideClass.popup)) {
+      return false;
+    }
+    removeClass(popup, innerParams.showClass.popup);
+    addClass(popup, innerParams.hideClass.popup);
+    const backdrop = getContainer();
+    removeClass(backdrop, innerParams.showClass.backdrop);
+    addClass(backdrop, innerParams.hideClass.backdrop);
+    handlePopupAnimation(instance, popup, innerParams);
+    return true;
+  };
+
+  /**
+   * @param {any} error
+   */
+  function rejectPromise(error) {
+    const rejectPromise = privateMethods.swalPromiseReject.get(this);
+    handleAwaitingPromise(this);
+    if (rejectPromise) {
+      // Reject Swal promise
+      rejectPromise(error);
+    }
+  }
+
+  /**
+   * @param {SweetAlert} instance
+   */
+  const handleAwaitingPromise = instance => {
+    if (instance.isAwaitingPromise) {
+      delete instance.isAwaitingPromise;
+      // The instance might have been previously partly destroyed, we must resume the destroy process in this case #2335
+      if (!privateProps.innerParams.get(instance)) {
+        instance._destroy();
+      }
+    }
+  };
+
+  /**
+   * @param {any} resolveValue
+   * @returns {SweetAlertResult}
+   */
+  const prepareResolveValue = resolveValue => {
+    // When user calls Swal.close()
+    if (typeof resolveValue === 'undefined') {
+      return {
+        isConfirmed: false,
+        isDenied: false,
+        isDismissed: true
+      };
+    }
+    return Object.assign({
+      isConfirmed: false,
+      isDenied: false,
+      isDismissed: false
+    }, resolveValue);
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {HTMLElement} popup
+   * @param {SweetAlertOptions} innerParams
+   */
+  const handlePopupAnimation = (instance, popup, innerParams) => {
+    const container = getContainer();
+    // If animation is supported, animate
+    const animationIsSupported = animationEndEvent && hasCssAnimation(popup);
+    if (typeof innerParams.willClose === 'function') {
+      innerParams.willClose(popup);
+    }
+    if (animationIsSupported) {
+      animatePopup(instance, popup, container, innerParams.returnFocus, innerParams.didClose);
+    } else {
+      // Otherwise, remove immediately
+      removePopupAndResetState(instance, container, innerParams.returnFocus, innerParams.didClose);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {HTMLElement} popup
+   * @param {HTMLElement} container
+   * @param {boolean} returnFocus
+   * @param {Function} didClose
+   */
+  const animatePopup = (instance, popup, container, returnFocus, didClose) => {
+    globalState.swalCloseEventFinishedCallback = removePopupAndResetState.bind(null, instance, container, returnFocus, didClose);
+    popup.addEventListener(animationEndEvent, function (e) {
+      if (e.target === popup) {
+        globalState.swalCloseEventFinishedCallback();
+        delete globalState.swalCloseEventFinishedCallback;
+      }
+    });
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {Function} didClose
+   */
+  const triggerDidCloseAndDispose = (instance, didClose) => {
+    setTimeout(() => {
+      if (typeof didClose === 'function') {
+        didClose.bind(instance.params)();
+      }
+      // instance might have been destroyed already
+      if (instance._destroy) {
+        instance._destroy();
+      }
+    });
+  };
+
+  /**
+   * Shows loader (spinner), this is useful with AJAX requests.
+   * By default the loader be shown instead of the "Confirm" button.
+   *
+   * @param {HTMLButtonElement} [buttonToReplace]
+   */
+  const showLoading = buttonToReplace => {
+    let popup = getPopup();
+    if (!popup) {
+      new Swal(); // eslint-disable-line no-new
+    }
+
+    popup = getPopup();
+    const loader = getLoader();
+    if (isToast()) {
+      hide(getIcon());
+    } else {
+      replaceButton(popup, buttonToReplace);
+    }
+    show(loader);
+    popup.setAttribute('data-loading', 'true');
+    popup.setAttribute('aria-busy', 'true');
+    popup.focus();
+  };
+
+  /**
+   * @param {HTMLElement} popup
+   * @param {HTMLButtonElement} [buttonToReplace]
+   */
+  const replaceButton = (popup, buttonToReplace) => {
+    const actions = getActions();
+    const loader = getLoader();
+    if (!buttonToReplace && isVisible$1(getConfirmButton())) {
+      buttonToReplace = getConfirmButton();
+    }
+    show(actions);
+    if (buttonToReplace) {
+      hide(buttonToReplace);
+      loader.setAttribute('data-button-to-replace', buttonToReplace.className);
+    }
+    loader.parentNode.insertBefore(loader, buttonToReplace);
+    addClass([popup, actions], swalClasses.loading);
+  };
+
+  /**
+   * @typedef { string | number | boolean } InputValue
+   */
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const handleInputOptionsAndValue = (instance, params) => {
+    if (params.input === 'select' || params.input === 'radio') {
+      handleInputOptions(instance, params);
+    } else if (['text', 'email', 'number', 'tel', 'textarea'].includes(params.input) && (hasToPromiseFn(params.inputValue) || isPromise(params.inputValue))) {
+      showLoading(getConfirmButton());
+      handleInputValue(instance, params);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} innerParams
+   * @returns {string | number | File | FileList | null}
+   */
+  const getInputValue = (instance, innerParams) => {
+    const input = instance.getInput();
+    if (!input) {
+      return null;
+    }
+    switch (innerParams.input) {
+      case 'checkbox':
+        return getCheckboxValue(input);
+      case 'radio':
+        return getRadioValue(input);
+      case 'file':
+        return getFileValue(input);
+      default:
+        return innerParams.inputAutoTrim ? input.value.trim() : input.value;
+    }
+  };
+
+  /**
+   * @param {HTMLInputElement} input
+   * @returns {number}
+   */
+  const getCheckboxValue = input => input.checked ? 1 : 0;
+
+  /**
+   * @param {HTMLInputElement} input
+   * @returns {string | null}
+   */
+  const getRadioValue = input => input.checked ? input.value : null;
+
+  /**
+   * @param {HTMLInputElement} input
+   * @returns {FileList | File | null}
+   */
+  const getFileValue = input => input.files.length ? input.getAttribute('multiple') !== null ? input.files : input.files[0] : null;
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const handleInputOptions = (instance, params) => {
+    const popup = getPopup();
+    /**
+     * @param {Record<string, any>} inputOptions
+     */
+    const processInputOptions = inputOptions => {
+      populateInputOptions[params.input](popup, formatInputOptions(inputOptions), params);
+    };
+    if (hasToPromiseFn(params.inputOptions) || isPromise(params.inputOptions)) {
+      showLoading(getConfirmButton());
+      asPromise(params.inputOptions).then(inputOptions => {
+        instance.hideLoading();
+        processInputOptions(inputOptions);
+      });
+    } else if (typeof params.inputOptions === 'object') {
+      processInputOptions(params.inputOptions);
+    } else {
+      error(`Unexpected type of inputOptions! Expected object, Map or Promise, got ${typeof params.inputOptions}`);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {SweetAlertOptions} params
+   */
+  const handleInputValue = (instance, params) => {
+    const input = instance.getInput();
+    hide(input);
+    asPromise(params.inputValue).then(inputValue => {
+      input.value = params.input === 'number' ? `${parseFloat(inputValue) || 0}` : `${inputValue}`;
+      show(input);
+      input.focus();
+      instance.hideLoading();
+    }).catch(err => {
+      error(`Error in inputValue promise: ${err}`);
+      input.value = '';
+      show(input);
+      input.focus();
+      instance.hideLoading();
+    });
+  };
+  const populateInputOptions = {
+    /**
+     * @param {HTMLElement} popup
+     * @param {Record<string, any>} inputOptions
+     * @param {SweetAlertOptions} params
+     */
+    select: (popup, inputOptions, params) => {
+      const select = getDirectChildByClass(popup, swalClasses.select);
+      /**
+       * @param {HTMLElement} parent
+       * @param {string} optionLabel
+       * @param {string} optionValue
+       */
+      const renderOption = (parent, optionLabel, optionValue) => {
+        const option = document.createElement('option');
+        option.value = optionValue;
+        setInnerHtml(option, optionLabel);
+        option.selected = isSelected(optionValue, params.inputValue);
+        parent.appendChild(option);
+      };
+      inputOptions.forEach(inputOption => {
+        const optionValue = inputOption[0];
+        const optionLabel = inputOption[1];
+        // <optgroup> spec:
+        // https://www.w3.org/TR/html401/interact/forms.html#h-17.6
+        // "...all OPTGROUP elements must be specified directly within a SELECT element (i.e., groups may not be nested)..."
+        // check whether this is a <optgroup>
+        if (Array.isArray(optionLabel)) {
+          // if it is an array, then it is an <optgroup>
+          const optgroup = document.createElement('optgroup');
+          optgroup.label = optionValue;
+          optgroup.disabled = false; // not configurable for now
+          select.appendChild(optgroup);
+          optionLabel.forEach(o => renderOption(optgroup, o[1], o[0]));
+        } else {
+          // case of <option>
+          renderOption(select, optionLabel, optionValue);
+        }
+      });
+      select.focus();
+    },
+    /**
+     * @param {HTMLElement} popup
+     * @param {Record<string, any>} inputOptions
+     * @param {SweetAlertOptions} params
+     */
+    radio: (popup, inputOptions, params) => {
+      const radio = getDirectChildByClass(popup, swalClasses.radio);
+      inputOptions.forEach(inputOption => {
+        const radioValue = inputOption[0];
+        const radioLabel = inputOption[1];
+        const radioInput = document.createElement('input');
+        const radioLabelElement = document.createElement('label');
+        radioInput.type = 'radio';
+        radioInput.name = swalClasses.radio;
+        radioInput.value = radioValue;
+        if (isSelected(radioValue, params.inputValue)) {
+          radioInput.checked = true;
+        }
+        const label = document.createElement('span');
+        setInnerHtml(label, radioLabel);
+        label.className = swalClasses.label;
+        radioLabelElement.appendChild(radioInput);
+        radioLabelElement.appendChild(label);
+        radio.appendChild(radioLabelElement);
+      });
+      const radios = radio.querySelectorAll('input');
+      if (radios.length) {
+        radios[0].focus();
+      }
+    }
+  };
+
+  /**
+   * Converts `inputOptions` into an array of `[value, label]`s
+   *
+   * @param {Record<string, any>} inputOptions
+   * @returns {Array<Array<string>>}
+   */
+  const formatInputOptions = inputOptions => {
+    const result = [];
+    if (typeof Map !== 'undefined' && inputOptions instanceof Map) {
+      inputOptions.forEach((value, key) => {
+        let valueFormatted = value;
+        if (typeof valueFormatted === 'object') {
+          // case of <optgroup>
+          valueFormatted = formatInputOptions(valueFormatted);
+        }
+        result.push([key, valueFormatted]);
+      });
+    } else {
+      Object.keys(inputOptions).forEach(key => {
+        let valueFormatted = inputOptions[key];
+        if (typeof valueFormatted === 'object') {
+          // case of <optgroup>
+          valueFormatted = formatInputOptions(valueFormatted);
+        }
+        result.push([key, valueFormatted]);
+      });
+    }
+    return result;
+  };
+
+  /**
+   * @param {string} optionValue
+   * @param {InputValue | Promise<InputValue> | { toPromise: () => InputValue }} inputValue
+   * @returns {boolean}
+   */
+  const isSelected = (optionValue, inputValue) => {
+    return inputValue && inputValue.toString() === optionValue.toString();
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   */
+  const handleConfirmButtonClick = instance => {
+    const innerParams = privateProps.innerParams.get(instance);
+    instance.disableButtons();
+    if (innerParams.input) {
+      handleConfirmOrDenyWithInput(instance, 'confirm');
+    } else {
+      confirm(instance, true);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   */
+  const handleDenyButtonClick = instance => {
+    const innerParams = privateProps.innerParams.get(instance);
+    instance.disableButtons();
+    if (innerParams.returnInputValueOnDeny) {
+      handleConfirmOrDenyWithInput(instance, 'deny');
+    } else {
+      deny(instance, false);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {Function} dismissWith
+   */
+  const handleCancelButtonClick = (instance, dismissWith) => {
+    instance.disableButtons();
+    dismissWith(DismissReason.cancel);
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {'confirm' | 'deny'} type
+   */
+  const handleConfirmOrDenyWithInput = (instance, type) => {
+    const innerParams = privateProps.innerParams.get(instance);
+    if (!innerParams.input) {
+      error(`The "input" parameter is needed to be set when using returnInputValueOn${capitalizeFirstLetter(type)}`);
+      return;
+    }
+    const inputValue = getInputValue(instance, innerParams);
+    if (innerParams.inputValidator) {
+      handleInputValidator(instance, inputValue, type);
+    } else if (!instance.getInput().checkValidity()) {
+      instance.enableButtons();
+      instance.showValidationMessage(innerParams.validationMessage);
+    } else if (type === 'deny') {
+      deny(instance, inputValue);
+    } else {
+      confirm(instance, inputValue);
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {string | number | File | FileList | null} inputValue
+   * @param {'confirm' | 'deny'} type
+   */
+  const handleInputValidator = (instance, inputValue, type) => {
+    const innerParams = privateProps.innerParams.get(instance);
+    instance.disableInput();
+    const validationPromise = Promise.resolve().then(() => asPromise(innerParams.inputValidator(inputValue, innerParams.validationMessage)));
+    validationPromise.then(validationMessage => {
+      instance.enableButtons();
+      instance.enableInput();
+      if (validationMessage) {
+        instance.showValidationMessage(validationMessage);
+      } else if (type === 'deny') {
+        deny(instance, inputValue);
+      } else {
+        confirm(instance, inputValue);
+      }
+    });
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {any} value
+   */
+  const deny = (instance, value) => {
+    const innerParams = privateProps.innerParams.get(instance || undefined);
+    if (innerParams.showLoaderOnDeny) {
+      showLoading(getDenyButton());
+    }
+    if (innerParams.preDeny) {
+      instance.isAwaitingPromise = true; // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesn't get destroyed until the result from this preDeny's promise is received
+      const preDenyPromise = Promise.resolve().then(() => asPromise(innerParams.preDeny(value, innerParams.validationMessage)));
+      preDenyPromise.then(preDenyValue => {
+        if (preDenyValue === false) {
+          instance.hideLoading();
+          handleAwaitingPromise(instance);
+        } else {
+          instance.close({
+            isDenied: true,
+            value: typeof preDenyValue === 'undefined' ? value : preDenyValue
+          });
+        }
+      }).catch(error => rejectWith(instance || undefined, error));
+    } else {
+      instance.close({
+        isDenied: true,
+        value
+      });
+    }
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {any} value
+   */
+  const succeedWith = (instance, value) => {
+    instance.close({
+      isConfirmed: true,
+      value
+    });
+  };
+
+  /**
+   *
+   * @param {SweetAlert} instance
+   * @param {string} error
+   */
+  const rejectWith = (instance, error) => {
+    instance.rejectPromise(error);
+  };
+
+  /**
+   *
+   * @param {SweetAlert} instance
+   * @param {any} value
+   */
+  const confirm = (instance, value) => {
+    const innerParams = privateProps.innerParams.get(instance || undefined);
+    if (innerParams.showLoaderOnConfirm) {
+      showLoading();
+    }
+    if (innerParams.preConfirm) {
+      instance.resetValidationMessage();
+      instance.isAwaitingPromise = true; // Flagging the instance as awaiting a promise so it's own promise's reject/resolve methods doesn't get destroyed until the result from this preConfirm's promise is received
+      const preConfirmPromise = Promise.resolve().then(() => asPromise(innerParams.preConfirm(value, innerParams.validationMessage)));
+      preConfirmPromise.then(preConfirmValue => {
+        if (isVisible$1(getValidationMessage()) || preConfirmValue === false) {
+          instance.hideLoading();
+          handleAwaitingPromise(instance);
+        } else {
+          succeedWith(instance, typeof preConfirmValue === 'undefined' ? value : preConfirmValue);
+        }
+      }).catch(error => rejectWith(instance || undefined, error));
+    } else {
+      succeedWith(instance, value);
+    }
+  };
+
+  /**
+   * Hides loader and shows back the button which was hidden by .showLoading()
+   */
+  function hideLoading() {
+    // do nothing if popup is closed
+    const innerParams = privateProps.innerParams.get(this);
+    if (!innerParams) {
+      return;
+    }
+    const domCache = privateProps.domCache.get(this);
+    hide(domCache.loader);
+    if (isToast()) {
+      if (innerParams.icon) {
+        show(getIcon());
+      }
+    } else {
+      showRelatedButton(domCache);
+    }
+    removeClass([domCache.popup, domCache.actions], swalClasses.loading);
+    domCache.popup.removeAttribute('aria-busy');
+    domCache.popup.removeAttribute('data-loading');
+    domCache.confirmButton.disabled = false;
+    domCache.denyButton.disabled = false;
+    domCache.cancelButton.disabled = false;
+  }
+  const showRelatedButton = domCache => {
+    const buttonToReplace = domCache.popup.getElementsByClassName(domCache.loader.getAttribute('data-button-to-replace'));
+    if (buttonToReplace.length) {
+      show(buttonToReplace[0], 'inline-block');
+    } else if (allButtonsAreHidden()) {
+      hide(domCache.actions);
+    }
+  };
+
+  /**
+   * Gets the input DOM node, this method works with input parameter.
+   *
+   * @returns {HTMLInputElement | null}
+   */
+  function getInput() {
+    const innerParams = privateProps.innerParams.get(this);
+    const domCache = privateProps.domCache.get(this);
+    if (!domCache) {
+      return null;
+    }
+    return getInput$1(domCache.popup, innerParams.input);
+  }
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {string[]} buttons
+   * @param {boolean} disabled
+   */
+  function setButtonsDisabled(instance, buttons, disabled) {
+    const domCache = privateProps.domCache.get(instance);
+    buttons.forEach(button => {
+      domCache[button].disabled = disabled;
+    });
+  }
+
+  /**
+   * @param {HTMLInputElement} input
+   * @param {boolean} disabled
+   */
+  function setInputDisabled(input, disabled) {
+    if (!input) {
+      return;
+    }
+    if (input.type === 'radio') {
+      const radiosContainer = input.parentNode.parentNode;
+      const radios = radiosContainer.querySelectorAll('input');
+      for (let i = 0; i < radios.length; i++) {
+        radios[i].disabled = disabled;
+      }
+    } else {
+      input.disabled = disabled;
+    }
+  }
+
+  /**
+   * Enable all the buttons
+   */
+  function enableButtons() {
+    setButtonsDisabled(this, ['confirmButton', 'denyButton', 'cancelButton'], false);
+  }
+
+  /**
+   * Disable all the buttons
+   */
+  function disableButtons() {
+    setButtonsDisabled(this, ['confirmButton', 'denyButton', 'cancelButton'], true);
+  }
+
+  /**
+   * Enable the input field
+   */
+  function enableInput() {
+    setInputDisabled(this.getInput(), false);
+  }
+
+  /**
+   * Disable the input field
+   */
+  function disableInput() {
+    setInputDisabled(this.getInput(), true);
+  }
+
+  /**
+   * Show block with validation message
+   *
+   * @param {string} error
+   */
+  function showValidationMessage(error) {
+    const domCache = privateProps.domCache.get(this);
+    const params = privateProps.innerParams.get(this);
+    setInnerHtml(domCache.validationMessage, error);
+    domCache.validationMessage.className = swalClasses['validation-message'];
+    if (params.customClass && params.customClass.validationMessage) {
+      addClass(domCache.validationMessage, params.customClass.validationMessage);
+    }
+    show(domCache.validationMessage);
+    const input = this.getInput();
+    if (input) {
+      input.setAttribute('aria-invalid', true);
+      input.setAttribute('aria-describedby', swalClasses['validation-message']);
+      focusInput(input);
+      addClass(input, swalClasses.inputerror);
+    }
+  }
+
+  /**
+   * Hide block with validation message
+   */
+  function resetValidationMessage() {
+    const domCache = privateProps.domCache.get(this);
+    if (domCache.validationMessage) {
+      hide(domCache.validationMessage);
+    }
+    const input = this.getInput();
+    if (input) {
+      input.removeAttribute('aria-invalid');
+      input.removeAttribute('aria-describedby');
+      removeClass(input, swalClasses.inputerror);
+    }
+  }
+
+  const defaultParams = {
+    title: '',
+    titleText: '',
+    text: '',
+    html: '',
+    footer: '',
+    icon: undefined,
+    iconColor: undefined,
+    iconHtml: undefined,
+    template: undefined,
+    toast: false,
+    showClass: {
+      popup: 'swal2-show',
+      backdrop: 'swal2-backdrop-show',
+      icon: 'swal2-icon-show'
+    },
+    hideClass: {
+      popup: 'swal2-hide',
+      backdrop: 'swal2-backdrop-hide',
+      icon: 'swal2-icon-hide'
+    },
+    customClass: {},
+    target: 'body',
+    color: undefined,
+    backdrop: true,
+    heightAuto: true,
+    allowOutsideClick: true,
+    allowEscapeKey: true,
+    allowEnterKey: true,
+    stopKeydownPropagation: true,
+    keydownListenerCapture: false,
+    showConfirmButton: true,
+    showDenyButton: false,
+    showCancelButton: false,
+    preConfirm: undefined,
+    preDeny: undefined,
+    confirmButtonText: 'OK',
+    confirmButtonAriaLabel: '',
+    confirmButtonColor: undefined,
+    denyButtonText: 'No',
+    denyButtonAriaLabel: '',
+    denyButtonColor: undefined,
+    cancelButtonText: 'Cancel',
+    cancelButtonAriaLabel: '',
+    cancelButtonColor: undefined,
+    buttonsStyling: true,
+    reverseButtons: false,
+    focusConfirm: true,
+    focusDeny: false,
+    focusCancel: false,
+    returnFocus: true,
+    showCloseButton: false,
+    closeButtonHtml: '&times;',
+    closeButtonAriaLabel: 'Close this dialog',
+    loaderHtml: '',
+    showLoaderOnConfirm: false,
+    showLoaderOnDeny: false,
+    imageUrl: undefined,
+    imageWidth: undefined,
+    imageHeight: undefined,
+    imageAlt: '',
+    timer: undefined,
+    timerProgressBar: false,
+    width: undefined,
+    padding: undefined,
+    background: undefined,
+    input: undefined,
+    inputPlaceholder: '',
+    inputLabel: '',
+    inputValue: '',
+    inputOptions: {},
+    inputAutoFocus: true,
+    inputAutoTrim: true,
+    inputAttributes: {},
+    inputValidator: undefined,
+    returnInputValueOnDeny: false,
+    validationMessage: undefined,
+    grow: false,
+    position: 'center',
+    progressSteps: [],
+    currentProgressStep: undefined,
+    progressStepsDistance: undefined,
+    willOpen: undefined,
+    didOpen: undefined,
+    didRender: undefined,
+    willClose: undefined,
+    didClose: undefined,
+    didDestroy: undefined,
+    scrollbarPadding: true
+  };
+  const updatableParams = ['allowEscapeKey', 'allowOutsideClick', 'background', 'buttonsStyling', 'cancelButtonAriaLabel', 'cancelButtonColor', 'cancelButtonText', 'closeButtonAriaLabel', 'closeButtonHtml', 'color', 'confirmButtonAriaLabel', 'confirmButtonColor', 'confirmButtonText', 'currentProgressStep', 'customClass', 'denyButtonAriaLabel', 'denyButtonColor', 'denyButtonText', 'didClose', 'didDestroy', 'footer', 'hideClass', 'html', 'icon', 'iconColor', 'iconHtml', 'imageAlt', 'imageHeight', 'imageUrl', 'imageWidth', 'preConfirm', 'preDeny', 'progressSteps', 'returnFocus', 'reverseButtons', 'showCancelButton', 'showCloseButton', 'showConfirmButton', 'showDenyButton', 'text', 'title', 'titleText', 'willClose'];
+
+  /** @type {Record<string, string>} */
+  const deprecatedParams = {};
+  const toastIncompatibleParams = ['allowOutsideClick', 'allowEnterKey', 'backdrop', 'focusConfirm', 'focusDeny', 'focusCancel', 'returnFocus', 'heightAuto', 'keydownListenerCapture'];
+
+  /**
+   * Is valid parameter
+   *
+   * @param {string} paramName
+   * @returns {boolean}
+   */
+  const isValidParameter = paramName => {
+    return Object.prototype.hasOwnProperty.call(defaultParams, paramName);
+  };
+
+  /**
+   * Is valid parameter for Swal.update() method
+   *
+   * @param {string} paramName
+   * @returns {boolean}
+   */
+  const isUpdatableParameter = paramName => {
+    return updatableParams.indexOf(paramName) !== -1;
+  };
+
+  /**
+   * Is deprecated parameter
+   *
+   * @param {string} paramName
+   * @returns {string | undefined}
+   */
+  const isDeprecatedParameter = paramName => {
+    return deprecatedParams[paramName];
+  };
+
+  /**
+   * @param {string} param
+   */
+  const checkIfParamIsValid = param => {
+    if (!isValidParameter(param)) {
+      warn(`Unknown parameter "${param}"`);
+    }
+  };
+
+  /**
+   * @param {string} param
+   */
+  const checkIfToastParamIsValid = param => {
+    if (toastIncompatibleParams.includes(param)) {
+      warn(`The parameter "${param}" is incompatible with toasts`);
+    }
+  };
+
+  /**
+   * @param {string} param
+   */
+  const checkIfParamIsDeprecated = param => {
+    const isDeprecated = isDeprecatedParameter(param);
+    if (isDeprecated) {
+      warnAboutDeprecation(param, isDeprecated);
+    }
+  };
+
+  /**
+   * Show relevant warnings for given params
+   *
+   * @param {SweetAlertOptions} params
+   */
+  const showWarningsForParams = params => {
+    if (params.backdrop === false && params.allowOutsideClick) {
+      warn('"allowOutsideClick" parameter requires `backdrop` parameter to be set to `true`');
+    }
+    for (const param in params) {
+      checkIfParamIsValid(param);
+      if (params.toast) {
+        checkIfToastParamIsValid(param);
+      }
+      checkIfParamIsDeprecated(param);
+    }
+  };
+
+  /**
+   * Updates popup parameters.
+   *
+   * @param {SweetAlertOptions} params
+   */
+  function update(params) {
+    const popup = getPopup();
+    const innerParams = privateProps.innerParams.get(this);
+    if (!popup || hasClass(popup, innerParams.hideClass.popup)) {
+      warn(`You're trying to update the closed or closing popup, that won't work. Use the update() method in preConfirm parameter or show a new popup.`);
+      return;
+    }
+    const validUpdatableParams = filterValidParams(params);
+    const updatedParams = Object.assign({}, innerParams, validUpdatableParams);
+    render(this, updatedParams);
+    privateProps.innerParams.set(this, updatedParams);
+    Object.defineProperties(this, {
+      params: {
+        value: Object.assign({}, this.params, params),
+        writable: false,
+        enumerable: true
+      }
+    });
+  }
+
+  /**
+   * @param {SweetAlertOptions} params
+   * @returns {SweetAlertOptions}
+   */
+  const filterValidParams = params => {
+    const validUpdatableParams = {};
+    Object.keys(params).forEach(param => {
+      if (isUpdatableParameter(param)) {
+        validUpdatableParams[param] = params[param];
+      } else {
+        warn(`Invalid parameter to update: ${param}`);
+      }
+    });
+    return validUpdatableParams;
+  };
+
+  /**
+   * Dispose the current SweetAlert2 instance
+   */
+  function _destroy() {
+    const domCache = privateProps.domCache.get(this);
+    const innerParams = privateProps.innerParams.get(this);
+    if (!innerParams) {
+      disposeWeakMaps(this); // The WeakMaps might have been partly destroyed, we must recall it to dispose any remaining WeakMaps #2335
+      return; // This instance has already been destroyed
+    }
+
+    // Check if there is another Swal closing
+    if (domCache.popup && globalState.swalCloseEventFinishedCallback) {
+      globalState.swalCloseEventFinishedCallback();
+      delete globalState.swalCloseEventFinishedCallback;
+    }
+    if (typeof innerParams.didDestroy === 'function') {
+      innerParams.didDestroy();
+    }
+    disposeSwal(this);
+  }
+
+  /**
+   * @param {SweetAlert} instance
+   */
+  const disposeSwal = instance => {
+    disposeWeakMaps(instance);
+    // Unset this.params so GC will dispose it (#1569)
+    delete instance.params;
+    // Unset globalState props so GC will dispose globalState (#1569)
+    delete globalState.keydownHandler;
+    delete globalState.keydownTarget;
+    // Unset currentInstance
+    delete globalState.currentInstance;
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   */
+  const disposeWeakMaps = instance => {
+    // If the current instance is awaiting a promise result, we keep the privateMethods to call them once the promise result is retrieved #2335
+    if (instance.isAwaitingPromise) {
+      unsetWeakMaps(privateProps, instance);
+      instance.isAwaitingPromise = true;
+    } else {
+      unsetWeakMaps(privateMethods, instance);
+      unsetWeakMaps(privateProps, instance);
+      delete instance.isAwaitingPromise;
+      // Unset instance methods
+      delete instance.disableButtons;
+      delete instance.enableButtons;
+      delete instance.getInput;
+      delete instance.disableInput;
+      delete instance.enableInput;
+      delete instance.hideLoading;
+      delete instance.disableLoading;
+      delete instance.showValidationMessage;
+      delete instance.resetValidationMessage;
+      delete instance.close;
+      delete instance.closePopup;
+      delete instance.closeModal;
+      delete instance.closeToast;
+      delete instance.rejectPromise;
+      delete instance.update;
+      delete instance._destroy;
+    }
+  };
+
+  /**
+   * @param {object} obj
+   * @param {SweetAlert} instance
+   */
+  const unsetWeakMaps = (obj, instance) => {
+    for (const i in obj) {
+      obj[i].delete(instance);
+    }
+  };
+
+  var instanceMethods = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    _destroy: _destroy,
+    close: close,
+    closeModal: close,
+    closePopup: close,
+    closeToast: close,
+    disableButtons: disableButtons,
+    disableInput: disableInput,
+    disableLoading: hideLoading,
+    enableButtons: enableButtons,
+    enableInput: enableInput,
+    getInput: getInput,
+    handleAwaitingPromise: handleAwaitingPromise,
+    hideLoading: hideLoading,
+    rejectPromise: rejectPromise,
+    resetValidationMessage: resetValidationMessage,
+    showValidationMessage: showValidationMessage,
+    update: update
+  });
+
+  const handlePopupClick = (instance, domCache, dismissWith) => {
+    const innerParams = privateProps.innerParams.get(instance);
+    if (innerParams.toast) {
+      handleToastClick(instance, domCache, dismissWith);
+    } else {
+      // Ignore click events that had mousedown on the popup but mouseup on the container
+      // This can happen when the user drags a slider
+      handleModalMousedown(domCache);
+
+      // Ignore click events that had mousedown on the container but mouseup on the popup
+      handleContainerMousedown(domCache);
+      handleModalClick(instance, domCache, dismissWith);
+    }
+  };
+  const handleToastClick = (instance, domCache, dismissWith) => {
+    // Closing toast by internal click
+    domCache.popup.onclick = () => {
+      const innerParams = privateProps.innerParams.get(instance);
+      if (innerParams && (isAnyButtonShown(innerParams) || innerParams.timer || innerParams.input)) {
+        return;
+      }
+      dismissWith(DismissReason.close);
+    };
+  };
+
+  /**
+   * @param {*} innerParams
+   * @returns {boolean}
+   */
+  const isAnyButtonShown = innerParams => {
+    return innerParams.showConfirmButton || innerParams.showDenyButton || innerParams.showCancelButton || innerParams.showCloseButton;
+  };
+  let ignoreOutsideClick = false;
+  const handleModalMousedown = domCache => {
+    domCache.popup.onmousedown = () => {
+      domCache.container.onmouseup = function (e) {
+        domCache.container.onmouseup = undefined;
+        // We only check if the mouseup target is the container because usually it doesn't
+        // have any other direct children aside of the popup
+        if (e.target === domCache.container) {
+          ignoreOutsideClick = true;
+        }
+      };
+    };
+  };
+  const handleContainerMousedown = domCache => {
+    domCache.container.onmousedown = () => {
+      domCache.popup.onmouseup = function (e) {
+        domCache.popup.onmouseup = undefined;
+        // We also need to check if the mouseup target is a child of the popup
+        if (e.target === domCache.popup || domCache.popup.contains(e.target)) {
+          ignoreOutsideClick = true;
+        }
+      };
+    };
+  };
+  const handleModalClick = (instance, domCache, dismissWith) => {
+    domCache.container.onclick = e => {
+      const innerParams = privateProps.innerParams.get(instance);
+      if (ignoreOutsideClick) {
+        ignoreOutsideClick = false;
+        return;
+      }
+      if (e.target === domCache.container && callIfFunction(innerParams.allowOutsideClick)) {
+        dismissWith(DismissReason.backdrop);
+      }
+    };
+  };
+
+  const isJqueryElement = elem => typeof elem === 'object' && elem.jquery;
+  const isElement = elem => elem instanceof Element || isJqueryElement(elem);
+  const argsToParams = args => {
+    const params = {};
+    if (typeof args[0] === 'object' && !isElement(args[0])) {
+      Object.assign(params, args[0]);
+    } else {
+      ['title', 'html', 'icon'].forEach((name, index) => {
+        const arg = args[index];
+        if (typeof arg === 'string' || isElement(arg)) {
+          params[name] = arg;
+        } else if (arg !== undefined) {
+          error(`Unexpected type of ${name}! Expected "string" or "Element", got ${typeof arg}`);
+        }
+      });
+    }
+    return params;
+  };
+
+  /**
+   * Main method to create a new SweetAlert2 popup
+   *
+   * @param  {...SweetAlertOptions} args
+   * @returns {Promise<SweetAlertResult>}
+   */
+  function fire() {
+    const Swal = this; // eslint-disable-line @typescript-eslint/no-this-alias
+    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+      args[_key] = arguments[_key];
+    }
+    return new Swal(...args);
+  }
+
+  /**
+   * Returns an extended version of `Swal` containing `params` as defaults.
+   * Useful for reusing Swal configuration.
+   *
+   * For example:
+   *
+   * Before:
+   * const textPromptOptions = { input: 'text', showCancelButton: true }
+   * const {value: firstName} = await Swal.fire({ ...textPromptOptions, title: 'What is your first name?' })
+   * const {value: lastName} = await Swal.fire({ ...textPromptOptions, title: 'What is your last name?' })
+   *
+   * After:
+   * const TextPrompt = Swal.mixin({ input: 'text', showCancelButton: true })
+   * const {value: firstName} = await TextPrompt('What is your first name?')
+   * const {value: lastName} = await TextPrompt('What is your last name?')
+   *
+   * @param {SweetAlertOptions} mixinParams
+   * @returns {SweetAlert}
+   */
+  function mixin(mixinParams) {
+    class MixinSwal extends this {
+      _main(params, priorityMixinParams) {
+        return super._main(params, Object.assign({}, mixinParams, priorityMixinParams));
+      }
+    }
+    // @ts-ignore
+    return MixinSwal;
+  }
+
+  /**
+   * If `timer` parameter is set, returns number of milliseconds of timer remained.
+   * Otherwise, returns undefined.
+   *
+   * @returns {number | undefined}
+   */
+  const getTimerLeft = () => {
+    return globalState.timeout && globalState.timeout.getTimerLeft();
+  };
+
+  /**
+   * Stop timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
+   *
+   * @returns {number | undefined}
+   */
+  const stopTimer = () => {
+    if (globalState.timeout) {
+      stopTimerProgressBar();
+      return globalState.timeout.stop();
+    }
+  };
+
+  /**
+   * Resume timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
+   *
+   * @returns {number | undefined}
+   */
+  const resumeTimer = () => {
+    if (globalState.timeout) {
+      const remaining = globalState.timeout.start();
+      animateTimerProgressBar(remaining);
+      return remaining;
+    }
+  };
+
+  /**
+   * Resume timer. Returns number of milliseconds of timer remained.
+   * If `timer` parameter isn't set, returns undefined.
+   *
+   * @returns {number | undefined}
+   */
+  const toggleTimer = () => {
+    const timer = globalState.timeout;
+    return timer && (timer.running ? stopTimer() : resumeTimer());
+  };
+
+  /**
+   * Increase timer. Returns number of milliseconds of an updated timer.
+   * If `timer` parameter isn't set, returns undefined.
+   *
+   * @param {number} n
+   * @returns {number | undefined}
+   */
+  const increaseTimer = n => {
+    if (globalState.timeout) {
+      const remaining = globalState.timeout.increase(n);
+      animateTimerProgressBar(remaining, true);
+      return remaining;
+    }
+  };
+
+  /**
+   * Check if timer is running. Returns true if timer is running
+   * or false if timer is paused or stopped.
+   * If `timer` parameter isn't set, returns undefined
+   *
+   * @returns {boolean}
+   */
+  const isTimerRunning = () => {
+    return !!(globalState.timeout && globalState.timeout.isRunning());
+  };
+
+  let bodyClickListenerAdded = false;
+  const clickHandlers = {};
+
+  /**
+   * @param {string} attr
+   */
+  function bindClickHandler() {
+    let attr = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'data-swal-template';
+    clickHandlers[attr] = this;
+    if (!bodyClickListenerAdded) {
+      document.body.addEventListener('click', bodyClickListener);
+      bodyClickListenerAdded = true;
+    }
+  }
+  const bodyClickListener = event => {
+    for (let el = event.target; el && el !== document; el = el.parentNode) {
+      for (const attr in clickHandlers) {
+        const template = el.getAttribute(attr);
+        if (template) {
+          clickHandlers[attr].fire({
+            template
+          });
+          return;
+        }
+      }
+    }
+  };
+
+  var staticMethods = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    argsToParams: argsToParams,
+    bindClickHandler: bindClickHandler,
+    clickCancel: clickCancel,
+    clickConfirm: clickConfirm,
+    clickDeny: clickDeny,
+    enableLoading: showLoading,
+    fire: fire,
+    getActions: getActions,
+    getCancelButton: getCancelButton,
+    getCloseButton: getCloseButton,
+    getConfirmButton: getConfirmButton,
+    getContainer: getContainer,
+    getDenyButton: getDenyButton,
+    getFocusableElements: getFocusableElements,
+    getFooter: getFooter,
+    getHtmlContainer: getHtmlContainer,
+    getIcon: getIcon,
+    getIconContent: getIconContent,
+    getImage: getImage,
+    getInputLabel: getInputLabel,
+    getLoader: getLoader,
+    getPopup: getPopup,
+    getProgressSteps: getProgressSteps,
+    getTimerLeft: getTimerLeft,
+    getTimerProgressBar: getTimerProgressBar,
+    getTitle: getTitle,
+    getValidationMessage: getValidationMessage,
+    increaseTimer: increaseTimer,
+    isDeprecatedParameter: isDeprecatedParameter,
+    isLoading: isLoading,
+    isTimerRunning: isTimerRunning,
+    isUpdatableParameter: isUpdatableParameter,
+    isValidParameter: isValidParameter,
+    isVisible: isVisible,
+    mixin: mixin,
+    resumeTimer: resumeTimer,
+    showLoading: showLoading,
+    stopTimer: stopTimer,
+    toggleTimer: toggleTimer
+  });
+
+  class Timer {
+    /**
+     * @param {Function} callback
+     * @param {number} delay
+     */
+    constructor(callback, delay) {
+      this.callback = callback;
+      this.remaining = delay;
+      this.running = false;
+      this.start();
+    }
+
+    /**
+     * @returns {number}
+     */
+    start() {
+      if (!this.running) {
+        this.running = true;
+        this.started = new Date();
+        this.id = setTimeout(this.callback, this.remaining);
+      }
+      return this.remaining;
+    }
+
+    /**
+     * @returns {number}
+     */
+    stop() {
+      if (this.started && this.running) {
+        this.running = false;
+        clearTimeout(this.id);
+        this.remaining -= new Date().getTime() - this.started.getTime();
+      }
+      return this.remaining;
+    }
+
+    /**
+     * @param {number} n
+     * @returns {number}
+     */
+    increase(n) {
+      const running = this.running;
+      if (running) {
+        this.stop();
+      }
+      this.remaining += n;
+      if (running) {
+        this.start();
+      }
+      return this.remaining;
+    }
+
+    /**
+     * @returns {number}
+     */
+    getTimerLeft() {
+      if (this.running) {
+        this.stop();
+        this.start();
+      }
+      return this.remaining;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    isRunning() {
+      return this.running;
+    }
+  }
+
+  const swalStringParams = ['swal-title', 'swal-html', 'swal-footer'];
+
+  /**
+   * @param {SweetAlertOptions} params
+   * @returns {SweetAlertOptions}
+   */
+  const getTemplateParams = params => {
+    /** @type {HTMLTemplateElement} */
+    const template = typeof params.template === 'string' ? document.querySelector(params.template) : params.template;
+    if (!template) {
+      return {};
+    }
+    /** @type {DocumentFragment} */
+    const templateContent = template.content;
+    showWarningsForElements(templateContent);
+    const result = Object.assign(getSwalParams(templateContent), getSwalFunctionParams(templateContent), getSwalButtons(templateContent), getSwalImage(templateContent), getSwalIcon(templateContent), getSwalInput(templateContent), getSwalStringParams(templateContent, swalStringParams));
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalParams = templateContent => {
+    const result = {};
+    /** @type {HTMLElement[]} */
+    const swalParams = Array.from(templateContent.querySelectorAll('swal-param'));
+    swalParams.forEach(param => {
+      showWarningsForAttributes(param, ['name', 'value']);
+      const paramName = param.getAttribute('name');
+      const value = param.getAttribute('value');
+      if (typeof defaultParams[paramName] === 'boolean') {
+        result[paramName] = value !== 'false';
+      } else if (typeof defaultParams[paramName] === 'object') {
+        result[paramName] = JSON.parse(value);
+      } else {
+        result[paramName] = value;
+      }
+    });
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalFunctionParams = templateContent => {
+    const result = {};
+    /** @type {HTMLElement[]} */
+    const swalFunctions = Array.from(templateContent.querySelectorAll('swal-function-param'));
+    swalFunctions.forEach(param => {
+      const paramName = param.getAttribute('name');
+      const value = param.getAttribute('value');
+      result[paramName] = new Function(`return ${value}`)();
+    });
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalButtons = templateContent => {
+    const result = {};
+    /** @type {HTMLElement[]} */
+    const swalButtons = Array.from(templateContent.querySelectorAll('swal-button'));
+    swalButtons.forEach(button => {
+      showWarningsForAttributes(button, ['type', 'color', 'aria-label']);
+      const type = button.getAttribute('type');
+      result[`${type}ButtonText`] = button.innerHTML;
+      result[`show${capitalizeFirstLetter(type)}Button`] = true;
+      if (button.hasAttribute('color')) {
+        result[`${type}ButtonColor`] = button.getAttribute('color');
+      }
+      if (button.hasAttribute('aria-label')) {
+        result[`${type}ButtonAriaLabel`] = button.getAttribute('aria-label');
+      }
+    });
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalImage = templateContent => {
+    const result = {};
+    /** @type {HTMLElement} */
+    const image = templateContent.querySelector('swal-image');
+    if (image) {
+      showWarningsForAttributes(image, ['src', 'width', 'height', 'alt']);
+      if (image.hasAttribute('src')) {
+        result.imageUrl = image.getAttribute('src');
+      }
+      if (image.hasAttribute('width')) {
+        result.imageWidth = image.getAttribute('width');
+      }
+      if (image.hasAttribute('height')) {
+        result.imageHeight = image.getAttribute('height');
+      }
+      if (image.hasAttribute('alt')) {
+        result.imageAlt = image.getAttribute('alt');
+      }
+    }
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalIcon = templateContent => {
+    const result = {};
+    /** @type {HTMLElement} */
+    const icon = templateContent.querySelector('swal-icon');
+    if (icon) {
+      showWarningsForAttributes(icon, ['type', 'color']);
+      if (icon.hasAttribute('type')) {
+        /** @type {SweetAlertIcon} */
+        // @ts-ignore
+        result.icon = icon.getAttribute('type');
+      }
+      if (icon.hasAttribute('color')) {
+        result.iconColor = icon.getAttribute('color');
+      }
+      result.iconHtml = icon.innerHTML;
+    }
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalInput = templateContent => {
+    const result = {};
+    /** @type {HTMLElement} */
+    const input = templateContent.querySelector('swal-input');
+    if (input) {
+      showWarningsForAttributes(input, ['type', 'label', 'placeholder', 'value']);
+      /** @type {SweetAlertInput} */
+      // @ts-ignore
+      result.input = input.getAttribute('type') || 'text';
+      if (input.hasAttribute('label')) {
+        result.inputLabel = input.getAttribute('label');
+      }
+      if (input.hasAttribute('placeholder')) {
+        result.inputPlaceholder = input.getAttribute('placeholder');
+      }
+      if (input.hasAttribute('value')) {
+        result.inputValue = input.getAttribute('value');
+      }
+    }
+    /** @type {HTMLElement[]} */
+    const inputOptions = Array.from(templateContent.querySelectorAll('swal-input-option'));
+    if (inputOptions.length) {
+      result.inputOptions = {};
+      inputOptions.forEach(option => {
+        showWarningsForAttributes(option, ['value']);
+        const optionValue = option.getAttribute('value');
+        const optionName = option.innerHTML;
+        result.inputOptions[optionValue] = optionName;
+      });
+    }
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   * @param {string[]} paramNames
+   * @returns {SweetAlertOptions}
+   */
+  const getSwalStringParams = (templateContent, paramNames) => {
+    const result = {};
+    for (const i in paramNames) {
+      const paramName = paramNames[i];
+      /** @type {HTMLElement} */
+      const tag = templateContent.querySelector(paramName);
+      if (tag) {
+        showWarningsForAttributes(tag, []);
+        result[paramName.replace(/^swal-/, '')] = tag.innerHTML.trim();
+      }
+    }
+    return result;
+  };
+
+  /**
+   * @param {DocumentFragment} templateContent
+   */
+  const showWarningsForElements = templateContent => {
+    const allowedElements = swalStringParams.concat(['swal-param', 'swal-function-param', 'swal-button', 'swal-image', 'swal-icon', 'swal-input', 'swal-input-option']);
+    Array.from(templateContent.children).forEach(el => {
+      const tagName = el.tagName.toLowerCase();
+      if (!allowedElements.includes(tagName)) {
+        warn(`Unrecognized element <${tagName}>`);
+      }
+    });
+  };
+
+  /**
+   * @param {HTMLElement} el
+   * @param {string[]} allowedAttributes
+   */
+  const showWarningsForAttributes = (el, allowedAttributes) => {
+    Array.from(el.attributes).forEach(attribute => {
+      if (allowedAttributes.indexOf(attribute.name) === -1) {
+        warn([`Unrecognized attribute "${attribute.name}" on <${el.tagName.toLowerCase()}>.`, `${allowedAttributes.length ? `Allowed attributes are: ${allowedAttributes.join(', ')}` : 'To set the value, use HTML within the element.'}`]);
+      }
+    });
+  };
+
+  const SHOW_CLASS_TIMEOUT = 10;
+
+  /**
+   * Open popup, add necessary classes and styles, fix scrollbar
+   *
+   * @param {SweetAlertOptions} params
+   */
+  const openPopup = params => {
+    const container = getContainer();
+    const popup = getPopup();
+    if (typeof params.willOpen === 'function') {
+      params.willOpen(popup);
+    }
+    const bodyStyles = window.getComputedStyle(document.body);
+    const initialBodyOverflow = bodyStyles.overflowY;
+    addClasses(container, popup, params);
+
+    // scrolling is 'hidden' until animation is done, after that 'auto'
+    setTimeout(() => {
+      setScrollingVisibility(container, popup);
+    }, SHOW_CLASS_TIMEOUT);
+    if (isModal()) {
+      fixScrollContainer(container, params.scrollbarPadding, initialBodyOverflow);
+      setAriaHidden();
+    }
+    if (!isToast() && !globalState.previousActiveElement) {
+      globalState.previousActiveElement = document.activeElement;
+    }
+    if (typeof params.didOpen === 'function') {
+      setTimeout(() => params.didOpen(popup));
+    }
+    removeClass(container, swalClasses['no-transition']);
+  };
+
+  /**
+   * @param {AnimationEvent} event
+   */
+  const swalOpenAnimationFinished = event => {
+    const popup = getPopup();
+    if (event.target !== popup) {
+      return;
+    }
+    const container = getContainer();
+    popup.removeEventListener(animationEndEvent, swalOpenAnimationFinished);
+    container.style.overflowY = 'auto';
+  };
+
+  /**
+   * @param {HTMLElement} container
+   * @param {HTMLElement} popup
+   */
+  const setScrollingVisibility = (container, popup) => {
+    if (animationEndEvent && hasCssAnimation(popup)) {
+      container.style.overflowY = 'hidden';
+      popup.addEventListener(animationEndEvent, swalOpenAnimationFinished);
+    } else {
+      container.style.overflowY = 'auto';
+    }
+  };
+
+  /**
+   * @param {HTMLElement} container
+   * @param {boolean} scrollbarPadding
+   * @param {string} initialBodyOverflow
+   */
+  const fixScrollContainer = (container, scrollbarPadding, initialBodyOverflow) => {
+    iOSfix();
+    if (scrollbarPadding && initialBodyOverflow !== 'hidden') {
+      fixScrollbar();
+    }
+
+    // sweetalert2/issues/1247
+    setTimeout(() => {
+      container.scrollTop = 0;
+    });
+  };
+
+  /**
+   * @param {HTMLElement} container
+   * @param {HTMLElement} popup
+   * @param {SweetAlertOptions} params
+   */
+  const addClasses = (container, popup, params) => {
+    addClass(container, params.showClass.backdrop);
+    // this workaround with opacity is needed for https://github.com/sweetalert2/sweetalert2/issues/2059
+    popup.style.setProperty('opacity', '0', 'important');
+    show(popup, 'grid');
+    setTimeout(() => {
+      // Animate popup right after showing it
+      addClass(popup, params.showClass.popup);
+      // and remove the opacity workaround
+      popup.style.removeProperty('opacity');
+    }, SHOW_CLASS_TIMEOUT); // 10ms in order to fix #2062
+
+    addClass([document.documentElement, document.body], swalClasses.shown);
+    if (params.heightAuto && params.backdrop && !params.toast) {
+      addClass([document.documentElement, document.body], swalClasses['height-auto']);
+    }
+  };
+
+  var defaultInputValidators = {
+    /**
+     * @param {string} string
+     * @param {string} validationMessage
+     * @returns {Promise<void | string>}
+     */
+    email: (string, validationMessage) => {
+      return /^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9-]{2,24}$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid email address');
+    },
+    /**
+     * @param {string} string
+     * @param {string} validationMessage
+     * @returns {Promise<void | string>}
+     */
+    url: (string, validationMessage) => {
+      // taken from https://stackoverflow.com/a/3809435 with a small change from #1306 and #2013
+      return /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-z]{2,63}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)$/.test(string) ? Promise.resolve() : Promise.resolve(validationMessage || 'Invalid URL');
+    }
+  };
+
+  /**
+   * @param {SweetAlertOptions} params
+   */
+  function setDefaultInputValidators(params) {
+    // Use default `inputValidator` for supported input types if not provided
+    if (!params.inputValidator) {
+      Object.keys(defaultInputValidators).forEach(key => {
+        if (params.input === key) {
+          params.inputValidator = defaultInputValidators[key];
+        }
+      });
+    }
+  }
+
+  /**
+   * @param {SweetAlertOptions} params
+   */
+  function validateCustomTargetElement(params) {
+    // Determine if the custom target element is valid
+    if (!params.target || typeof params.target === 'string' && !document.querySelector(params.target) || typeof params.target !== 'string' && !params.target.appendChild) {
+      warn('Target parameter is not valid, defaulting to "body"');
+      params.target = 'body';
+    }
+  }
+
+  /**
+   * Set type, text and actions on popup
+   *
+   * @param {SweetAlertOptions} params
+   */
+  function setParameters(params) {
+    setDefaultInputValidators(params);
+
+    // showLoaderOnConfirm && preConfirm
+    if (params.showLoaderOnConfirm && !params.preConfirm) {
+      warn('showLoaderOnConfirm is set to true, but preConfirm is not defined.\n' + 'showLoaderOnConfirm should be used together with preConfirm, see usage example:\n' + 'https://sweetalert2.github.io/#ajax-request');
+    }
+    validateCustomTargetElement(params);
+
+    // Replace newlines with <br> in title
+    if (typeof params.title === 'string') {
+      params.title = params.title.split('\n').join('<br />');
+    }
+    init(params);
+  }
+
+  /** @type {SweetAlert} */
+  let currentInstance;
+  class SweetAlert {
+    /**
+     * @param {...any} args
+     * @this {SweetAlert}
+     */
+    constructor() {
+      // Prevent run in Node env
+      if (typeof window === 'undefined') {
+        return;
+      }
+      currentInstance = this;
+
+      // @ts-ignore
+      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+        args[_key] = arguments[_key];
+      }
+      const outerParams = Object.freeze(this.constructor.argsToParams(args));
+
+      /** @type {Readonly<SweetAlertOptions>} */
+      this.params = outerParams;
+
+      /** @type {boolean} */
+      this.isAwaitingPromise = false;
+      const promise = currentInstance._main(currentInstance.params);
+      privateProps.promise.set(this, promise);
+    }
+    _main(userParams) {
+      let mixinParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      showWarningsForParams(Object.assign({}, mixinParams, userParams));
+      if (globalState.currentInstance) {
+        globalState.currentInstance._destroy();
+        if (isModal()) {
+          unsetAriaHidden();
+        }
+      }
+      globalState.currentInstance = currentInstance;
+      const innerParams = prepareParams(userParams, mixinParams);
+      setParameters(innerParams);
+      Object.freeze(innerParams);
+
+      // clear the previous timer
+      if (globalState.timeout) {
+        globalState.timeout.stop();
+        delete globalState.timeout;
+      }
+
+      // clear the restore focus timeout
+      clearTimeout(globalState.restoreFocusTimeout);
+      const domCache = populateDomCache(currentInstance);
+      render(currentInstance, innerParams);
+      privateProps.innerParams.set(currentInstance, innerParams);
+      return swalPromise(currentInstance, domCache, innerParams);
+    }
+
+    // `catch` cannot be the name of a module export, so we define our thenable methods here instead
+    then(onFulfilled) {
+      const promise = privateProps.promise.get(this);
+      return promise.then(onFulfilled);
+    }
+    finally(onFinally) {
+      const promise = privateProps.promise.get(this);
+      return promise.finally(onFinally);
+    }
+  }
+
+  /**
+   * @param {SweetAlert} instance
+   * @param {DomCache} domCache
+   * @param {SweetAlertOptions} innerParams
+   * @returns {Promise}
+   */
+  const swalPromise = (instance, domCache, innerParams) => {
+    return new Promise((resolve, reject) => {
+      // functions to handle all closings/dismissals
+      /**
+       * @param {DismissReason} dismiss
+       */
+      const dismissWith = dismiss => {
+        instance.close({
+          isDismissed: true,
+          dismiss
+        });
+      };
+      privateMethods.swalPromiseResolve.set(instance, resolve);
+      privateMethods.swalPromiseReject.set(instance, reject);
+      domCache.confirmButton.onclick = () => {
+        handleConfirmButtonClick(instance);
+      };
+      domCache.denyButton.onclick = () => {
+        handleDenyButtonClick(instance);
+      };
+      domCache.cancelButton.onclick = () => {
+        handleCancelButtonClick(instance, dismissWith);
+      };
+      domCache.closeButton.onclick = () => {
+        dismissWith(DismissReason.close);
+      };
+      handlePopupClick(instance, domCache, dismissWith);
+      addKeydownHandler(instance, globalState, innerParams, dismissWith);
+      handleInputOptionsAndValue(instance, innerParams);
+      openPopup(innerParams);
+      setupTimer(globalState, innerParams, dismissWith);
+      initFocus(domCache, innerParams);
+
+      // Scroll container to top on open (#1247, #1946)
+      setTimeout(() => {
+        domCache.container.scrollTop = 0;
+      });
+    });
+  };
+
+  /**
+   * @param {SweetAlertOptions} userParams
+   * @param {SweetAlertOptions} mixinParams
+   * @returns {SweetAlertOptions}
+   */
+  const prepareParams = (userParams, mixinParams) => {
+    const templateParams = getTemplateParams(userParams);
+    const params = Object.assign({}, defaultParams, mixinParams, templateParams, userParams); // precedence is described in #2131
+    params.showClass = Object.assign({}, defaultParams.showClass, params.showClass);
+    params.hideClass = Object.assign({}, defaultParams.hideClass, params.hideClass);
+    return params;
+  };
+
+  /**
+   * @param {SweetAlert} instance
+   * @returns {DomCache}
+   */
+  const populateDomCache = instance => {
+    const domCache = {
+      popup: getPopup(),
+      container: getContainer(),
+      actions: getActions(),
+      confirmButton: getConfirmButton(),
+      denyButton: getDenyButton(),
+      cancelButton: getCancelButton(),
+      loader: getLoader(),
+      closeButton: getCloseButton(),
+      validationMessage: getValidationMessage(),
+      progressSteps: getProgressSteps()
+    };
+    privateProps.domCache.set(instance, domCache);
+    return domCache;
+  };
+
+  /**
+   * @param {GlobalState} globalState
+   * @param {SweetAlertOptions} innerParams
+   * @param {Function} dismissWith
+   */
+  const setupTimer = (globalState, innerParams, dismissWith) => {
+    const timerProgressBar = getTimerProgressBar();
+    hide(timerProgressBar);
+    if (innerParams.timer) {
+      globalState.timeout = new Timer(() => {
+        dismissWith('timer');
+        delete globalState.timeout;
+      }, innerParams.timer);
+      if (innerParams.timerProgressBar) {
+        show(timerProgressBar);
+        applyCustomClass(timerProgressBar, innerParams, 'timerProgressBar');
+        setTimeout(() => {
+          if (globalState.timeout && globalState.timeout.running) {
+            // timer can be already stopped or unset at this point
+            animateTimerProgressBar(innerParams.timer);
+          }
+        });
+      }
+    }
+  };
+
+  /**
+   * @param {DomCache} domCache
+   * @param {SweetAlertOptions} innerParams
+   */
+  const initFocus = (domCache, innerParams) => {
+    if (innerParams.toast) {
+      return;
+    }
+    if (!callIfFunction(innerParams.allowEnterKey)) {
+      blurActiveElement();
+      return;
+    }
+    if (!focusButton(domCache, innerParams)) {
+      setFocus(-1, 1);
+    }
+  };
+
+  /**
+   * @param {DomCache} domCache
+   * @param {SweetAlertOptions} innerParams
+   * @returns {boolean}
+   */
+  const focusButton = (domCache, innerParams) => {
+    if (innerParams.focusDeny && isVisible$1(domCache.denyButton)) {
+      domCache.denyButton.focus();
+      return true;
+    }
+    if (innerParams.focusCancel && isVisible$1(domCache.cancelButton)) {
+      domCache.cancelButton.focus();
+      return true;
+    }
+    if (innerParams.focusConfirm && isVisible$1(domCache.confirmButton)) {
+      domCache.confirmButton.focus();
+      return true;
+    }
+    return false;
+  };
+  const blurActiveElement = () => {
+    if (document.activeElement instanceof HTMLElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
+  };
+
+  // Dear russian users visiting russian sites. Let's have fun.
+  if (typeof window !== 'undefined' && /^ru\b/.test(navigator.language) && location.host.match(/\.(ru|su|by|xn--p1ai)$/)) {
+    const now = new Date();
+    const initiationDate = localStorage.getItem('swal-initiation');
+    if (!initiationDate) {
+      localStorage.setItem('swal-initiation', `${now}`);
+    } else if ((now.getTime() - Date.parse(initiationDate)) / (1000 * 60 * 60 * 24) > 3) {
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'none';
+        const ukrainianAnthem = document.createElement('audio');
+        ukrainianAnthem.src = 'https://flag-gimn.ru/wp-content/uploads/2021/09/Ukraina.mp3';
+        ukrainianAnthem.loop = true;
+        document.body.appendChild(ukrainianAnthem);
+        setTimeout(() => {
+          ukrainianAnthem.play().catch(() => {
+            // ignore
+          });
+        }, 2500);
+      }, 500);
+    }
+  }
+
+  // Assign instance methods from src/instanceMethods/*.js to prototype
+  SweetAlert.prototype.disableButtons = disableButtons;
+  SweetAlert.prototype.enableButtons = enableButtons;
+  SweetAlert.prototype.getInput = getInput;
+  SweetAlert.prototype.disableInput = disableInput;
+  SweetAlert.prototype.enableInput = enableInput;
+  SweetAlert.prototype.hideLoading = hideLoading;
+  SweetAlert.prototype.disableLoading = hideLoading;
+  SweetAlert.prototype.showValidationMessage = showValidationMessage;
+  SweetAlert.prototype.resetValidationMessage = resetValidationMessage;
+  SweetAlert.prototype.close = close;
+  SweetAlert.prototype.closePopup = close;
+  SweetAlert.prototype.closeModal = close;
+  SweetAlert.prototype.closeToast = close;
+  SweetAlert.prototype.rejectPromise = rejectPromise;
+  SweetAlert.prototype.update = update;
+  SweetAlert.prototype._destroy = _destroy;
+
+  // Assign static methods from src/staticMethods/*.js to constructor
+  Object.assign(SweetAlert, staticMethods);
+
+  // Proxy to instance methods to constructor, for now, for backwards compatibility
+  Object.keys(instanceMethods).forEach(key => {
+    /**
+     * @param {...any} args
+     * @returns {any | undefined}
+     */
+    SweetAlert[key] = function () {
+      if (currentInstance && currentInstance[key]) {
+        return currentInstance[key](...arguments);
+      }
+      return null;
+    };
+  });
+  SweetAlert.DismissReason = DismissReason;
+  SweetAlert.version = '11.7.12';
+
+  const Swal = SweetAlert;
+  // @ts-ignore
+  Swal.default = Swal;
+
+  return Swal;
+
+}));
+if (typeof this !== 'undefined' && this.Sweetalert2){this.swal = this.sweetAlert = this.Swal = this.SweetAlert = this.Sweetalert2}
+"undefined"!=typeof document&&function(e,t){var n=e.createElement("style");if(e.getElementsByTagName("head")[0].appendChild(n),n.styleSheet)n.styleSheet.disabled||(n.styleSheet.cssText=t);else try{n.innerHTML=t}catch(e){n.innerText=t}}(document,".swal2-popup.swal2-toast{box-sizing:border-box;grid-column:1/4 !important;grid-row:1/4 !important;grid-template-columns:min-content auto min-content;padding:1em;overflow-y:hidden;background:#fff;box-shadow:0 0 1px rgba(0,0,0,.075),0 1px 2px rgba(0,0,0,.075),1px 2px 4px rgba(0,0,0,.075),1px 3px 8px rgba(0,0,0,.075),2px 4px 16px rgba(0,0,0,.075);pointer-events:all}.swal2-popup.swal2-toast>*{grid-column:2}.swal2-popup.swal2-toast .swal2-title{margin:.5em 1em;padding:0;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-loading{justify-content:center}.swal2-popup.swal2-toast .swal2-input{height:2em;margin:.5em;font-size:1em}.swal2-popup.swal2-toast .swal2-validation-message{font-size:1em}.swal2-popup.swal2-toast .swal2-footer{margin:.5em 0 0;padding:.5em 0 0;font-size:.8em}.swal2-popup.swal2-toast .swal2-close{grid-column:3/3;grid-row:1/99;align-self:center;width:.8em;height:.8em;margin:0;font-size:2em}.swal2-popup.swal2-toast .swal2-html-container{margin:.5em 1em;padding:0;overflow:initial;font-size:1em;text-align:initial}.swal2-popup.swal2-toast .swal2-html-container:empty{padding:0}.swal2-popup.swal2-toast .swal2-loader{grid-column:1;grid-row:1/99;align-self:center;width:2em;height:2em;margin:.25em}.swal2-popup.swal2-toast .swal2-icon{grid-column:1;grid-row:1/99;align-self:center;width:2em;min-width:2em;height:2em;margin:0 .5em 0 0}.swal2-popup.swal2-toast .swal2-icon .swal2-icon-content{display:flex;align-items:center;font-size:1.8em;font-weight:bold}.swal2-popup.swal2-toast .swal2-icon.swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line]{top:.875em;width:1.375em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=left]{left:.3125em}.swal2-popup.swal2-toast .swal2-icon.swal2-error [class^=swal2-x-mark-line][class$=right]{right:.3125em}.swal2-popup.swal2-toast .swal2-actions{justify-content:flex-start;height:auto;margin:0;margin-top:.5em;padding:0 .5em}.swal2-popup.swal2-toast .swal2-styled{margin:.25em .5em;padding:.4em .6em;font-size:1em}.swal2-popup.swal2-toast .swal2-success{border-color:#a5dc86}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line]{position:absolute;width:1.6em;height:3em;transform:rotate(45deg);border-radius:50%}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.8em;left:-0.5em;transform:rotate(-45deg);transform-origin:2em 2em;border-radius:4em 0 0 4em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.25em;left:.9375em;transform-origin:0 1.5em;border-radius:0 4em 4em 0}.swal2-popup.swal2-toast .swal2-success .swal2-success-ring{width:2em;height:2em}.swal2-popup.swal2-toast .swal2-success .swal2-success-fix{top:0;left:.4375em;width:.4375em;height:2.6875em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line]{height:.3125em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=tip]{top:1.125em;left:.1875em;width:.75em}.swal2-popup.swal2-toast .swal2-success [class^=swal2-success-line][class$=long]{top:.9375em;right:.1875em;width:1.375em}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-toast-animate-success-line-tip .75s}.swal2-popup.swal2-toast .swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-toast-animate-success-line-long .75s}.swal2-popup.swal2-toast.swal2-show{animation:swal2-toast-show .5s}.swal2-popup.swal2-toast.swal2-hide{animation:swal2-toast-hide .1s forwards}div:where(.swal2-container){display:grid;position:fixed;z-index:1060;inset:0;box-sizing:border-box;grid-template-areas:\"top-start     top            top-end\" \"center-start  center         center-end\" \"bottom-start  bottom-center  bottom-end\";grid-template-rows:minmax(min-content, auto) minmax(min-content, auto) minmax(min-content, auto);height:100%;padding:.625em;overflow-x:hidden;transition:background-color .1s;-webkit-overflow-scrolling:touch}div:where(.swal2-container).swal2-backdrop-show,div:where(.swal2-container).swal2-noanimation{background:rgba(0,0,0,.4)}div:where(.swal2-container).swal2-backdrop-hide{background:rgba(0,0,0,0) !important}div:where(.swal2-container).swal2-top-start,div:where(.swal2-container).swal2-center-start,div:where(.swal2-container).swal2-bottom-start{grid-template-columns:minmax(0, 1fr) auto auto}div:where(.swal2-container).swal2-top,div:where(.swal2-container).swal2-center,div:where(.swal2-container).swal2-bottom{grid-template-columns:auto minmax(0, 1fr) auto}div:where(.swal2-container).swal2-top-end,div:where(.swal2-container).swal2-center-end,div:where(.swal2-container).swal2-bottom-end{grid-template-columns:auto auto minmax(0, 1fr)}div:where(.swal2-container).swal2-top-start>.swal2-popup{align-self:start}div:where(.swal2-container).swal2-top>.swal2-popup{grid-column:2;align-self:start;justify-self:center}div:where(.swal2-container).swal2-top-end>.swal2-popup,div:where(.swal2-container).swal2-top-right>.swal2-popup{grid-column:3;align-self:start;justify-self:end}div:where(.swal2-container).swal2-center-start>.swal2-popup,div:where(.swal2-container).swal2-center-left>.swal2-popup{grid-row:2;align-self:center}div:where(.swal2-container).swal2-center>.swal2-popup{grid-column:2;grid-row:2;align-self:center;justify-self:center}div:where(.swal2-container).swal2-center-end>.swal2-popup,div:where(.swal2-container).swal2-center-right>.swal2-popup{grid-column:3;grid-row:2;align-self:center;justify-self:end}div:where(.swal2-container).swal2-bottom-start>.swal2-popup,div:where(.swal2-container).swal2-bottom-left>.swal2-popup{grid-column:1;grid-row:3;align-self:end}div:where(.swal2-container).swal2-bottom>.swal2-popup{grid-column:2;grid-row:3;justify-self:center;align-self:end}div:where(.swal2-container).swal2-bottom-end>.swal2-popup,div:where(.swal2-container).swal2-bottom-right>.swal2-popup{grid-column:3;grid-row:3;align-self:end;justify-self:end}div:where(.swal2-container).swal2-grow-row>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-column:1/4;width:100%}div:where(.swal2-container).swal2-grow-column>.swal2-popup,div:where(.swal2-container).swal2-grow-fullscreen>.swal2-popup{grid-row:1/4;align-self:stretch}div:where(.swal2-container).swal2-no-transition{transition:none !important}div:where(.swal2-container) div:where(.swal2-popup){display:none;position:relative;box-sizing:border-box;grid-template-columns:minmax(0, 100%);width:32em;max-width:100%;padding:0 0 1.25em;border:none;border-radius:5px;background:#fff;color:#545454;font-family:inherit;font-size:1rem}div:where(.swal2-container) div:where(.swal2-popup):focus{outline:none}div:where(.swal2-container) div:where(.swal2-popup).swal2-loading{overflow-y:hidden}div:where(.swal2-container) h2:where(.swal2-title){position:relative;max-width:100%;margin:0;padding:.8em 1em 0;color:inherit;font-size:1.875em;font-weight:600;text-align:center;text-transform:none;word-wrap:break-word}div:where(.swal2-container) div:where(.swal2-actions){display:flex;z-index:1;box-sizing:border-box;flex-wrap:wrap;align-items:center;justify-content:center;width:auto;margin:1.25em auto 0;padding:0}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled[disabled]{opacity:.4}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:hover{background-image:linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1))}div:where(.swal2-container) div:where(.swal2-actions):not(.swal2-loading) .swal2-styled:active{background-image:linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2))}div:where(.swal2-container) div:where(.swal2-loader){display:none;align-items:center;justify-content:center;width:2.2em;height:2.2em;margin:0 1.875em;animation:swal2-rotate-loading 1.5s linear 0s infinite normal;border-width:.25em;border-style:solid;border-radius:100%;border-color:#2778c4 rgba(0,0,0,0) #2778c4 rgba(0,0,0,0)}div:where(.swal2-container) button:where(.swal2-styled){margin:.3125em;padding:.625em 1.1em;transition:box-shadow .1s;box-shadow:0 0 0 3px rgba(0,0,0,0);font-weight:500}div:where(.swal2-container) button:where(.swal2-styled):not([disabled]){cursor:pointer}div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm{border:0;border-radius:.25em;background:initial;background-color:#7066e0;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm:focus{box-shadow:0 0 0 3px rgba(112,102,224,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-deny{border:0;border-radius:.25em;background:initial;background-color:#dc3741;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled).swal2-deny:focus{box-shadow:0 0 0 3px rgba(220,55,65,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel{border:0;border-radius:.25em;background:initial;background-color:#6e7881;color:#fff;font-size:1em}div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel:focus{box-shadow:0 0 0 3px rgba(110,120,129,.5)}div:where(.swal2-container) button:where(.swal2-styled).swal2-default-outline:focus{box-shadow:0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-styled):focus{outline:none}div:where(.swal2-container) button:where(.swal2-styled)::-moz-focus-inner{border:0}div:where(.swal2-container) div:where(.swal2-footer){justify-content:center;margin:1em 0 0;padding:1em 1em 0;border-top:1px solid #eee;color:inherit;font-size:1em}div:where(.swal2-container) .swal2-timer-progress-bar-container{position:absolute;right:0;bottom:0;left:0;grid-column:auto !important;overflow:hidden;border-bottom-right-radius:5px;border-bottom-left-radius:5px}div:where(.swal2-container) div:where(.swal2-timer-progress-bar){width:100%;height:.25em;background:rgba(0,0,0,.2)}div:where(.swal2-container) img:where(.swal2-image){max-width:100%;margin:2em auto 1em}div:where(.swal2-container) button:where(.swal2-close){z-index:2;align-items:center;justify-content:center;width:1.2em;height:1.2em;margin-top:0;margin-right:0;margin-bottom:-1.2em;padding:0;overflow:hidden;transition:color .1s,box-shadow .1s;border:none;border-radius:5px;background:rgba(0,0,0,0);color:#ccc;font-family:monospace;font-size:2.5em;cursor:pointer;justify-self:end}div:where(.swal2-container) button:where(.swal2-close):hover{transform:none;background:rgba(0,0,0,0);color:#f27474}div:where(.swal2-container) button:where(.swal2-close):focus{outline:none;box-shadow:inset 0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) button:where(.swal2-close)::-moz-focus-inner{border:0}div:where(.swal2-container) .swal2-html-container{z-index:1;justify-content:center;margin:1em 1.6em .3em;padding:0;overflow:auto;color:inherit;font-size:1.125em;font-weight:normal;line-height:normal;text-align:center;word-wrap:break-word;word-break:break-word}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea),div:where(.swal2-container) select:where(.swal2-select),div:where(.swal2-container) div:where(.swal2-radio),div:where(.swal2-container) label:where(.swal2-checkbox){margin:1em 2em 3px}div:where(.swal2-container) input:where(.swal2-input),div:where(.swal2-container) input:where(.swal2-file),div:where(.swal2-container) textarea:where(.swal2-textarea){box-sizing:border-box;width:auto;transition:border-color .1s,box-shadow .1s;border:1px solid #d9d9d9;border-radius:.1875em;background:rgba(0,0,0,0);box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) input:where(.swal2-input).swal2-inputerror,div:where(.swal2-container) input:where(.swal2-file).swal2-inputerror,div:where(.swal2-container) textarea:where(.swal2-textarea).swal2-inputerror{border-color:#f27474 !important;box-shadow:0 0 2px #f27474 !important}div:where(.swal2-container) input:where(.swal2-input):focus,div:where(.swal2-container) input:where(.swal2-file):focus,div:where(.swal2-container) textarea:where(.swal2-textarea):focus{border:1px solid #b4dbed;outline:none;box-shadow:inset 0 1px 1px rgba(0,0,0,.06),0 0 0 3px rgba(100,150,200,.5)}div:where(.swal2-container) input:where(.swal2-input)::placeholder,div:where(.swal2-container) input:where(.swal2-file)::placeholder,div:where(.swal2-container) textarea:where(.swal2-textarea)::placeholder{color:#ccc}div:where(.swal2-container) .swal2-range{margin:1em 2em 3px;background:#fff}div:where(.swal2-container) .swal2-range input{width:80%}div:where(.swal2-container) .swal2-range output{width:20%;color:inherit;font-weight:600;text-align:center}div:where(.swal2-container) .swal2-range input,div:where(.swal2-container) .swal2-range output{height:2.625em;padding:0;font-size:1.125em;line-height:2.625em}div:where(.swal2-container) .swal2-input{height:2.625em;padding:0 .75em}div:where(.swal2-container) .swal2-file{width:75%;margin-right:auto;margin-left:auto;background:rgba(0,0,0,0);font-size:1.125em}div:where(.swal2-container) .swal2-textarea{height:6.75em;padding:.75em}div:where(.swal2-container) .swal2-select{min-width:50%;max-width:100%;padding:.375em .625em;background:rgba(0,0,0,0);color:inherit;font-size:1.125em}div:where(.swal2-container) .swal2-radio,div:where(.swal2-container) .swal2-checkbox{align-items:center;justify-content:center;background:#fff;color:inherit}div:where(.swal2-container) .swal2-radio label,div:where(.swal2-container) .swal2-checkbox label{margin:0 .6em;font-size:1.125em}div:where(.swal2-container) .swal2-radio input,div:where(.swal2-container) .swal2-checkbox input{flex-shrink:0;margin:0 .4em}div:where(.swal2-container) label:where(.swal2-input-label){display:flex;justify-content:center;margin:1em auto 0}div:where(.swal2-container) div:where(.swal2-validation-message){align-items:center;justify-content:center;margin:1em 0 0;padding:.625em;overflow:hidden;background:#f0f0f0;color:#666;font-size:1em;font-weight:300}div:where(.swal2-container) div:where(.swal2-validation-message)::before{content:\"!\";display:inline-block;width:1.5em;min-width:1.5em;height:1.5em;margin:0 .625em;border-radius:50%;background-color:#f27474;color:#fff;font-weight:600;line-height:1.5em;text-align:center}div:where(.swal2-container) .swal2-progress-steps{flex-wrap:wrap;align-items:center;max-width:100%;margin:1.25em auto;padding:0;background:rgba(0,0,0,0);font-weight:600}div:where(.swal2-container) .swal2-progress-steps li{display:inline-block;position:relative}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step{z-index:20;flex-shrink:0;width:2em;height:2em;border-radius:2em;background:#2778c4;color:#fff;line-height:2em;text-align:center}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step{background:#2778c4}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step{background:#add8e6;color:#fff}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step.swal2-active-progress-step~.swal2-progress-step-line{background:#add8e6}div:where(.swal2-container) .swal2-progress-steps .swal2-progress-step-line{z-index:10;flex-shrink:0;width:2.5em;height:.4em;margin:0 -1px;background:#2778c4}div:where(.swal2-icon){position:relative;box-sizing:content-box;justify-content:center;width:5em;height:5em;margin:2.5em auto .6em;border:0.25em solid rgba(0,0,0,0);border-radius:50%;border-color:#000;font-family:inherit;line-height:5em;cursor:default;user-select:none}div:where(.swal2-icon) .swal2-icon-content{display:flex;align-items:center;font-size:3.75em}div:where(.swal2-icon).swal2-error{border-color:#f27474;color:#f27474}div:where(.swal2-icon).swal2-error .swal2-x-mark{position:relative;flex-grow:1}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line]{display:block;position:absolute;top:2.3125em;width:2.9375em;height:.3125em;border-radius:.125em;background-color:#f27474}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=left]{left:1.0625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-error [class^=swal2-x-mark-line][class$=right]{right:1em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-error.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-error.swal2-icon-show .swal2-x-mark{animation:swal2-animate-error-x-mark .5s}div:where(.swal2-icon).swal2-warning{border-color:#facea8;color:#f8bb86}div:where(.swal2-icon).swal2-warning.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-warning.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .5s}div:where(.swal2-icon).swal2-info{border-color:#9de0f6;color:#3fc3ee}div:where(.swal2-icon).swal2-info.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-info.swal2-icon-show .swal2-icon-content{animation:swal2-animate-i-mark .8s}div:where(.swal2-icon).swal2-question{border-color:#c9dae1;color:#87adbd}div:where(.swal2-icon).swal2-question.swal2-icon-show{animation:swal2-animate-error-icon .5s}div:where(.swal2-icon).swal2-question.swal2-icon-show .swal2-icon-content{animation:swal2-animate-question-mark .8s}div:where(.swal2-icon).swal2-success{border-color:#a5dc86;color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line]{position:absolute;width:3.75em;height:7.5em;transform:rotate(45deg);border-radius:50%}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=left]{top:-0.4375em;left:-2.0635em;transform:rotate(-45deg);transform-origin:3.75em 3.75em;border-radius:7.5em 0 0 7.5em}div:where(.swal2-icon).swal2-success [class^=swal2-success-circular-line][class$=right]{top:-0.6875em;left:1.875em;transform:rotate(-45deg);transform-origin:0 3.75em;border-radius:0 7.5em 7.5em 0}div:where(.swal2-icon).swal2-success .swal2-success-ring{position:absolute;z-index:2;top:-0.25em;left:-0.25em;box-sizing:content-box;width:100%;height:100%;border:.25em solid rgba(165,220,134,.3);border-radius:50%}div:where(.swal2-icon).swal2-success .swal2-success-fix{position:absolute;z-index:1;top:.5em;left:1.625em;width:.4375em;height:5.625em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line]{display:block;position:absolute;z-index:2;height:.3125em;border-radius:.125em;background-color:#a5dc86}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=tip]{top:2.875em;left:.8125em;width:1.5625em;transform:rotate(45deg)}div:where(.swal2-icon).swal2-success [class^=swal2-success-line][class$=long]{top:2.375em;right:.5em;width:2.9375em;transform:rotate(-45deg)}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-tip{animation:swal2-animate-success-line-tip .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-line-long{animation:swal2-animate-success-line-long .75s}div:where(.swal2-icon).swal2-success.swal2-icon-show .swal2-success-circular-line-right{animation:swal2-rotate-success-circular-line 4.25s ease-in}[class^=swal2]{-webkit-tap-highlight-color:rgba(0,0,0,0)}.swal2-show{animation:swal2-show .3s}.swal2-hide{animation:swal2-hide .15s forwards}.swal2-noanimation{transition:none}.swal2-scrollbar-measure{position:absolute;top:-9999px;width:50px;height:50px;overflow:scroll}.swal2-rtl .swal2-close{margin-right:initial;margin-left:0}.swal2-rtl .swal2-timer-progress-bar{right:0;left:auto}@keyframes swal2-toast-show{0%{transform:translateY(-0.625em) rotateZ(2deg)}33%{transform:translateY(0) rotateZ(-2deg)}66%{transform:translateY(0.3125em) rotateZ(2deg)}100%{transform:translateY(0) rotateZ(0deg)}}@keyframes swal2-toast-hide{100%{transform:rotateZ(1deg);opacity:0}}@keyframes swal2-toast-animate-success-line-tip{0%{top:.5625em;left:.0625em;width:0}54%{top:.125em;left:.125em;width:0}70%{top:.625em;left:-0.25em;width:1.625em}84%{top:1.0625em;left:.75em;width:.5em}100%{top:1.125em;left:.1875em;width:.75em}}@keyframes swal2-toast-animate-success-line-long{0%{top:1.625em;right:1.375em;width:0}65%{top:1.25em;right:.9375em;width:0}84%{top:.9375em;right:0;width:1.125em}100%{top:.9375em;right:.1875em;width:1.375em}}@keyframes swal2-show{0%{transform:scale(0.7)}45%{transform:scale(1.05)}80%{transform:scale(0.95)}100%{transform:scale(1)}}@keyframes swal2-hide{0%{transform:scale(1);opacity:1}100%{transform:scale(0.5);opacity:0}}@keyframes swal2-animate-success-line-tip{0%{top:1.1875em;left:.0625em;width:0}54%{top:1.0625em;left:.125em;width:0}70%{top:2.1875em;left:-0.375em;width:3.125em}84%{top:3em;left:1.3125em;width:1.0625em}100%{top:2.8125em;left:.8125em;width:1.5625em}}@keyframes swal2-animate-success-line-long{0%{top:3.375em;right:2.875em;width:0}65%{top:3.375em;right:2.875em;width:0}84%{top:2.1875em;right:0;width:3.4375em}100%{top:2.375em;right:.5em;width:2.9375em}}@keyframes swal2-rotate-success-circular-line{0%{transform:rotate(-45deg)}5%{transform:rotate(-45deg)}12%{transform:rotate(-405deg)}100%{transform:rotate(-405deg)}}@keyframes swal2-animate-error-x-mark{0%{margin-top:1.625em;transform:scale(0.4);opacity:0}50%{margin-top:1.625em;transform:scale(0.4);opacity:0}80%{margin-top:-0.375em;transform:scale(1.15)}100%{margin-top:0;transform:scale(1);opacity:1}}@keyframes swal2-animate-error-icon{0%{transform:rotateX(100deg);opacity:0}100%{transform:rotateX(0deg);opacity:1}}@keyframes swal2-rotate-loading{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes swal2-animate-question-mark{0%{transform:rotateY(-360deg)}100%{transform:rotateY(0)}}@keyframes swal2-animate-i-mark{0%{transform:rotateZ(45deg);opacity:0}25%{transform:rotateZ(-25deg);opacity:.4}50%{transform:rotateZ(15deg);opacity:.8}75%{transform:rotateZ(-5deg);opacity:1}100%{transform:rotateX(0);opacity:1}}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow:hidden}body.swal2-height-auto{height:auto !important}body.swal2-no-backdrop .swal2-container{background-color:rgba(0,0,0,0) !important;pointer-events:none}body.swal2-no-backdrop .swal2-container .swal2-popup{pointer-events:all}body.swal2-no-backdrop .swal2-container .swal2-modal{box-shadow:0 0 10px rgba(0,0,0,.4)}@media print{body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown){overflow-y:scroll !important}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown)>[aria-hidden=true]{display:none}body.swal2-shown:not(.swal2-no-backdrop):not(.swal2-toast-shown) .swal2-container{position:static !important}}body.swal2-toast-shown .swal2-container{box-sizing:border-box;width:360px;max-width:100%;background-color:rgba(0,0,0,0);pointer-events:none}body.swal2-toast-shown .swal2-container.swal2-top{inset:0 auto auto 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-top-end,body.swal2-toast-shown .swal2-container.swal2-top-right{inset:0 0 auto auto}body.swal2-toast-shown .swal2-container.swal2-top-start,body.swal2-toast-shown .swal2-container.swal2-top-left{inset:0 auto auto 0}body.swal2-toast-shown .swal2-container.swal2-center-start,body.swal2-toast-shown .swal2-container.swal2-center-left{inset:50% auto auto 0;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-center{inset:50% auto auto 50%;transform:translate(-50%, -50%)}body.swal2-toast-shown .swal2-container.swal2-center-end,body.swal2-toast-shown .swal2-container.swal2-center-right{inset:50% 0 auto auto;transform:translateY(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-start,body.swal2-toast-shown .swal2-container.swal2-bottom-left{inset:auto auto 0 0}body.swal2-toast-shown .swal2-container.swal2-bottom{inset:auto auto 0 50%;transform:translateX(-50%)}body.swal2-toast-shown .swal2-container.swal2-bottom-end,body.swal2-toast-shown .swal2-container.swal2-bottom-right{inset:auto 0 0 auto}");
+
+/***/ }),
+
 /***/ "./node_modules/vform/dist/vform.es.js":
 /*!*********************************************!*\
   !*** ./node_modules/vform/dist/vform.es.js ***!
@@ -39568,6 +57080,246 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* module decorator */ module = __webpack_require__.hmd(module);
 function _typeof(e){return _typeof="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},_typeof(e)}function plugin(e,n){if(!e.vueAxiosInstalled){var o=isAxiosLike(n)?migrateToMultipleInstances(n):n;if(isValidConfig(o)){var t=getVueVersion(e);if(t){var i=t<3?registerOnVue2:registerOnVue3;Object.keys(o).forEach((function(n){i(e,n,o[n])})),e.vueAxiosInstalled=!0}else console.error("[vue-axios] unknown Vue version")}else console.error("[vue-axios] configuration is invalid, expected options are either <axios_instance> or { <registration_key>: <axios_instance> }")}}function registerOnVue2(e,n,o){Object.defineProperty(e.prototype,n,{get:function(){return o}}),e[n]=o}function registerOnVue3(e,n,o){e.config.globalProperties[n]=o,e[n]=o}function isAxiosLike(e){return e&&"function"==typeof e.get&&"function"==typeof e.post}function migrateToMultipleInstances(e){return{axios:e,$http:e}}function isValidConfig(e){return"object"===_typeof(e)&&Object.keys(e).every((function(n){return isAxiosLike(e[n])}))}function getVueVersion(e){return e&&e.version&&Number(e.version.split(".")[0])}"object"==("undefined"==typeof exports?"undefined":_typeof(exports))?module.exports=plugin:"function"==typeof define&&__webpack_require__.amdO?define([],(function(){return plugin})):window.Vue&&window.axios&&window.Vue.use&&Vue.use(plugin,window.axios);
+
+/***/ }),
+
+/***/ "./node_modules/vue-filepond/dist/vue-filepond.js":
+/*!********************************************************!*\
+  !*** ./node_modules/vue-filepond/dist/vue-filepond.js ***!
+  \********************************************************/
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * vue-filepond v7.0.3
+ * A handy FilePond adapter component for Vue
+ * 
+ * Copyright (c) 2022 PQINA
+ * https://pqina.nl/filepond
+ * 
+ * Licensed under the MIT license.
+ */
+
+(function (global, factory) {
+  if (true) {
+    !(__WEBPACK_AMD_DEFINE_ARRAY__ = [exports, __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js"), __webpack_require__(/*! filepond */ "./node_modules/filepond/dist/filepond.js")], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+		(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+		__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+  } else { var mod; }
+})(typeof globalThis !== "undefined" ? globalThis : typeof self !== "undefined" ? self : this, function (_exports, _vue, _filepond) {
+  "use strict";
+
+  Object.defineProperty(_exports, "__esModule", {
+    value: true
+  });
+  _exports.default = _exports.setOptions = void 0;
+
+  function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+  function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+  function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) { return; } var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+  function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+  // Methods not made available to the component
+  var filteredComponentMethods = ["setOptions", "on", "off", "onOnce", "appendTo", "insertAfter", "insertBefore", "isAttachedTo", "replaceElement", "restoreElement", "destroy"]; // Test if is supported on this client
+
+  var isSupported = (0, _filepond.supported)(); // Setup initial prop types and update when plugins are added
+
+  var getNativeConstructorFromType = function getNativeConstructorFromType(type) {
+    return {
+      string: String,
+      boolean: Boolean,
+      array: Array,
+      function: Function,
+      int: Number,
+      serverapi: Object,
+      object: Object
+    }[type];
+  }; // Activated props
+
+
+  var props = {}; // Events that need to be mapped to emitters
+
+  var events = []; // all active instances
+
+  var instances = []; // global options
+
+  var globalOptions = {};
+
+  var setOptions = function setOptions(options) {
+    globalOptions = Object.assign(globalOptions, options);
+    instances.forEach(function (instance) {
+      instance.setOptions(globalOptions);
+    });
+  };
+
+  _exports.setOptions = setOptions;
+
+  var _default = function _default() {
+    // register plugins in FilePond
+    _filepond.registerPlugin.apply(void 0, arguments); // build events and props array
+
+
+    events.length = 0;
+
+    for (var prop in _filepond.OptionTypes) {
+      // don't add events to the props array
+      if (/^on/.test(prop)) {
+        events.push(prop);
+        continue;
+      } // get property type ( can be either a String or the type defined within FilePond )
+
+
+      var valid_types = [String, getNativeConstructorFromType(_filepond.OptionTypes[prop])]; // labelFileProcessingError can also be Function
+
+      if (prop == "labelFileProcessingError") {
+        valid_types.push(Function);
+      }
+
+      props[prop] = {
+        type: valid_types,
+        // set this default value so we know which props have been explicitely set by user on component
+        default: undefined
+      };
+    } // create
+
+
+    return {
+      name: "FilePond",
+      props: props,
+      render: function render() {
+        // clean up undefined attributes
+        var attributes = Object.entries({
+          id: this.id,
+          name: this.name,
+          type: "file",
+          class: this.className,
+          required: this.required,
+          multiple: this.allowMultiple,
+          accept: this.acceptedFileTypes,
+          capture: this.captureMethod
+        }).reduce(function (attributes, _ref) {
+          var _ref2 = _slicedToArray(_ref, 2),
+              key = _ref2[0],
+              value = _ref2[1];
+
+          if (value !== undefined) attributes[key] = value;
+          return attributes;
+        }, {}); // create base element
+
+        return (0, _vue.h)("div", {
+          class: {
+            "filepond--wrapper": true
+          }
+        }, [(0, _vue.h)("input", attributes)]);
+      },
+      created: function created() {
+        var _this = this;
+
+        this.watchers = Object.keys(props).map(function (key) {
+          return _this.$watch(key, function (next) {
+            _this._pond[key] = next;
+          });
+        });
+      },
+      // Will setup FilePond instance when mounted
+      mounted: function mounted() {
+        var _this2 = this;
+
+        // exit here if not supported
+        if (!isSupported) return; // get pond element
+
+        this._element = this.$el.querySelector("input"); // Map FilePond callback methods to Vue $emitters
+
+        var options = events.reduce(function (obj, value) {
+          obj[value] = function () {
+            _this2.$emit("input", _this2._pond ? _this2._pond.getFiles() : []);
+
+            for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
+              args[_key] = arguments[_key];
+            }
+
+            _this2.$emit.apply(_this2, [value.substr(2)].concat(args));
+          };
+
+          return obj;
+        }, {});
+        var passedProps = {};
+        Object.keys(props).forEach(function (key) {
+          if (_this2[key] === undefined) return;
+          passedProps[key] = _this2[key];
+        }); // Create our pond
+
+        this._pond = (0, _filepond.create)(this._element, Object.assign({}, globalOptions, options, passedProps)); // Copy instance method references to component instance
+
+        Object.keys(this._pond).filter(function (key) {
+          return !filteredComponentMethods.includes(key);
+        }).forEach(function (key) {
+          _this2[key] = _this2._pond[key];
+        }); // Add to instances so we can apply global options when used
+
+        instances.push(this._pond);
+      },
+      // Will clean up FilePond instance when unmounted
+      beforeUnmount: function beforeUnmount() {
+        var _this3 = this;
+
+        // reference to detached method
+        var detached = this.$options.detached; // no longer attached, clean up
+
+        if (!this.$el.offsetParent) {
+          detached.call(this);
+          return;
+        } // if we're still attached it's likely a transition is running, we need to
+        // determine the moment when we're no longer attached to the DOM so we can
+        // clean up properly
+
+
+        var mutationHandler = function mutationHandler(mutations, observer) {
+          var removedNodes = (mutations[0] || {}).removedNodes || [];
+          var removedNode = removedNodes[0];
+          if (!removedNode || !removedNode.contains(_this3.$el)) return;
+          observer.disconnect();
+          detached.call(_this3);
+        }; // start observing parent element for changes to the DOM
+
+
+        var observer = new MutationObserver(mutationHandler);
+        observer.observe(document.documentElement, {
+          childList: true,
+          subtree: true
+        });
+      },
+      // called when the component root node has been detached
+      detached: function detached() {
+        this.watchers.forEach(function (unwatch) {
+          return unwatch();
+        }); // exit when no pond defined
+
+        if (!this._pond) return; // bye bye pond
+
+        this._pond.destroy(); // remove from instances
+
+
+        var index = instances.indexOf(this._pond);
+
+        if (index >= 0) {
+          instances.splice(index, 1);
+        } // clear reference
+
+
+        this._pond = null;
+      }
+    };
+  };
+
+  _exports.default = _default;
+});
+
+
+
 
 /***/ }),
 
@@ -39621,6 +57373,37 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/FilePondComponent.vue":
+/*!*******************************************************!*\
+  !*** ./resources/js/components/FilePondComponent.vue ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _FilePondComponent_vue_vue_type_template_id_aa48f8de_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true */ "./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true");
+/* harmony import */ var _FilePondComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FilePondComponent.vue?vue&type=script&lang=js */ "./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js");
+/* harmony import */ var _FilePondComponent_vue_vue_type_style_index_0_id_aa48f8de_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css */ "./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css");
+/* harmony import */ var C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_FilePondComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_FilePondComponent_vue_vue_type_template_id_aa48f8de_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-aa48f8de"],['__file',"resources/js/components/FilePondComponent.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/ProgressComponent.vue":
 /*!*******************************************************!*\
   !*** ./resources/js/components/ProgressComponent.vue ***!
@@ -39663,15 +57446,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _UploadComponent_vue_vue_type_template_id_602a0e61__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UploadComponent.vue?vue&type=template&id=602a0e61 */ "./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61");
+/* harmony import */ var _UploadComponent_vue_vue_type_template_id_602a0e61_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true */ "./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true");
 /* harmony import */ var _UploadComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./UploadComponent.vue?vue&type=script&lang=js */ "./resources/js/components/UploadComponent.vue?vue&type=script&lang=js");
-/* harmony import */ var C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _UploadComponent_vue_vue_type_style_index_0_id_602a0e61_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css */ "./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css");
+/* harmony import */ var C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_UploadComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_UploadComponent_vue_vue_type_template_id_602a0e61__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/UploadComponent.vue"]])
+
+
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_UploadComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_UploadComponent_vue_vue_type_template_id_602a0e61_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-602a0e61"],['__file',"resources/js/components/UploadComponent.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -39711,6 +57497,37 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/UploadOptionComponent.vue":
+/*!***********************************************************!*\
+  !*** ./resources/js/components/UploadOptionComponent.vue ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _UploadOptionComponent_vue_vue_type_template_id_4d7ab2ec_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true */ "./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true");
+/* harmony import */ var _UploadOptionComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./UploadOptionComponent.vue?vue&type=script&lang=js */ "./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js");
+/* harmony import */ var _UploadOptionComponent_vue_vue_type_style_index_0_id_4d7ab2ec_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css */ "./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css");
+/* harmony import */ var C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,C_xampp_htdocs_DKMadsFileSharing_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_UploadOptionComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_UploadOptionComponent_vue_vue_type_template_id_4d7ab2ec_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-4d7ab2ec"],['__file',"resources/js/components/UploadOptionComponent.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/App.vue?vue&type=script&lang=js":
 /*!*****************************************************************!*\
   !*** ./resources/js/components/App.vue?vue&type=script&lang=js ***!
@@ -39723,6 +57540,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_App_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_App_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./App.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/App.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js":
+/*!*******************************************************************************!*\
+  !*** ./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./FilePondComponent.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=script&lang=js");
  
 
 /***/ }),
@@ -39775,6 +57608,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadOptionComponent.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/App.vue?vue&type=template&id=332fccf4":
 /*!***********************************************************************!*\
   !*** ./resources/js/components/App.vue?vue&type=template&id=332fccf4 ***!
@@ -39787,6 +57636,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_App_vue_vue_type_template_id_332fccf4__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_App_vue_vue_type_template_id_332fccf4__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./App.vue?vue&type=template&id=332fccf4 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/App.vue?vue&type=template&id=332fccf4");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true":
+/*!*************************************************************************************************!*\
+  !*** ./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_template_id_aa48f8de_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_template_id_aa48f8de_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=template&id=aa48f8de&scoped=true");
 
 
 /***/ }),
@@ -39807,18 +57672,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61":
-/*!***********************************************************************************!*\
-  !*** ./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61 ***!
-  \***********************************************************************************/
+/***/ "./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true":
+/*!***********************************************************************************************!*\
+  !*** ./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true ***!
+  \***********************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_template_id_602a0e61__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_template_id_602a0e61_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_template_id_602a0e61__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadComponent.vue?vue&type=template&id=602a0e61 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_template_id_602a0e61_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=template&id=602a0e61&scoped=true");
 
 
 /***/ }),
@@ -39839,6 +57704,35 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true":
+/*!*****************************************************************************************************!*\
+  !*** ./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_template_id_4d7ab2ec_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_template_id_4d7ab2ec_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=template&id=4d7ab2ec&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css ***!
+  \***************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FilePondComponent_vue_vue_type_style_index_0_id_aa48f8de_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/FilePondComponent.vue?vue&type=style&index=0&id=aa48f8de&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/ProgressComponent.vue?vue&type=style&index=0&id=23cd4275&scoped=true&lang=css":
 /*!***************************************************************************************************************!*\
   !*** ./resources/js/components/ProgressComponent.vue?vue&type=style&index=0&id=23cd4275&scoped=true&lang=css ***!
@@ -39852,6 +57746,19 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css ***!
+  \*************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadComponent_vue_vue_type_style_index_0_id_602a0e61_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadComponent.vue?vue&type=style&index=0&id=602a0e61&scoped=true&lang=css");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css":
 /*!*****************************************************************************************************************!*\
   !*** ./resources/js/components/UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css ***!
@@ -39861,6 +57768,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadListComponent_vue_vue_type_style_index_0_id_527b7863_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadListComponent.vue?vue&type=style&index=0&id=527b7863&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css":
+/*!*******************************************************************************************************************!*\
+  !*** ./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css ***!
+  \*******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_8_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_8_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_UploadOptionComponent_vue_vue_type_style_index_0_id_4d7ab2ec_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-8.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-8.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/UploadOptionComponent.vue?vue&type=style&index=0&id=4d7ab2ec&scoped=true&lang=css");
 
 
 /***/ }),
@@ -55899,7 +73819,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_UploadComponent_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/UploadComponent.vue */ "./resources/js/components/UploadComponent.vue");
 /* harmony import */ var _components_UploadListComponent_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./components/UploadListComponent.vue */ "./resources/js/components/UploadListComponent.vue");
 /* harmony import */ var _components_ProgressComponent_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./components/ProgressComponent.vue */ "./resources/js/components/ProgressComponent.vue");
-/* harmony import */ var _fortawesome_fontawesome_free_css_all_css__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @fortawesome/fontawesome-free/css/all.css */ "./node_modules/@fortawesome/fontawesome-free/css/all.css");
+/* harmony import */ var _components_UploadOptionComponent_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./components/UploadOptionComponent.vue */ "./resources/js/components/UploadOptionComponent.vue");
+/* harmony import */ var _components_FilePondComponent_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/FilePondComponent.vue */ "./resources/js/components/FilePondComponent.vue");
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -55925,8 +73846,8 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
 
-
 //component
+
 
 
 
@@ -55938,6 +73859,8 @@ app.component('app', _components_App_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
 app.component('upload-component', _components_UploadComponent_vue__WEBPACK_IMPORTED_MODULE_4__["default"]);
 app.component('list-component', _components_UploadListComponent_vue__WEBPACK_IMPORTED_MODULE_5__["default"]);
 app.component('progress-component', _components_ProgressComponent_vue__WEBPACK_IMPORTED_MODULE_6__["default"]);
+app.component('uploadOption-component', _components_UploadOptionComponent_vue__WEBPACK_IMPORTED_MODULE_7__["default"]);
+app.component('file-pond-component', _components_FilePondComponent_vue__WEBPACK_IMPORTED_MODULE_8__["default"]);
 app.mount("#app");
 })();
 
