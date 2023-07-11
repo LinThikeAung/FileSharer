@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Carbon\Carbon;
 use App\Models\File;
 use App\Models\MainFile;
 use App\Models\SubFolder;
@@ -34,8 +35,8 @@ class UploadController extends Controller
         $fileSize = $file->getSize();
         $formattedSize = $this->formatFileSize($fileSize);
         $size =$formattedSize;
+        $name = $file->getClientOriginalName();
         if($file){
-            $name = $file->getClientOriginalName();
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
             $name = auth()->user()->name;
@@ -77,7 +78,7 @@ class UploadController extends Controller
         }
     }
     public function delete(){
-        $data = MainFile::where('file',request()->getContent())->first();
+        $data = MainFolder::where('file',request()->getContent())->first();
         if($data){
             $data->delete();
             $name = auth()->user()->name;
@@ -125,35 +126,15 @@ class UploadController extends Controller
         $main_folder = new MainFolder();
         $main_folder->user_id = auth()->id();
         $main_folder->name = $parent[0];
+        $main_folder->type = "folder";
         $main_folder->save();
         $path = Storage::disk('chitmaymay')->path($parent[0]);
-        return $this->listFolderFiles($path,$main_folder->id);
-        return "Success";
+        $this->listFolderFiles($path,$main_folder->id);
+        return response()->json([
+            'status'=>'success'
+        ]);
     }
 
-    public function uploadOption(Request $request){
-        $file = MainFolder::firstWhere('name',$request->fileName);
-        if($file){
-                $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
-                $array  = $sub_folder->toArray();
-                SubFolder::whereIn('main_sub_id',$array)->delete();
-                $file->delete();
-                return response()->json([
-                    'status'=>'success'
-                ]);
-        }
-    }
-
-    public function uploadOptionBoth(Request $request){
-        $file = MainFolder::where('name',$request->fileName)->get();
-        if($file){
-            $count = count($file);
-            return response()->json([
-                'status'=>'success',
-                'data'=>$request->fileName ." " . "(" . $count .")"
-            ]);
-        }
-    }
     public function listFolderFiles($dir,$main_id,$sub_id = null){
         $directory = scandir($dir);
         foreach($directory as $folder){
@@ -191,4 +172,27 @@ class UploadController extends Controller
             }
         }
 }
+    public function uploadOption(Request $request){
+        $file = MainFolder::firstWhere('name',$request->fileName);
+        if($file){
+                $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
+                $array  = $sub_folder->toArray();
+                SubFolder::whereIn('main_sub_id',$array)->delete();
+                $file->delete();
+                return response()->json([
+                    'status'=>'success'
+                ]);
+        }
+    }
+
+    public function uploadOptionBoth(Request $request){
+        $file = MainFolder::where('name',$request->fileName)->get();
+        if($file){
+            $count = count($file);
+            return response()->json([
+                'status'=>'success',
+                'data'=>$request->fileName ." " . "(" . $count .")"
+            ]);
+        }
+    }
 }

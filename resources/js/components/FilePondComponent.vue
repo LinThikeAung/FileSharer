@@ -1,38 +1,40 @@
 <template>
-    <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">File Pond</h5>
-          <button type="button" class="btn-close" @click="onCloseFilePond" :disabled="showClose"><i class="bi bi-x"></i></button>
+   <div class="modal-backdrop">
+        <div class="modal-content shadow">
+            <div class="modal-header">
+            <h5 class="modal-title">File Pond</h5>
+            <button type="button" class="btn-close" @click="onCloseFilePond" :disabled="showClose"><i class="bi bi-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <file-pond 
+                name="file"
+                ref="pond"
+                v-on:initfile="handleFilePondInit"
+                v-on:warning="handleFilePond"
+                v-on:processfileprogress="handleFilePondProcessFile"
+                v-on:processfile="stopFileClose"
+                v-on:processfileabort="onProcessfileabort"
+                allowMultiple = true
+                maxFiles = 5
+                :server="{
+                    url : '',
+                    process : {
+                        url : '/upload',
+                        method : 'POST'
+                    },
+                    revert : {
+                        url : '/upload-delete',
+                        method : 'POST'
+                    },
+                    headers : {
+                            'X-CSRF-TOKEN' : this.token
+                    },
+                }"
+                />
+                <p v-if="showError" class="text-danger">The maximum number of files is 5</p>
+            </div>
         </div>
-        <div class="modal-body">
-            <file-pond 
-            name="file"
-            ref="pond"
-            v-on:initfile="handleFilePondInit"
-            v-on:warning="handleFilePond"
-            v-on:processfilestart="handleFilePondProcessFile"
-            v-on:processfile="stopFileClose"
-            v-on:processfileabort="onProcessfileabort"
-            allowMultiple = true
-            maxFiles = 5
-            :server="{
-                url : '',
-                process : {
-                    url : '/upload',
-                    method : 'POST'
-                },
-                revert : {
-                    url : '/upload-delete',
-                    method : 'POST'
-                },
-                headers : {
-                        'X-CSRF-TOKEN' : this.token
-                },
-            }"
-            />
-            <p v-if="showError" class="text-danger">The maximum number of files is 5</p>
-        </div>
-    </div>
+   </div>
 </template>
 
 <script>
@@ -80,11 +82,23 @@ export default {
         sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
 }
 
+.modal-backdrop {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
 .modal-content {
     width: 500px;
-    left: 0px;
-    right: 0px;
-    margin: 0 auto;
+    left: 0px !important;
+    right: 0px !important;
+    margin: 0 auto !important;
+    border: none !important;
+    transition: opacity 0.3s ease;
 }
 
 .btn-close{

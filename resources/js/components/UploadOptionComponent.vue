@@ -1,5 +1,6 @@
 <template>
-      <div class="modal-content shadow">
+     <div class="modal-backdrop">
+        <div class="modal-content shadow">
         <div class="modal-body">   
             <h3 class="mb-4">Upload options</h3> 
             <p class="mb-4">{{ fileName }} already exists in this location.Do you want to replace the existing folder with a new version or keep both folders?Replacing the folder won't change sharing settings.</p>
@@ -23,6 +24,7 @@
             </div>
         </div>
     </div>
+     </div>
 </template>
 
 <script>
@@ -71,7 +73,15 @@ export default {
     border: none !important;
 }
 
-
+.modal-backdrop {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 .btn-default{
     color: #4B49AC;
 }

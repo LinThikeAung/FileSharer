@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use datatables;
 use App\Models\MainFile;
+use App\Models\MainFolder;
 use App\Models\UploadFile;
 use Illuminate\Support\Facades\Crypt;
 
@@ -19,7 +20,7 @@ class FileUploadRepository
      *  Return the model
      */
     public function storeFile(array $data){
-        return MainFile::create([
+        return MainFolder::create([
             'name'=>$data['name'],
             'user_id'=>$data['user_id'],
             'size'=>$data['size'],
@@ -30,8 +31,9 @@ class FileUploadRepository
     }
 
     public function getAllFiles(){
+       
         $id = auth()->id();
-        $query = UploadFile::where('user_id',$id);
+        $query = MainFolder::where('user_id',$id)->latest();
 
         if(request()->name){
             $query = $query->where('name','LIKE','%'.request()->name.'%');
@@ -49,31 +51,44 @@ class FileUploadRepository
         }
 
         return datatables($query)
-        ->addColumn('action',function($each){
-            $drop_icon = '  <div class="btn-group dropstart">
-                                <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li class="dropdown-item"><i class="bi bi-link"></i> <p>Copy Link</p></li>
-                                    <li class="dropdown-item"><i class="bi bi-download"></i> <p>Download</p></li>
-                                    <li class="dropdown-item"><i class="bi bi-share"></i> <p>Share</p></li>
-                                    <li class="dropdown-item"><i class="bi bi-trash"></i> <p>Delete</p></li>
-                                </ul>
-                            </div>';
-            return $drop_icon;
+        ->editColumn('name',function($each){
+            if($each->type == 'png' || $each->type == 'jpg' || $each->type == 'svg' || $each->type == 'jpeg' || $each->type == 'gig'){
+              return '<img src="'.asset('/backend/images/image.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+            if($each->type == 'mp4' || $each->type == 'mov'){
+                return '<img src="'.asset('/backend/images/video.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+            if($each->type == 'folder'){
+                return '<img src="'.asset('/backend/images/folder_icon.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+
+            if($each->type == 'pdf'){
+                return '<img src="'.asset('/backend/images/pdf.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+
+            if($each->type == 'sql'){
+                return '<img src="'.asset('/backend/images/sql.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+
+            if($each->type == 'txt'){
+                return '<img src="'.asset('/backend/images/txt.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
+
+            if($each->type == 'zip'){
+                return '<img src="'.asset('/backend/images/zip.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            }
         })
         ->editColumn('size',function($each){
-            return Crypt::decryptString($each->size);
+            return $each->size??"-";
         })
         ->editColumn('created_at',function($each){
             return $each->created_at->format('d-m-Y h:i A');
         })
-        ->rawColumns(['action'])
+        ->rawColumns(['action','name'])
         ->toJson();
     }
 
     public function getTypeData(){
-        return UploadFile::distinct()->get('type');
+        return MainFolder::distinct()->get('type');
     }
 }

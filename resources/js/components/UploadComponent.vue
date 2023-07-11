@@ -1,18 +1,47 @@
 <template>
     <div class="d-flex justify-content-between align-items-center upload-container">
     <h5>Upload Lists</h5>
-        <div class="dropdown dropstart">
-            <button class="btn btn-theme " type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-plus"></i> <span>New</span>
+        <div class="d-flex align-items-center">
+            <button class="btn btn-theme mr-2" type="button" aria-expanded="false" @click="showFilter = !showFilter">
+                <i class="bi bi-filter"></i> <span>Filter</span>
             </button>
-            <ul class="dropdown-menu mr-1 shadow" style="border-radius: 10px">
-                <input type="file" hidden ref="fileInput" webkitdirectory directory multiple @change="onChangeEvent" :disabled="uploading">
-                <li class="mb-2 text-dark" @click="onFileUpload"><button class="dropdown-item px-3" type="button"><img :src="fileImageUrl" class="image"/><span class="mr-4">File upload</span></button></li>
-                <li class="mb-2" @click="onClickHandler"><button class="dropdown-item px-3" type="button"><img :src="folderImageUrl" class="image"/><span class="mr-4">Folder upload</span></button></li>
-            </ul>
-      </div>
+            <div class="dropdown dropstart">
+                <button class="btn btn-theme " type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-plus"></i> <span>New</span>
+                </button>
+                <ul class="dropdown-menu mr-1 shadow" style="border-radius: 8px;z-index: 999;">
+                    <input type="file" hidden ref="fileInput" webkitdirectory directory multiple @change="onChangeEvent" :disabled="uploading">
+                    <li class="mb-2 text-dark" @click="onFileUpload"><button class="dropdown-item px-3" type="button"><img :src="fileImageUrl" class="image"/><span class="mr-4">File upload</span></button></li>
+                    <li class="mb-2" @click="onClickHandler"><button class="dropdown-item px-3" type="button"><img :src="folderImageUrl" class="image"/><span class="mr-4">Folder upload</span></button></li>
+                </ul>
+            </div>
+        </div>
     </div>
-    
+    <div v-if="showFilter">
+        <filter-component @search="searEventHandler" @clear="clearEvent"></filter-component>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-3 mb-3 shadow">
+     <div class="card-body p-2">
+        <div class="table-responsive ">
+            <table class="table table-hover" id="datatable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Type</th>
+                        <th>Uploaded Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
     <div v-if="showProgress">
         <progress-component 
         :fileName = "fileName" 
@@ -61,6 +90,8 @@ export default {
             folderImageUrl : "/backend/images/upload-folder.png",
             showOptionComponent : false,
             showFilePond : false,
+            folders : [],
+            showFilter : false
         }
     },
     methods:{
@@ -86,7 +117,7 @@ export default {
             });
             
         },
-        uploadData(){
+        async uploadData(){
             let formData = new FormData();
             for(var i=0;i < this.files.length;i++)
             {
@@ -98,7 +129,7 @@ export default {
             this.uploadProgress = 0;
             this.uploading = true;
             this.uploadCancelToken = axios.CancelToken.source();
-            axios.post('/reset',formData,{
+            await axios.post('/reset',formData,{
                     headers : {
                         'Content-Type': 'multipart/form-data'
                     },
@@ -115,7 +146,9 @@ export default {
                     cancelToken: this.uploadCancelToken.token
             })
             .then(response=>{
-                console.log(response);
+               if(response.data.status == 'success'){
+                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+               }
             })
             .catch(error=>{
                 if (axios.isCancel(error)) {
@@ -206,13 +239,58 @@ export default {
             // this.files = this.formattedUsers;
             // this.uploadData();
         },
+        getAllFiles(){
+            $(document).ready(function(){
+                $('#datatable').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: '/upload-list/data',
+                    columns : [
+                        { data : 'name' , name : 'name' },
+                        { data : 'size' , name : 'size' },
+                        { data : 'type' , name : 'type' },
+                        { data : 'created_at' , name : 'created_at' },
+                    ],
+                    
+                });
+
+                // $('#datatable').on('click', '.copy', (event) => {
+                //     let value = event.target.id;
+                //     let input = document.createElement("input");
+                //     input.value = value;
+                //     document.body.appendChild(input);
+                //     input.select();
+                //     if(document.execCommand('copy')) {
+                //         document.body.removeChild(input);
+                //     }
+                // });
+            })
+        },
         onFileUpload(){
             this.showFilePond = true;
         },
         onCloseFilePond(){
             this.showFilePond = false;
+            $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+        },
+        searEventHandler(option){
+            let name = option.name;
+            let type = option.type;
+            let date = option.date;
+            if(option.name){
+                document.getElementById('clear_btn').style.display = "block";
+            }
+            $('#datatable').DataTable().ajax.url(`/upload-list/data?name=${name}&type=${type}&date=${date}`).load();
+        },
+        clearEvent(data){
+            $('#datatable').DataTable().ajax.url(`/upload-list/data?name=${data}`).load();
+            document.getElementById('clear_btn').style.display = "none";
+
         }
     },
+    mounted(){
+        this.getAllFiles();     
+    }
 }
 </script>
 
@@ -223,7 +301,7 @@ export default {
     align-items: center;
     justify-content: space-between !important;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-    border-radius: 10px !important;
+    border-radius: 8px !important;
     padding: 13px 15px;
 }
 
@@ -244,4 +322,9 @@ export default {
     width: 18px;
     margin-right: 12px;
 }
+
+.card{
+    border-radius: 8px !important;
+}
+
 </style>
