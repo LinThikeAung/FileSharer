@@ -52,7 +52,7 @@ class FileUploadRepository
 
         return datatables($query)
         ->editColumn('name',function($each){
-            if($each->type == 'png' || $each->type == 'jpg' || $each->type == 'svg' || $each->type == 'jpeg' || $each->type == 'gig'){
+            if($each->type == 'png' || $each->type == 'jpg' || $each->type == 'svg' || $each->type == 'jpeg' || $each->type == 'gif'){
               return '<img src="'.asset('/backend/images/image.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
             }
             if($each->type == 'mp4' || $each->type == 'mov'){

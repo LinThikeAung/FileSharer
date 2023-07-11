@@ -22686,10 +22686,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     clearEvent: function clearEvent(data) {
       $('#datatable').DataTable().ajax.url("/upload-list/data?name=".concat(data)).load();
       document.getElementById('clear_btn').style.display = "none";
+    },
+    dbClickEvent: function dbClickEvent() {
+      alert('hit');
     }
   },
   mounted: function mounted() {
     this.getAllFiles();
+    $(document).ready(function () {
+      $(document.getElementById('datatable')).on('dblclick', 'tr', function (event) {
+        var table = $(document.getElementById('datatable')).DataTable();
+        var rowData = table.row(this).data();
+        if (rowData.type == 'folder') {
+          window.location.replace("/upload-list/folders/".concat(rowData.id));
+        }
+      });
+    });
   }
 });
 

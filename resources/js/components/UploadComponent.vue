@@ -286,10 +286,22 @@ export default {
             $('#datatable').DataTable().ajax.url(`/upload-list/data?name=${data}`).load();
             document.getElementById('clear_btn').style.display = "none";
 
+        },
+        dbClickEvent(){
+            alert('hit');
         }
     },
     mounted(){
         this.getAllFiles();     
+       $(document).ready(function(){
+        $(document.getElementById('datatable')).on('dblclick', 'tr', function(event) {
+           var table  = $(document.getElementById('datatable')).DataTable();
+            let rowData = table.row(this).data();
+            if(rowData.type == 'folder'){
+               window.location.replace(`/upload-list/folders/${rowData.id}`);
+            }
+        }); 
+       })
     }
 }
 </script>

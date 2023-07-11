@@ -30,6 +30,8 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/upload-option-check',[UploadController::class,'uploadOption']);
     Route::get('//upload-option-both',[UploadController::class,'uploadOptionBoth']);
     Route::get('/upload-list',[UploadController::class,'uploadList'])->name('upload-list');
+    Route::get('/upload-list/folders/{id}',[UploadController::class,'getFolder']);
+    Route::get('/upload-list/folders/sub-folders/{id}',[UploadController::class,'getSubFolder']);
     Route::get('/upload-list/data',[UploadController::class,'uploadData']);
     Route::get('/upload-list/type',[UploadController::class,'getType']);
     Route::post('/category/save', [CategoryController::class, 'save'])->name('category.save');

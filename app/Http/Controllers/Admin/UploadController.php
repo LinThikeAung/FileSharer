@@ -35,7 +35,7 @@ class UploadController extends Controller
         $fileSize = $file->getSize();
         $formattedSize = $this->formatFileSize($fileSize);
         $size =$formattedSize;
-        $name = $file->getClientOriginalName();
+        $unique_name = $file->getClientOriginalName();
         if($file){
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
@@ -45,7 +45,7 @@ class UploadController extends Controller
         $path = "$name/".$fileName;
         $url = Storage::disk('chitmaymay')->url($path);
         $files = [
-            "name" =>$name,
+            "name" =>$unique_name,
             "user_id"=>$id,
             "size"=>$size,
             "type"=>$type,
@@ -144,6 +144,7 @@ class UploadController extends Controller
                     $sub_folder->parent_id = $main_id??null;
                     $sub_folder->main_sub_id = $sub_id??null;
                     $sub_folder->name = $folder;
+                    $sub_folder->type = 'folder';
                     $sub_folder->save();
                     $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id);
                 }else{
@@ -195,4 +196,25 @@ class UploadController extends Controller
             ]);
         }
     }
+
+  public function getFolder($id){ 
+    $main = MainFolder::firstWhere('id',$id);
+    $folders = SubFolder::where('parent_id',$id)->get();
+    $files = File::where('main_folder_id',$id)->get();
+    $user = auth()->user();
+    return view('admin.sub_folder',compact('main','folders','files','user'));
+    // $sub_folders 
+    // return response()->json([
+    //     'status'=>'success',
+    //     'data'=>request()->id
+    // ]);
+  }
+
+  public function getSubFolder($id){
+    $main = SubFolder::firstWhere('id',$id);
+    $folders = SubFolder::where('main_sub_id',$id)->get();
+    $files = File::where('sub_folder_id',$id)->get();
+    $user = auth()->user();
+    return view('admin.sub_folder',compact('main','folders','files','user'));
+  }
 }
