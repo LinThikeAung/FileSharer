@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use ZipArchive;
 use Carbon\Carbon;
 use App\Models\File;
 use App\Models\MainFile;
@@ -12,7 +13,10 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use App\Repositories\FileUploadRepository;
+use Illuminate\Support\Facades\File as Facade;
+use Illuminate\Support\Facades\File as FacadeFile;
 
 class UploadController extends Controller
 {
@@ -128,6 +132,14 @@ class UploadController extends Controller
         $main_folder->name = $parent[0];
         $main_folder->type = "folder";
         $main_folder->save();
+        MainFolder::updateOrCreate(
+            [
+                'id'=>$main_folder->id
+            ],
+            [
+                'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
+            ]
+        );
         $path = Storage::disk('chitmaymay')->path($parent[0]);
         $this->listFolderFiles($path,$main_folder->id);
         return response()->json([
@@ -140,12 +152,26 @@ class UploadController extends Controller
         foreach($directory as $folder){
             if($folder != '.' && $folder != '..'){
                 if(is_dir($dir.'/'.$folder)){
+                    $array = explode('/',$dir);
+                    $path = implode(',', $array);
+                    $new_path = explode('\\',$path);
+                    $result = array_slice($new_path,1);
+                    $real_path = implode('/',$result);
                     $sub_folder = new SubFolder();
                     $sub_folder->parent_id = $main_id??null;
                     $sub_folder->main_sub_id = $sub_id??null;
                     $sub_folder->name = $folder;
                     $sub_folder->type = 'folder';
+                    $sub_folder->path = $real_path;
                     $sub_folder->save();
+                    SubFolder::updateOrCreate(
+                        [
+                            'id'=>$sub_folder->id
+                        ],
+                        [
+                            'url' => env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
+                        ]
+                    );
                     $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id);
                 }else{
                     $array = $_FILES['folder']['name'];
@@ -179,10 +205,23 @@ class UploadController extends Controller
                 $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
                 $array  = $sub_folder->toArray();
                 SubFolder::whereIn('main_sub_id',$array)->delete();
-                $file->delete();
+                FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.$file->name));                $file->delete();
                 return response()->json([
                     'status'=>'success'
                 ]);
+        }
+    }
+
+    public function deleteSubFolder(){
+        $file = SubFolder::firstWhere('name',request()->fileName);
+        if($file){
+            $sub_folder = SubFolder::where('main_sub_id',$file->id)->delete();
+            $array = explode(",",$file->path);
+            $name = implode('/',$array);
+            FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.$name.'/'.$file->name));                $file->delete();
+            return response()->json([
+                'status'=>'success'
+            ]);
         }
     }
 
@@ -216,5 +255,92 @@ class UploadController extends Controller
     $files = File::where('sub_folder_id',$id)->get();
     $user = auth()->user();
     return view('admin.sub_folder',compact('main','folders','files','user'));
+  }
+
+  public function uploadZip(){
+    $folderPath = '\dkmads-upload\\'.request()->fileName; 
+    // Specify the path of the folder you want to download
+        $zipFileName = request()->fileName.'.zip';
+        $zip = new ZipArchive();
+
+        if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($folderPath),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            foreach ($files as $name => $file) {
+                if($file != '.' && $file != '..'){
+                    if (!$file->isDir()) {
+                        $filePath = $file->getRealPath();
+                        $fileArray = explode('\\',$filePath);
+                        $subArray = explode('\\',$folderPath);
+                        $count = count(array_slice($subArray,1));
+                        $new_file = array_slice($fileArray,$count);
+                        $path = implode('\\',$new_file);
+                        $relativePath = $path;
+                        $zip->addFile($filePath, $relativePath);
+                    }
+                }
+            }
+
+            $zip->close();
+        }
+
+        return Response::download(public_path('storage/'.$zipFileName));
+  }
+
+  public function uploadSubFolderZip(){
+    $sub_folder = SubFolder::firstWhere('name',request()->fileName);
+    $array = explode(",",$sub_folder->path);
+    $name = implode('\\',$array);
+    $folderPath = '\dkmads-upload\\'.$name.'\\'.request()->fileName; // Specify the path of the folder you want to download
+    $zipFileName = request()->fileName.'.zip';
+    $zip = new ZipArchive();
+
+    if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($folderPath),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $fileArray = explode('\\',$filePath);
+                    $subArray = explode('\\',$folderPath);
+                    $count = count(array_slice($subArray,1));
+                    $new_file = array_slice($fileArray,$count);
+                    $path = implode('\\',$new_file);
+                    $relativePath = $path;
+                    $zip->addFile($filePath, $relativePath);
+                }
+        }
+
+        $zip->close();
+    }
+
+    return Response::download(public_path('storage/'.$zipFileName));
+  }
+
+  public function download(){
+    return Response::download(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.request()->name));
+  }
+
+  public function downloadSubFile(){
+    $sub_file = request()->name;
+    $array = explode('//',$sub_file);
+    $new_array = array_slice($array,1);
+    $path = explode('/',$new_array[0]);
+    $new_path = array_slice($path,1);
+    $real_path = implode('/',$new_path);
+    return Response::download(public_path($real_path));
+  }
+
+  public function deleteFile(){
+        $file = MainFolder::firstWhere('id',request()->fileName);
+        FacadeFile::delete(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.$file->file));
+        $file->delete();
+        return response()->json([
+            'status'=>'success'
+        ]);
   }
 }

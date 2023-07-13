@@ -24,6 +24,7 @@ require('./bootstrap');
 import { createApp } from 'vue'
 import VueAxios from 'vue-axios';
 import axios from 'axios';
+import Swal from 'sweetalert2'
 //component
 import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
@@ -35,6 +36,7 @@ import FilePondComponent from './components/FilePondComponent.vue';
 const app = createApp({});
 
 app.use(VueAxios, axios);
+app.use('Swal',Swal);
 app.component('app',App);
 app.component('upload-component',UploadComponent);
 app.component('filter-component',FilterComponent);

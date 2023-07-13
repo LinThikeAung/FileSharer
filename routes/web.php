@@ -27,8 +27,15 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/upload',[UploadController::class,'store']);
     Route::get('/upload-exist',[UploadController::class,'upload']);
     Route::post('/upload-delete',[UploadController::class,'delete']);
-    Route::get('/upload-option-check',[UploadController::class,'uploadOption']);
-    Route::get('//upload-option-both',[UploadController::class,'uploadOptionBoth']);
+    Route::post('/upload-option-check',[UploadController::class,'uploadOption']);
+    Route::post('/delete-subFolder',[UploadController::class,'deleteSubFolder']);
+    Route::get('/upload-option-both',[UploadController::class,'uploadOptionBoth']);
+    Route::get('/upload-zip',[UploadController::class,'uploadZip']);
+    Route::get('/upload-subFolder-zip',[UploadController::class,'uploadSubFolderZip']);
+    Route::post('/upload-file-delete',[UploadController::class,'deleteFile']);
+    Route::post('/upload-subFile-delete',[UploadController::class,'subFileDelete']);
+    Route::get('/download-file',[UploadController::class,'download']);
+    Route::get('/download-subFile',[UploadController::class,'downloadSubFile']);
     Route::get('/upload-list',[UploadController::class,'uploadList'])->name('upload-list');
     Route::get('/upload-list/folders/{id}',[UploadController::class,'getFolder']);
     Route::get('/upload-list/folders/sub-folders/{id}',[UploadController::class,'getSubFolder']);

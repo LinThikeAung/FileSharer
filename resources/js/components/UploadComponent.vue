@@ -24,7 +24,7 @@
         <div class="col-12">
             <div class="card mt-3 mb-3 shadow">
      <div class="card-body p-2">
-        <div class="table-responsive ">
+        <!-- <div class="table-responsive"> -->
             <table class="table table-hover" id="datatable">
                 <thead>
                     <tr>
@@ -32,12 +32,13 @@
                         <th>Size</th>
                         <th>Type</th>
                         <th>Uploaded Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
-        </div>
+        <!-- </div> -->
     </div>
 </div>
         </div>
@@ -74,6 +75,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import FilePondComponent from './FilePondComponent.vue';
+import swal from 'sweetalert';
 export default {
   components: { FilePondComponent },
     data(){
@@ -230,14 +232,6 @@ export default {
             }
             console.log(this.files[i]);
             }
-            
-            // for (let i = 0; i < this.formattedUsers.length; i++) {
-            //     let name = this.formattedUsers[i].webkitRelativePath.split('/')[1];
-            //     let real_path = value + "/" + name;
-            //     this.formattedUsers[i].webkitRelativePath = real_path;
-            // }
-            // this.files = this.formattedUsers;
-            // this.uploadData();
         },
         getAllFiles(){
             $(document).ready(function(){
@@ -250,20 +244,76 @@ export default {
                         { data : 'size' , name : 'size' },
                         { data : 'type' , name : 'type' },
                         { data : 'created_at' , name : 'created_at' },
+                        { data : 'action' , name : 'action'}
                     ],
                     
                 });
 
-                // $('#datatable').on('click', '.copy', (event) => {
-                //     let value = event.target.id;
-                //     let input = document.createElement("input");
-                //     input.value = value;
-                //     document.body.appendChild(input);
-                //     input.select();
-                //     if(document.execCommand('copy')) {
-                //         document.body.removeChild(input);
-                //     }
-                // });
+                $('#datatable').on('click', '.copy', (event) => {
+                    let value = event.target.id;
+                    let input = document.createElement("input");
+                    input.value = value;
+                    document.body.appendChild(input);
+                    input.select();
+                    if(document.execCommand('copy')) {
+                        document.body.removeChild(input);
+                        swal({
+                            text: "copied!",
+                            buttons : false,
+                            timer : 1000
+                        });
+                    }
+                });
+
+                $('#datatable').on('click', '.delete_folder', (event) => {
+                    let value = event.target.id;
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: "you want to delete!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'red',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons : true,
+                    focusConfirm : false
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       axios.post(`/upload-option-check?fileName=${value}`)
+                       .then(response=>{
+                            if(response.data.status == 'success'){
+                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                            }
+                       })
+                       .catch(console.error());
+                    }
+                    })
+                });
+
+                $('#datatable').on('click', '.delete', (event) => {
+                    let value = event.target.id;
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: "you want to delete!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'red',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons : true,
+                    focusConfirm : false
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       axios.post(`/upload-file-delete?fileName=${value}`)
+                       .then(response=>{
+                            if(response.data.status == 'success'){
+                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                            }
+                       })
+                       .catch(console.error());
+                    }
+                    })
+                });
             })
         },
         onFileUpload(){
