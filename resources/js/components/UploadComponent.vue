@@ -148,9 +148,10 @@ export default {
                     cancelToken: this.uploadCancelToken.token
             })
             .then(response=>{
-               if(response.data.status == 'success'){
-                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-               }
+            //    if(response.data.status == 'success'){
+            //     $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+            //    }
+            window.location.reload();
             })
             .catch(error=>{
                 if (axios.isCancel(error)) {

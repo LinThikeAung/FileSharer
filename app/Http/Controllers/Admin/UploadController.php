@@ -182,8 +182,7 @@ class UploadController extends Controller
                             break;
                         }
                     }
-                    $path = $_FILES['folder']['full_path'][$index];
-                    $url =  Storage::disk('chitmaymay')->url($path);
+                    $url =  Storage::disk('chitmaymay')->url($_FILES['folder']['full_path'][$index]);
                     $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
                     $type = explode('.',$folder)[1];
                     $file = new File();   
@@ -338,6 +337,18 @@ class UploadController extends Controller
   public function deleteFile(){
         $file = MainFolder::firstWhere('id',request()->fileName);
         FacadeFile::delete(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.$file->file));
+        $file->delete();
+        return response()->json([
+            'status'=>'success'
+        ]);
+  }
+
+  public function subFileDelete(){
+        $file = File::firstWhere('name',request()->fileName);
+        $array = explode('/',$file->url);
+        $new_array = array_slice($array,3);
+        $path = implode('/',$new_array);
+        FacadeFile::delete(public_path($path));
         $file->delete();
         return response()->json([
             'status'=>'success'

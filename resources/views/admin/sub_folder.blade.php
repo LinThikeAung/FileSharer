@@ -97,13 +97,18 @@
                                         <li class="dropdown-item copy_file" id="{{ $item->url }}"><i class="bi bi-link copy_file" id="{{ $item->url }}"></i> <p class="copy_file" id="{{ $item->url }}">Copy Link</p></li>
                                         <a  href="/download-subFile?name={{ $item->url }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
                                         <li class="dropdown-item "><i class="bi bi-share"></i> <p >Share</p></li>
-                                        <li class="dropdown-item delete" id="{{ $item->url }}"><i class="bi bi-trash delete" id="{{ $item->url }}"></i> <p class="delete" id="{{ $item->url }}">Delete</p></li>
+                                        <li class="dropdown-item file_delete" id="{{ $item->name }}"><i class="bi bi-trash file_delete" id="{{ $item->name }}"></i> <p class="file_delete" id="{{ $item->name }}">Delete</p></li>
                                     </ul> 
                                 </div>
                              </td>
                          </tr>
                     @endforeach
-                 @endif
+                    @else
+                    <tr>
+                        <td colspan="5" class="text-center">No data available in table</td>
+                    </tr>
+                    @endif
+
                 </tbody>
             </table>
         </div>
@@ -154,6 +159,31 @@
         }
     });
 
+    $('#table').on('click','.file_delete',event=>{
+        let value = event.target.id;
+            Swal.fire({
+            title: 'Are you sure?',
+            text: "you want to delete!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'red',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!',
+            reverseButtons : true,
+            focusConfirm : false
+            }).then((result) => {
+            if (result.isConfirmed) {
+               axios.post(`/upload-subFile-delete?fileName=${value}`)
+               .then(response=>{
+                    if(response.data.status == 'success'){
+                        window.location.reload();
+                    }
+               })
+               .catch(console.error());
+            }
+        })
+    })
+
     $('#table').on('click', '.delete_folder', (event) => {
         let value = event.target.id;
         Swal.fire({
@@ -178,30 +208,6 @@
         }
     })
 
-    $('#datatable').on('click', '.delete', (event) => {
-        let value = event.target.id;
-        Swal.fire({
-        title: 'Are you sure?',
-        text: "you want to delete!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: 'red',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        reverseButtons : true,
-        focusConfirm : false
-        }).then((result) => {
-        if (result.isConfirmed) {
-           axios.post(`/upload-subFile-delete?fileName=${value}`)
-           .then(response=>{
-                if(response.data.status == 'success'){
-                    window.location.reload();
-                }
-           })
-           .catch(console.error());
-        }
-        })
-    });
 });
 </script>    
 @endsection

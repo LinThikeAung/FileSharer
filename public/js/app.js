@@ -22534,9 +22534,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 },
                 cancelToken: _this2.uploadCancelToken.token
               }).then(function (response) {
-                if (response.data.status == 'success') {
-                  $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-                }
+                //    if(response.data.status == 'success'){
+                //     $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                //    }
+                window.location.reload();
               })["catch"](function (error) {
                 if (axios__WEBPACK_IMPORTED_MODULE_0___default().isCancel(error)) {
                   console.log(error);
