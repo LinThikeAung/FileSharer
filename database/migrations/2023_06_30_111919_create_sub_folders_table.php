@@ -19,6 +19,8 @@ return new class extends Migration
             $table->integer('main_sub_id')->nullable()->constrained('sub_folders')->cascadeOnDelete();
             $table->string('name');
             $table->string('type');
+            $table->string('url')->nullable();
+            $table->string('path');
             $table->timestamps();
         });
     }

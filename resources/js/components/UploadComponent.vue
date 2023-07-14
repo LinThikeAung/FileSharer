@@ -24,7 +24,7 @@
         <div class="col-12">
             <div class="card mt-3 mb-3 shadow">
      <div class="card-body p-2">
-        <div class="table-responsive ">
+        <!-- <div class="table-responsive"> -->
             <table class="table table-hover" id="datatable">
                 <thead>
                     <tr>
@@ -32,12 +32,13 @@
                         <th>Size</th>
                         <th>Type</th>
                         <th>Uploaded Time</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                 </tbody>
             </table>
-        </div>
+        <!-- </div> -->
     </div>
 </div>
         </div>
@@ -68,12 +69,16 @@
           @close-file-pond = "onCloseFilePond"
         ></file-pond-component>
     </div>
+   <div v-if="showShareComponent">
+    <share-component :shareName = "shareName" :users="users" @close="closeShareModal"></share-component>
+   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import Swal from 'sweetalert2'
 import FilePondComponent from './FilePondComponent.vue';
+import swal from 'sweetalert';
 export default {
   components: { FilePondComponent },
     data(){
@@ -91,7 +96,10 @@ export default {
             showOptionComponent : false,
             showFilePond : false,
             folders : [],
-            showFilter : false
+            showFilter : false,
+            showShareComponent : false,
+            shareName : null,
+            users : []
         }
     },
     methods:{
@@ -146,9 +154,10 @@ export default {
                     cancelToken: this.uploadCancelToken.token
             })
             .then(response=>{
-               if(response.data.status == 'success'){
-                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-               }
+            //    if(response.data.status == 'success'){
+            //     $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+            //    }
+            window.location.reload();
             })
             .catch(error=>{
                 if (axios.isCancel(error)) {
@@ -230,14 +239,6 @@ export default {
             }
             console.log(this.files[i]);
             }
-            
-            // for (let i = 0; i < this.formattedUsers.length; i++) {
-            //     let name = this.formattedUsers[i].webkitRelativePath.split('/')[1];
-            //     let real_path = value + "/" + name;
-            //     this.formattedUsers[i].webkitRelativePath = real_path;
-            // }
-            // this.files = this.formattedUsers;
-            // this.uploadData();
         },
         getAllFiles(){
             $(document).ready(function(){
@@ -250,6 +251,7 @@ export default {
                         { data : 'size' , name : 'size' },
                         { data : 'type' , name : 'type' },
                         { data : 'created_at' , name : 'created_at' },
+                        { data : 'action' , name : 'action'}
                     ],
                     
                 });
@@ -295,7 +297,7 @@ export default {
                     })
                 });
 
-                $('#datatable').on('click', '.delete', (event) => {
+            $('#datatable').on('click', '.delete', (event) => {
                     let value = event.target.id;
                     Swal.fire({
                     title: 'Are you sure?',
@@ -319,6 +321,18 @@ export default {
                     }
                     })
                 });
+            })
+
+            $('#datatable').on('click','.share',event=>{
+                let fileName = event.target.id;
+                this.shareName = fileName;
+                axios.get('/getUser')
+                .then(response=>{
+                    this.users = response.data.data;
+                    this.showShareComponent = true;
+                })
+                .catch(console.error());
+                
             })
         },
         onFileUpload(){
@@ -344,6 +358,10 @@ export default {
         },
         dbClickEvent(){
             alert('hit');
+        },
+        closeShareModal(){
+            this.showShareComponent = false;
+            window.location.reload();
         }
     },
     mounted(){
