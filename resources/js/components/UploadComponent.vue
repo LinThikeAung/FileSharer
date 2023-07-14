@@ -69,6 +69,9 @@
           @close-file-pond = "onCloseFilePond"
         ></file-pond-component>
     </div>
+   <div v-if="showShareComponent">
+    <share-component :shareName = "shareName" :users="users" @close="closeShareModal"></share-component>
+   </div>
 </template>
 
 <script>
@@ -93,7 +96,10 @@ export default {
             showOptionComponent : false,
             showFilePond : false,
             folders : [],
-            showFilter : false
+            showFilter : false,
+            showShareComponent : false,
+            shareName : null,
+            users : []
         }
     },
     methods:{
@@ -291,7 +297,7 @@ export default {
                     })
                 });
 
-                $('#datatable').on('click', '.delete', (event) => {
+            $('#datatable').on('click', '.delete', (event) => {
                     let value = event.target.id;
                     Swal.fire({
                     title: 'Are you sure?',
@@ -315,6 +321,18 @@ export default {
                     }
                     })
                 });
+            })
+
+            $('#datatable').on('click','.share',event=>{
+                let fileName = event.target.id;
+                this.shareName = fileName;
+                axios.get('/getUser')
+                .then(response=>{
+                    this.users = response.data.data;
+                    this.showShareComponent = true;
+                })
+                .catch(console.error());
+                
             })
         },
         onFileUpload(){
@@ -340,6 +358,10 @@ export default {
         },
         dbClickEvent(){
             alert('hit');
+        },
+        closeShareModal(){
+            this.showShareComponent = false;
+            window.location.reload();
         }
     },
     mounted(){

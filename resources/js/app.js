@@ -32,6 +32,11 @@ import FilterComponent from './components/FilterComponent.vue';
 import ProgressComponent from './components/ProgressComponent.vue';
 import UploadOptionComponent from './components/UploadOptionComponent.vue';
 import FilePondComponent from './components/FilePondComponent.vue';
+import ShareComponent from './components/ShareComponent.vue';
+import MyShareComponent from './components/MyShareComponent.vue';
+import MyShareFilterComponent from './components/MyShareFilterComponent.vue';
+import OtherShareComponent from './components/OtherShareComponent.vue';
+import OtherShareFilterComponent from './components/OtherShareFilterComponent.vue';
 
 const app = createApp({});
 
@@ -43,4 +48,9 @@ app.component('filter-component',FilterComponent);
 app.component('progress-component',ProgressComponent);
 app.component('uploadOption-component',UploadOptionComponent);
 app.component('file-pond-component',FilePondComponent);
+app.component('my-share-component',MyShareComponent);
+app.component('share-component',ShareComponent);
+app.component('my-shareFilter-component',MyShareFilterComponent);
+app.component('other-share-component',OtherShareComponent)
+app.component('other-shareFilter-component',OtherShareFilterComponent);
 app.mount("#app");

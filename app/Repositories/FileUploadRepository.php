@@ -87,7 +87,7 @@ class FileUploadRepository
                 <ul class="dropdown-menu">
                     <li class="dropdown-item copy" id="'.$each->url.'"><i class="bi bi-link copy" id="'.$each->url.'"></i> <p class="copy" id="'.$each->url.'">Copy Link</p></li>
                     <a href="/upload-zip?fileName='.$each->name.'" class="dropdown-item"><i class="bi bi-download download"></i> <p class="download"">Download</p></a>
-                    <li class="dropdown-item"><i class="bi bi-share"></i> <p>Share</p></li>
+                    <li class="dropdown-item share" id="'.$each->name.'"><i class="bi bi-share share" id="'.$each->name.'"></i> <p class="share" id="'.$each->name.'">Share</p></li>
                     <li class="dropdown-item delete_folder"  id="'.$each->name.'"><i class="bi bi-trash delete_folder" id="'.$each->name.'"></i> <p class="delete_folder" id="'.$each->name.'">Delete</p></li>
                 </ul> 
             </div>';
@@ -99,7 +99,7 @@ class FileUploadRepository
                 <ul class="dropdown-menu">
                     <li class="dropdown-item copy" id="'.$each->url.'"><i class="bi bi-link copy" id="'.$each->url.'"></i> <p class="copy" id="'.$each->url.'">Copy Link</p></li>
                     <a  href="/download-file?name='.$each->file.'" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
-                    <li class="dropdown-item delete" id="'.$each->id.'"><i class="bi bi-share delete" id="'.$each->id.'"></i> <p class="delete" id="'.$each->id.'">Share</p></li>
+                    <li class="dropdown-item share" id="'.$each->name.'"><i class="bi bi-share share" id="'.$each->name.'"></i> <p class="share" id="'.$each->name.'">Share</p></li>
                     <li class="dropdown-item delete"  id="'.$each->id.'"><i class="bi bi-trash delete" id="'.$each->id.'"></i> <p class="delete" id="'.$each->id.'">Delete</p></li>
                 </ul> 
             </div>';

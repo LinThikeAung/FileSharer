@@ -42,7 +42,7 @@ export default {
         },
         uploadOptionData(){
            if(this.selectedOption == 'option1'){
-                axios.get(`/upload-option-check?fileName=${this.fileName}`)
+                axios.post(`/upload-option-check?fileName=${this.fileName}`)
                 .then(response=>{
                     if(response.data.status == 'success'){
                         this.$emit('replace-data');

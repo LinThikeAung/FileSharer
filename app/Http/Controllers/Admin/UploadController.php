@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use ZipArchive;
 use Carbon\Carbon;
 use App\Models\File;
+use App\Models\User;
 use App\Models\MainFile;
 use App\Models\SubFolder;
 use App\Models\MainFolder;
 use App\Models\UploadFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
@@ -354,4 +356,12 @@ class UploadController extends Controller
             'status'=>'success'
         ]);
   }
+
+  public function getUser(){
+        $id = auth()->id();
+        $users = User::whereNotIn('id', [$id])->get();
+        return response()->json([
+            'data'=>$users
+        ]);
+    }
 }

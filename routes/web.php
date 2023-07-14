@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\ShareController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\Admin\CategoryController;
 
@@ -41,8 +42,19 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/upload-list/folders/sub-folders/{id}',[UploadController::class,'getSubFolder']);
     Route::get('/upload-list/data',[UploadController::class,'uploadData']);
     Route::get('/upload-list/type',[UploadController::class,'getType']);
+    Route::get('/share-list/type',[ShareController::class,'getType']);
     Route::post('/category/save', [CategoryController::class, 'save'])->name('category.save');
     Route::post('/reset',[UploadController::class,'test']);
+    Route::get('/getUser',[UploadController::class,'getUser']);
+    Route::get('/myShare-getUser',[ShareController::class,'getUser']);
+    Route::post('/store-share-user',[ShareController::class,'storeShare']);
+    Route::get('/my-share',[ShareController::class,'myShare'])->name('my-share');
+    Route::get('/my-share-list/data',[ShareController::class,'uploadData']);
+    Route::post('/my-shareFile-delete',[ShareController::class,'deleteFile']);
+    Route::get('/other-share',[ShareController::class,'otherShare'])->name('other-share');
+    Route::get('/other-share-list/data',[ShareController::class,'otherShareData']);
+    Route::get('/other-share-list/type',[ShareController::class,'getOtherShare']);
+    Route::get('/otherShare-getUser',[ShareController::class,'getOtherUser']);
 });
 
 
