@@ -217,4 +217,102 @@ class UploadController extends Controller
     $user = auth()->user();
     return view('admin.sub_folder',compact('main','folders','files','user'));
   }
+  public function uploadZip(){
+    $folderPath = '\dkmads-upload\\'.request()->fileName; 
+    // Specify the path of the folder you want to download
+        $zipFileName = request()->fileName.'.zip';
+        $zip = new ZipArchive();
+
+        if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($folderPath),
+                \RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            foreach ($files as $name => $file) {
+                if($file != '.' && $file != '..'){
+                    if (!$file->isDir()) {
+                        $filePath = $file->getRealPath();
+                        $fileArray = explode('\\',$filePath);
+                        $subArray = explode('\\',$folderPath);
+                        $count = count(array_slice($subArray,1));
+                        $new_file = array_slice($fileArray,$count);
+                        $path = implode('\\',$new_file);
+                        $relativePath = $path;
+                        $zip->addFile($filePath, $relativePath);
+                    }
+                }
+            }
+
+            $zip->close();
+        }
+
+        return Response::download(public_path('storage/'.$zipFileName));
+  }
+
+  public function uploadSubFolderZip(){
+    $sub_folder = SubFolder::firstWhere('name',request()->fileName);
+    $array = explode(",",$sub_folder->path);
+    $name = implode('\\',$array);
+    $folderPath = '\dkmads-upload\\'.$name.'\\'.request()->fileName; // Specify the path of the folder you want to download
+    $zipFileName = request()->fileName.'.zip';
+    $zip = new ZipArchive();
+
+    if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($folderPath),
+            \RecursiveIteratorIterator::LEAVES_ONLY
+        );
+        foreach ($files as $name => $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $fileArray = explode('\\',$filePath);
+                    $subArray = explode('\\',$folderPath);
+                    $count = count(array_slice($subArray,1));
+                    $new_file = array_slice($fileArray,$count);
+                    $path = implode('\\',$new_file);
+                    $relativePath = $path;
+                    $zip->addFile($filePath, $relativePath);
+                }
+        }
+
+        $zip->close();
+    }
+
+    return Response::download(public_path('storage/'.$zipFileName));
+  }
+
+  public function download(){
+    return Response::download(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.request()->name));
+  }
+
+  public function downloadSubFile(){
+    $sub_file = request()->name;
+    $array = explode('//',$sub_file);
+    $new_array = array_slice($array,1);
+    $path = explode('/',$new_array[0]);
+    $new_path = array_slice($path,1);
+    $real_path = implode('/',$new_path);
+    return Response::download(public_path($real_path));
+  }
+
+  public function deleteFile(){
+        $file = MainFolder::firstWhere('id',request()->fileName);
+        FacadeFile::delete(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.$file->file));
+        $file->delete();
+        return response()->json([
+            'status'=>'success'
+        ]);
+  }
+
+  public function subFileDelete(){
+        $file = File::firstWhere('name',request()->fileName);
+        $array = explode('/',$file->url);
+        $new_array = array_slice($array,3);
+        $path = implode('/',$new_array);
+        FacadeFile::delete(public_path($path));
+        $file->delete();
+        return response()->json([
+            'status'=>'success'
+        ]);
+  }
 }

@@ -254,16 +254,71 @@ export default {
                     
                 });
 
-                // $('#datatable').on('click', '.copy', (event) => {
-                //     let value = event.target.id;
-                //     let input = document.createElement("input");
-                //     input.value = value;
-                //     document.body.appendChild(input);
-                //     input.select();
-                //     if(document.execCommand('copy')) {
-                //         document.body.removeChild(input);
-                //     }
-                // });
+                $('#datatable').on('click', '.copy', (event) => {
+                    let value = event.target.id;
+                    let input = document.createElement("input");
+                    input.value = value;
+                    document.body.appendChild(input);
+                    input.select();
+                    if(document.execCommand('copy')) {
+                        document.body.removeChild(input);
+                        swal({
+                            text: "copied!",
+                            buttons : false,
+                            timer : 1000
+                        });
+                    }
+                });
+
+                $('#datatable').on('click', '.delete_folder', (event) => {
+                    let value = event.target.id;
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: "you want to delete!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'red',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons : true,
+                    focusConfirm : false
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       axios.post(`/upload-option-check?fileName=${value}`)
+                       .then(response=>{
+                            if(response.data.status == 'success'){
+                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                            }
+                       })
+                       .catch(console.error());
+                    }
+                    })
+                });
+
+                $('#datatable').on('click', '.delete', (event) => {
+                    let value = event.target.id;
+                    Swal.fire({
+                    title: 'Are you sure?',
+                    text: "you want to delete!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: 'red',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    reverseButtons : true,
+                    focusConfirm : false
+                    }).then((result) => {
+                    if (result.isConfirmed) {
+                       axios.post(`/upload-file-delete?fileName=${value}`)
+                       .then(response=>{
+                            if(response.data.status == 'success'){
+                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                            }
+                       })
+                       .catch(console.error());
+                    }
+                    })
+                });
             })
         },
         onFileUpload(){

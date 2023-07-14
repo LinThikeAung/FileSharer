@@ -33,7 +33,10 @@ import ProgressComponent from './components/ProgressComponent.vue';
 =======
 import UploadOptionComponent from './components/UploadOptionComponent.vue';
 import FilePondComponent from './components/FilePondComponent.vue';
+<<<<<<< HEAD
 >>>>>>> cf9d1d95d8569c1c68cfce9086b22eaf1bbbf6eb
+=======
+>>>>>>> parent of 3cca326 (upload_commit_in_lwinkoko)
 
 const app = createApp({});
 
