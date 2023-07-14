@@ -6,7 +6,6 @@ use datatables;
 use App\Models\User;
 use App\Models\ShareUser;
 use App\Models\MainFolder;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class ShareController extends Controller
