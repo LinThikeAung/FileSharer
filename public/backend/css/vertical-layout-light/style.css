@@ -28381,7 +28381,11 @@ div.tagsinput span.tag a {
 }
 
 .auth .brand-logo img {
-  width: 150px;
+  width: 250px;
+}
+
+.auth .brand-logo span{
+  font-size: 14px !important;
 }
 
 .auth form .form-group {
@@ -28793,13 +28797,16 @@ div.tagsinput span.tag a {
 }
 
 .navbar .navbar-brand-wrapper .navbar-brand img {
-  max-width: 100%;
-  height: 34px;
+  height: 50px;
   margin: auto;
   vertical-align: middle;
 }
 
-.navbar .navbar-brand-wrapper .brand-logo-mini {
+.navbar .navbar-brand-wrapper .navbar-brand span{
+  font-size: 16px !important;
+  font-weight: bold;
+}
+/* .navbar .navbar-brand-wrapper .brand-logo-mini {
   padding-left: 0;
   text-align: center;
 }
@@ -28808,7 +28815,7 @@ div.tagsinput span.tag a {
   width: calc(70px - 30px);
   max-width: 100%;
   margin: auto;
-}
+} */
 
 .navbar .navbar-menu-wrapper {
   background: #ffffff;

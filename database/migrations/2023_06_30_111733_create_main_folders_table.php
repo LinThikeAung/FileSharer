@@ -17,6 +17,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
+            $table->string('file')->nullable();
+            $table->text('url')->nullable();
+            $table->string('size')->nullable();
+            $table->string('type')->nullable();
             $table->timestamps();
         });
     }

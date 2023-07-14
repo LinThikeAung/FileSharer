@@ -24,18 +24,24 @@ require('./bootstrap');
 import { createApp } from 'vue'
 import VueAxios from 'vue-axios';
 import axios from 'axios';
-
 //component
 import App from './components/App.vue';
 import UploadComponent from './components/UploadComponent.vue';
-import UploadListComponent from './components/UploadListComponent.vue';
+import FilterComponent from './components/FilterComponent.vue';
 import ProgressComponent from './components/ProgressComponent.vue';
+<<<<<<< HEAD
+=======
+import UploadOptionComponent from './components/UploadOptionComponent.vue';
+import FilePondComponent from './components/FilePondComponent.vue';
+>>>>>>> cf9d1d95d8569c1c68cfce9086b22eaf1bbbf6eb
 
 const app = createApp({});
 
 app.use(VueAxios, axios);
 app.component('app',App);
 app.component('upload-component',UploadComponent);
-app.component('list-component',UploadListComponent);
+app.component('filter-component',FilterComponent);
 app.component('progress-component',ProgressComponent);
+app.component('uploadOption-component',UploadOptionComponent);
+app.component('file-pond-component',FilePondComponent);
 app.mount("#app");

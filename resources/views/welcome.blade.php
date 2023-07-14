@@ -28,7 +28,7 @@
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 @auth
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{{ route('home') }}">Go Back Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/upload-list">Go Back Dashboard</a></li>
                 </ul>
                 @else
                 <ul class="navbar-nav ms-auto">

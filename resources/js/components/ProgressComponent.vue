@@ -1,31 +1,71 @@
 <template>
     <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">1 upload complete</h5>
-          <button type="button" class="close" aria-label="Close">
+          <h5 class="modal-title">Folder upload</h5>
+          <button type="button" class="close" aria-label="Close" v-if="uploading"  @click="closeDialoag">
+            <i class="bi bi-x"></i>
+          </button>
+          <button type="button" class="close" aria-label="Close" v-if="uploadCancel" @click="closeUpload">
+            <i class="bi bi-x"></i>
+          </button>
+          <button type="button" class="close" aria-label="Close" v-if="showSuccess" @click="closeUpload">
             <i class="bi bi-x"></i>
           </button>
         </div>
         <div class="modal-body">    
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <i class="fa-solid fa-folder mr-4"></i>
-                    <span>{{ fileName }}</span>
+            <div v-if="uploading">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img :src="imageUrl" class="folder-image mr-4"/>
+                        <span>{{ fileName }}</span>
+                    </div>
+                    <i class="bi bi-x" style="cursor: pointer;" @click="cancelUpload"></i>
                 </div>
-                <button class="btn-default">Cancel</button>
+                    <div class="progress my-1" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" :style="{width :uploadProgress+'%' }">{{ uploadProgress }}%</div>
+                    </div>
             </div>
-            {{ upload }}
-                <!-- <div class="progress mt-3">
-                    {{  }} -->
-                    <!-- <div class="progress-bar" role="progressbar" :style="{width: uploadProgress}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">{{ uploadProgress }}</div> -->
-                <!-- </div> -->
+            <div v-if="uploadCancel">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img :src="imageUrl" class="folder-image mr-4"/>
+                        <span>{{ fileName }}</span>
+                    </div>
+                    <span>Upload Canceled</span>
+                </div>            
+            </div>
+            <div v-if="showSuccess">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                        <img :src="imageUrl" class="folder-image mr-4"/>
+                        <span>{{ fileName }}</span>
+                    </div>
+                    <i class="bi bi-check2"></i>
+                </div>
+            </div>
         </div>
-      </div>
+    </div>
 </template>
 
 <script>
 export default {
-props : ['fileName','uploadProgress']
+props : ['fileName','uploadProgress','uploading','uploadCancel','showSuccess'],
+data(){
+    return  {
+        imageUrl : '/backend/images/folder.png'
+    }
+},
+methods:{
+    cancelUpload(){
+        this.$emit('update-parent-data');
+    },
+    closeDialoag(){
+        this.$emit('close-dialoag');
+    },
+    closeUpload(){
+        this.$emit('close-upload');
+    }
+}
 }
 </script>
 
@@ -68,25 +108,39 @@ props : ['fileName','uploadProgress']
 }
 
 i{
-    font-size: 25px;
-}
-
-button.btn-default{
-    border: none;
-    background: rgba(130, 130, 130, 0.219);
-    border-radius: 15px;
-    padding: 5px 12px;
-    color:rgba(9, 84, 183, 0.847) ;
-    font-size: 14px;
-    font-weight: bold;
+    font-size: 22px;
+    margin-top: 3px;
 }
 .progress{
-    height: 13px !important;
+    height: 15px !important;
     border-radius: 0px !important;
 }
 
 .progress-bar{
     border-radius: 0px !important;
     background-color: green !important;
+    font-size: 12px !important;
+    padding-left: 5px;
+}
+
+.folder-image{
+    width: 20px;
+}
+.modal-header .bi-x{
+    font-weight: bold !important;
+}
+.modal-body .bi-x{
+    padding: 3px 5px;
+    background-color: rgba(224, 224, 224, 0.34);
+    border-radius: 50%;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.modal-body .bi-check2{
+    padding: 3px 5px;
+    background-color: rgba(11, 151, 63, 0.756);
+    border-radius: 50%;
+    font-size: 16px;
+    color: white;
 }
 </style>
