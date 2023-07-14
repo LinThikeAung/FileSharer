@@ -2,21 +2,21 @@
     <ul class="nav">
         <li class="nav-item @yield('upload-list-active')">
             <a class="nav-link" href="{{ route('upload-list') }}" >
-                <i class="ti-share menu-icon mb-1"></i>
+                <i class="ti-list menu-icon mb-1"></i>
                 <span class="menu-title">Upload Lists</span>
             </a>
         </li>
 
         <li class="nav-item @yield('my-share-active')">
             <a class="nav-link" href="{{ route('my-share') }}" >
-                <i class="ti-new-window menu-icon mb-1"></i>
+                <i class="ti-share menu-icon mb-1"></i>
                 <span class="menu-title">My Share</span>
             </a>
         </li>
 
         <li class="nav-item @yield('other-share-active')">
             <a class="nav-link" href="{{ route('other-share') }}" >
-                <i class="ti-list menu-icon mb-1"></i>
+                <i class="ti-new-window menu-icon mb-1"></i>
                 <span class="menu-title">Other Share</span>
             </a>
         </li>

@@ -41,6 +41,7 @@
 <script>
 import axios from 'axios'
 import { filter } from 'lodash';
+import swal from 'sweetalert';
 export default {
    data(){
        return {
@@ -55,16 +56,27 @@ export default {
         if(document.getElementById('add-input').innerText == 'Add people you want to send'){
                 document.getElementById('add-input').innerText = " ";
                 if(document.getElementById('add-input').innerText.includes(user.email)){
-                    alert('hit');
+                    swal({
+                            text: "This user is already added",
+                            buttons : false,
+                            timer : 1000
+                    });
+                    return false;
                 }
-                document.getElementById('add-input').innerHTML = `<span id="${user.id}" style="display:'inline-block';border:1px solid grey;padding:5px;border-radius:20px;cursor:pointer;" class="m-1">${user.email}</span>`;
+                document.getElementById('add-input').innerHTML = `<span class="badge rounded-pill bg-light text-dark m-2" id="${user.id}" style="cursor:pointer;">${user.email}</span>`;
+                this.error = null;
                 this.shareUsers.push(user.id);
         }else{
                 if(document.getElementById('add-input').innerText.includes(user.email)){
-                    alert('hit');
+                    swal({
+                            text: "This user is already added",
+                            buttons : false,
+                            timer : 1000
+                    });
                     return false;
                 }
-                document.getElementById('add-input').innerHTML +=`<span id="${user.id}" style="display:'inline-block';border:1px solid grey;padding:5px;border-radius:20px;cursor:pointer;" class="m-1">${user.email}</span>`;
+                document.getElementById('add-input').innerHTML +=`<span class="badge rounded-pill bg-light text-dark m-1" id="${user.id}" style="cursor:pointer;">${user.email}</span>`;
+                this.error = null;
                 this.shareUsers.push(user.id);
         }
     },

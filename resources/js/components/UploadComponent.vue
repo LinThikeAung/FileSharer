@@ -106,9 +106,14 @@ export default {
         onChangeEvent(event){  
             this.files = [];
             this.files = Array.from(event.target.files);   
-            if(this.files.length > 50){
-                alert('You files less than 50');
-            }
+            // if(this.files.length > 50){
+            //     swal({
+            //         text: "Your files less than 50.",
+            //         buttons : false,
+            //         timer : 1000
+            //     });
+
+            // }
             let file = this.files[0].webkitRelativePath;
             this.fileName = file.split('/')[0];
             axios.get(`/upload-exist?fileName=${this.fileName}`)
@@ -355,9 +360,6 @@ export default {
             $('#datatable').DataTable().ajax.url(`/upload-list/data?name=${data}`).load();
             document.getElementById('clear_btn').style.display = "none";
 
-        },
-        dbClickEvent(){
-            alert('hit');
         },
         closeShareModal(){
             this.showShareComponent = false;
