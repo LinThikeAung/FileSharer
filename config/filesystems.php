@@ -44,7 +44,7 @@ return [
 
         'chitmaymay' => [
             'driver' => 'local',
-            'root' => '/dkmads-upload/'.date('Y-m-d').'/',
+            'root' => 'media/dkmads-upload/'.date('Y-m-d').'/',
             'url' => env('APP_URL') . '/storage/dkmads-upload/'.date('Y-m-d').'/',
             'visibility' => 'public',
         ],
