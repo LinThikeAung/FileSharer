@@ -45,7 +45,7 @@ class UploadController extends Controller
         if($file){
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
-            $name = auth()->user()->name;
+            $name = auth()->user()->id;
             Storage::disk('chitmaymay')->put("$name/".$fileName, file_get_contents($file));
         }
         $path = "$name/".$fileName;
@@ -87,7 +87,7 @@ class UploadController extends Controller
         $data = MainFolder::where('file',request()->getContent())->first();
         if($data){
             $data->delete();
-            $name = auth()->user()->name;
+            $name = auth()->user()->id;
             Storage::disk('chitmaymay')->delete("$name/".$data->file);
             return response()->json([
                 'status'=>'success',
@@ -122,7 +122,7 @@ class UploadController extends Controller
         foreach($folders as $path=>$name)
         {
             $dir = dirname($path).'/';
-            Storage::disk('chitmaymay')->put($dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            Storage::disk('chitmaymay')->put(auth()->id().'\\'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $index++;
             $parent = explode('/',$dir);
             $sub = ltrim($dir,$parent[0]);
@@ -142,7 +142,7 @@ class UploadController extends Controller
                 'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
             ]
         );
-        $path = Storage::disk('chitmaymay')->path($parent[0]);
+        $path = Storage::disk('chitmaymay')->path(auth()->id().'\\'.$parent[0]);
         $this->listFolderFiles($path,$main_folder->id);
         return response()->json([
             'status'=>'success'
@@ -184,7 +184,7 @@ class UploadController extends Controller
                             break;
                         }
                     }
-                    $url =  Storage::disk('chitmaymay')->url($_FILES['folder']['full_path'][$index]);
+                    $url =  Storage::disk('chitmaymay')->url(auth()->id().'/'.$_FILES['folder']['full_path'][$index]);
                     $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
                     $type = explode('.',$folder)[1];
                     $file = new File();   
@@ -206,7 +206,8 @@ class UploadController extends Controller
                 $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
                 $array  = $sub_folder->toArray();
                 SubFolder::whereIn('main_sub_id',$array)->delete();
-                FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.$file->name));                $file->delete();
+                FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.date('Y-m-d').'/'.auth()->id().'/'.$file->name));                
+                $file->delete();
                 return response()->json([
                     'status'=>'success'
                 ]);
@@ -219,7 +220,7 @@ class UploadController extends Controller
             $sub_folder = SubFolder::where('main_sub_id',$file->id)->delete();
             $array = explode(",",$file->path);
             $name = implode('/',$array);
-            FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.$name.'/'.$file->name));                $file->delete();
+            FacadeFile::deleteDirectory(public_path('storage/dkmads-upload/'.date('Y-m-d').'/'.$name.'/'.$file->name));                $file->delete();
             return response()->json([
                 'status'=>'success'
             ]);
@@ -259,7 +260,7 @@ class UploadController extends Controller
   }
 
   public function uploadZip(){
-    $folderPath = '\dkmads-upload\\'.request()->fileName; 
+    $folderPath = '\dkmads-upload\\'.date('Y-m-d').'\\'.auth()->id().'\\'.request()->fileName; 
     // Specify the path of the folder you want to download
         $zipFileName = request()->fileName.'.zip';
         $zip = new ZipArchive();
@@ -294,7 +295,9 @@ class UploadController extends Controller
     $sub_folder = SubFolder::firstWhere('name',request()->fileName);
     $array = explode(",",$sub_folder->path);
     $name = implode('\\',$array);
-    $folderPath = '\dkmads-upload\\'.$name.'\\'.request()->fileName; // Specify the path of the folder you want to download
+    $new_array = explode('/',$name);
+    $new_name = implode('\\',$new_array);
+    $folderPath = '\dkmads-upload\\'.date('Y-m-d').'\\'.$new_name.'\\'.request()->fileName; // Specify the path of the folder you want to download
     $zipFileName = request()->fileName.'.zip';
     $zip = new ZipArchive();
 
@@ -323,7 +326,7 @@ class UploadController extends Controller
   }
 
   public function download(){
-    return Response::download(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.request()->name));
+    return Response::download(public_path('storage/dkmads-upload/'.date('Y-m-d').'/'.auth()->user()->id.'/'.request()->name));
   }
 
   public function downloadSubFile(){
@@ -338,7 +341,7 @@ class UploadController extends Controller
 
   public function deleteFile(){
         $file = MainFolder::firstWhere('id',request()->fileName);
-        FacadeFile::delete(public_path('storage/dkmads-upload/'.auth()->user()->name.'/'.$file->file));
+        FacadeFile::delete(public_path('storage/dkmads-upload/'.date('Y-m-d').'/'.auth()->user()->id.'/'.$file->file));
         $file->delete();
         return response()->json([
             'status'=>'success'
