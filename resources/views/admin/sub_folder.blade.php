@@ -58,8 +58,20 @@
                     @foreach ($files as $item)
                          <tr>
                              <td>
-                                    <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
+                                    <?php
+                                    $backendPath = public_path('backend/images/'.$item->type.".png");
+                                   if(File::exists($backendPath)){
+                               ?>
+                                      <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
+                                      <span>{{ $item->name }}</span>
+                               <?php
+                                   }else{
+                               ?>
+                                   <img src='{{ asset("/backend/images/unknown.png") }}' class="mr-3"/> 
+                                   <span>{{ $item->name }}</span>
+                               <?php
+                                   }
+                               ?>
                             </td>
                              <td>{{ $item->size }}</td>
                              <td>{{ $item->type }}</td>

@@ -3,10 +3,10 @@
 namespace App\Repositories;
 
 use datatables;
-use App\Models\MainFile;
 use App\Models\MainFolder;
-use App\Models\UploadFile;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Storage;
 
 //use Your Model
 
@@ -52,9 +52,26 @@ class FileUploadRepository
 
         return datatables($query)
         ->editColumn('name',function($each){
-
-            // return '<img src="'.asset('/backend/images/{{ $each->type }}.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            return '<img src="'.asset('/backend/images/'.$each->type.'.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            $backendPath = public_path('backend/images/'.$each->type.".png");
+           if(File::exists($backendPath)){
+                return '<img src="'.asset('/backend/images/'.$each->type.'.png').'" class="mr-3"/> <span>'.$each->name.'</span>';                           
+           }else{
+             return '<img src="'.asset('/backend/images/unknown.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+           }
+        
+            // // Now $images will contain an array of SplFileInfo objects representing each image file.
+        
+            // // If you want to get the file paths as strings, you can use the `getPathname` method:
+            // $imagePaths = array_map(function ($image) {
+            //     return $image->getPathname();
+            // }, $images);
+        
+            // return $imagePaths;
+            // if(Storage::disk('public')->exists("$each->type.png")){
+            //     return '<img src="'.asset('/backend/images/'.$each->type.'.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            // }else{
+            //     return '<img src="'.asset('/backend/images/unknown.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+            // }
         })
         ->addColumn('action',function($each){
             if ($each->type == 'folder') {
