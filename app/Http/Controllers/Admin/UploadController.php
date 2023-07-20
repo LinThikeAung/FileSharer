@@ -10,6 +10,7 @@ use App\Models\MainFile;
 use App\Models\SubFolder;
 use App\Models\MainFolder;
 use App\Models\UploadFile;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -143,6 +144,7 @@ class UploadController extends Controller
             ]
         );
         $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
+        $path = str_replace("\\", "/", $path);
         $this->listFolderFiles($path,$main_folder->id);
         return response()->json([
             'status'=>'success'
@@ -155,10 +157,7 @@ class UploadController extends Controller
             if($folder != '.' && $folder != '..'){
                 if(is_dir($dir.'/'.$folder)){
                     $array = explode('/',$dir);
-                    $path = implode(',', $array);
-                    $new_path = explode('\\',$path);
-                    $result = array_slice($new_path,1);
-                    $real_path = implode('/',$result);
+                    $real_path = implode('/',$array);
                     $sub_folder = new SubFolder();
                     $sub_folder->parent_id = $main_id??null;
                     $sub_folder->main_sub_id = $sub_id??null;
@@ -294,9 +293,9 @@ class UploadController extends Controller
 
   public function uploadSubFolderZip(){
     $sub_folder = SubFolder::firstWhere('name',request()->fileName);
-    $array = explode(",",$sub_folder->path);
+    $array = explode("/",$sub_folder->path);
     $new_name = implode('/',$array);
-    $folderPath = '/media/dkmads-upload/'.$new_name.'/'.request()->fileName; // Specify the path of the folder you want to download
+    $folderPath = $new_name.'/'.request()->fileName; // Specify the path of the folder you want to download
     $zipFileName = request()->fileName.'.zip';
     $zip = new ZipArchive();
 
