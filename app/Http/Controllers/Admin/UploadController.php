@@ -263,7 +263,7 @@ class UploadController extends Controller
   }
 
   public function uploadZip(){
-    $folderPath = '\media\dkmads-upload\\'.date('Y').'\\'.date('m').'\\'.date('d').'\\'.auth()->id().'\\'.request()->fileName; 
+    $folderPath = '\media\dkmads-upload\\'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.request()->fileName; 
     // Specify the path of the folder you want to download
         $zipFileName = request()->fileName.'.zip';
         $zip = new ZipArchive();
