@@ -41,7 +41,6 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],
-
         'chitmaymay' => [
             'driver' => 'local',
             'root' => '/media/dkmads-upload/',

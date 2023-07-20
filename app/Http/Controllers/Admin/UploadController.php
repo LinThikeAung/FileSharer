@@ -122,7 +122,7 @@ class UploadController extends Controller
         foreach($folders as $path=>$name)
         {
             $dir = dirname($path).'/';
-            Storage::disk('chitmaymay')->put(date('Y').'\\'.date('m').'\\'.date('d').'\\'.auth()->id().'\\'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $index++;
             $parent = explode('/',$dir);
             $sub = ltrim($dir,$parent[0]);
@@ -263,7 +263,7 @@ class UploadController extends Controller
   }
 
   public function uploadZip(){
-    $folderPath = '\media\dkmads-upload\\'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.request()->fileName; 
+    $folderPath = '/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.request()->fileName; 
     // Specify the path of the folder you want to download
         $zipFileName = request()->fileName.'.zip';
         $zip = new ZipArchive();
@@ -278,10 +278,8 @@ class UploadController extends Controller
                     if (!$file->isDir()) {
                         $filePath = $file->getRealPath();
                         $fileArray = explode('\\',$filePath);
-                        $subArray = explode('\\',$folderPath);
-                        $count = count(array_slice($subArray,1));
-                        $new_file = array_slice($fileArray,$count);
-                        $path = implode('\\',$new_file);
+                        $new_file = array_slice($fileArray,1);
+                        $path = implode('/',$new_file);
                         $relativePath = $path;
                         $zip->addFile($filePath, $relativePath);
                     }
@@ -297,10 +295,8 @@ class UploadController extends Controller
   public function uploadSubFolderZip(){
     $sub_folder = SubFolder::firstWhere('name',request()->fileName);
     $array = explode(",",$sub_folder->path);
-    $name = implode('\\',$array);
-    $new_array = explode('/',$name);
-    $new_name = implode('\\',$new_array);
-    $folderPath = '\media\dkmads-upload\\'.$new_name.'\\'.request()->fileName; // Specify the path of the folder you want to download
+    $new_name = implode('/',$array);
+    $folderPath = '/media/dkmads-upload/'.$new_name.'/'.request()->fileName; // Specify the path of the folder you want to download
     $zipFileName = request()->fileName.'.zip';
     $zip = new ZipArchive();
 
@@ -313,10 +309,8 @@ class UploadController extends Controller
                 if (!$file->isDir()) {
                     $filePath = $file->getRealPath();
                     $fileArray = explode('\\',$filePath);
-                    $subArray = explode('\\',$folderPath);
-                    $count = count(array_slice($subArray,1));
-                    $new_file = array_slice($fileArray,$count);
-                    $path = implode('\\',$new_file);
+                    $new_file = array_slice($fileArray,1);
+                    $path = implode('/',$new_file);
                     $relativePath = $path;
                     $zip->addFile($filePath, $relativePath);
                 }
