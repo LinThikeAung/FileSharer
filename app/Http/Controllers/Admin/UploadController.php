@@ -186,7 +186,9 @@ class UploadController extends Controller
                     }
                     $url =  Storage::disk('chitmaymay')->url(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$_FILES['folder']['full_path'][$index]);
                     $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
-                    $type = explode('.',$folder)[1];
+                    $edit_type = explode('.',$folder);
+                    $count = count($edit_type)-1;
+                    $type = $edit_type[$count];
                     $file = new File();   
                     $file->name = $folder;
                     $file->url = $url;

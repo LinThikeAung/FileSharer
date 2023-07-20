@@ -26,11 +26,9 @@
                     @if (count($folders) > 0)
                        @foreach ($folders as $item)
                             <tr data-id="{{ $item->id }}">
-                                <td>
-                                        @if ($item->type == 'folder')
-                                            <img src="{{ asset('/backend/images/folder_icon.png') }}" class="mr-3"/> 
-                                            <span>{{ $item->name }}</span>
-                                        @endif
+                                <td>   
+                                    <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
+                                    <span>{{ $item->name }}</span>
                                 </td>
                                 <td>
                                         {{ $item->size??"-" }}
@@ -60,30 +58,8 @@
                     @foreach ($files as $item)
                          <tr>
                              <td>
-                                @if ($item->type == 'png' || $item->type == 'jpg' || $item->type == 'svg' || $item->type == 'jpeg' || $item->type == 'gif'  || $item->type == 'webp' || $item->type == 'com_wallpaper' )
-                                    <img src="{{ asset('/backend/images/image.png') }}" class="mr-3"/> 
+                                    <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
                                     <span>{{ $item->name }}</span>
-                                @endif
-                                @if ($item->type == 'mp4' || $item->type == 'mov')
-                                    <img src="{{ asset('/backend/images/video.png') }}" class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
-                                @endif
-                                @if ($item->type == 'pdf')
-                                    <img src="{{ asset('/backend/images/pdf.png') }}" class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
-                                @endif
-                                @if ($item->type == 'sql')
-                                    <img src="{{ asset('/backend/images/sql.png') }}" class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
-                                @endif
-                                @if ($item->type == 'txt')
-                                    <img src="{{ asset('/backend/images/txt.png') }}" class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
-                                @endif
-                                @if ($item->type == 'zip')
-                                    <img src="{{ asset('/backend/images/zip.png') }}" class="mr-3"/> 
-                                    <span>{{ $item->name }}</span>
-                                @endif
                             </td>
                              <td>{{ $item->size }}</td>
                              <td>{{ $item->type }}</td>

@@ -54,32 +54,7 @@ class FileUploadRepository
         ->editColumn('name',function($each){
 
             // return '<img src="'.asset('/backend/images/{{ $each->type }}.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-
-            if($each->type == 'png' || $each->type == 'jpg' || $each->type == 'svg' || $each->type == 'jpeg' || $each->type == 'gif' || $each->type == 'webp'){
-              return '<img src="'.asset('/backend/images/image.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-            if($each->type == 'mp4' || $each->type == 'mov'){
-                return '<img src="'.asset('/backend/images/video.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-            if($each->type == 'folder'){
-                return '<img src="'.asset('/backend/images/folder_icon.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-
-            if($each->type == 'pdf'){
-                return '<img src="'.asset('/backend/images/pdf.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-
-            if($each->type == 'sql'){
-                return '<img src="'.asset('/backend/images/sql.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-
-            if($each->type == 'txt'){
-                return '<img src="'.asset('/backend/images/txt.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
-
-            if($each->type == 'zip'){
-                return '<img src="'.asset('/backend/images/zip.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            }
+            return '<img src="'.asset('/backend/images/'.$each->type.'.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
         })
         ->addColumn('action',function($each){
             if ($each->type == 'folder') {
