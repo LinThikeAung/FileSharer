@@ -142,7 +142,7 @@ class UploadController extends Controller
                 'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
             ]
         );
-        $path = Storage::disk('chitmaymay')->path(date('Y').'\\'.date('m').'\\'.date('d').'\\'.auth()->id().'\\'.$parent[0]);
+        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
         $this->listFolderFiles($path,$main_folder->id);
         return response()->json([
             'status'=>'success'

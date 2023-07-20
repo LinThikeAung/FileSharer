@@ -52,6 +52,9 @@ class FileUploadRepository
 
         return datatables($query)
         ->editColumn('name',function($each){
+
+            // return '<img src="'.asset('/backend/images/{{ $each->type }}.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
+
             if($each->type == 'png' || $each->type == 'jpg' || $each->type == 'svg' || $each->type == 'jpeg' || $each->type == 'gif' || $each->type == 'webp'){
               return '<img src="'.asset('/backend/images/image.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
             }
