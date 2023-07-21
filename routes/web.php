@@ -33,9 +33,11 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/upload-option-both',[UploadController::class,'uploadOptionBoth']);
     Route::get('/upload-zip',[UploadController::class,'uploadZip']);
     Route::get('/upload-subFolder-zip',[UploadController::class,'uploadSubFolderZip']);
+    Route::get('/share-upload-zip',[ShareController::class,'shareUploadZip']);
     Route::post('/upload-file-delete',[UploadController::class,'deleteFile']);
     Route::post('/upload-subFile-delete',[UploadController::class,'subFileDelete']);
     Route::get('/download-file',[UploadController::class,'download']);
+    Route::get('/share-download-file',[ShareController::class,'shareDownload']);
     Route::get('/download-subFile',[UploadController::class,'downloadSubFile']);
     Route::get('/upload-list',[UploadController::class,'uploadList'])->name('upload-list');
     Route::get('/upload-list/folders/{id}',[UploadController::class,'getFolder']);
