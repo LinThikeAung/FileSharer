@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Response;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\File as Facade;
 use Illuminate\Support\Facades\File as FacadeFile;
-
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 class UploadController extends Controller
 {
     protected $file_upload;
@@ -268,7 +269,7 @@ class UploadController extends Controller
         $zip = new ZipArchive();
 
         if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-            $files = new \RecursiveIteratorIterator(
+            /*$files = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($folderPath),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             );
@@ -283,12 +284,30 @@ class UploadController extends Controller
                         $zip->addFile($filePath, $relativePath);
                     }
                 }
+            }*/
+	    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
+	   while ($iterator->valid()) {
+            if (!$iterator->isDot()) {
+                $filePath = $iterator->getPathName();
+                $relativePath = substr($filePath, strlen($folderPath) + 1);
+                if (!$iterator->isDir()) {
+                    $zip->addFile($filePath, $relativePath);
+                } else {
+                    if ($relativePath !== false) {
+                        $zip->addEmptyDir($relativePath);
+                    }
+                }
             }
-
+            $iterator->next();
+        }
             $zip->close();
         }
-
-        return Response::download(public_path('storage/'.$zipFileName));
+	$fileurl = public_path('storage/'.$zipFileName);
+	if (file_exists($fileurl)) {
+    		return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)));
+	} else {
+    		return ['status'=>'zip file does not exist'];
+	}	
   }
 
   public function uploadSubFolderZip(){
@@ -302,29 +321,33 @@ class UploadController extends Controller
     $zip = new ZipArchive();
 
     if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-        $files = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($folderPath),
-            \RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        foreach ($files as $name => $file) {
-                if (!$file->isDir()) {
-                    $filePath = $file->getRealPath();
-                    $fileArray = explode('\\',$filePath);
-                    $new_file = array_slice($fileArray,$count);
-                    $path = implode('/',$new_file);
-                    $relativePath = $path;
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
+	   while ($iterator->valid()) {
+            if (!$iterator->isDot()) {
+                $filePath = $iterator->getPathName();
+                $relativePath = substr($filePath, strlen($folderPath) + 1);
+                if (!$iterator->isDir()) {
                     $zip->addFile($filePath, $relativePath);
+                } else {
+                    if ($relativePath !== false) {
+                        $zip->addEmptyDir($relativePath);
+                    }
                 }
+            }
+            $iterator->next();
         }
-
-        $zip->close();
-    }
-
-    return Response::download(public_path('storage/'.$zipFileName));
+            $zip->close();
+        }
+	$fileurl = public_path('storage/'.$zipFileName);
+	if (file_exists($fileurl)) {
+    		return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)));
+	} else {
+    		return ['status'=>'zip file does not exist'];
+	}	
   }
 
   public function download(){
-    return Response::download(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->user()->id.'/'.request()->name));
+    return response()->download(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->user()->id.'/'.request()->name));
   }
 
   public function downloadSubFile(){

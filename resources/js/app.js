@@ -37,6 +37,7 @@ import MyShareComponent from './components/MyShareComponent.vue';
 import MyShareFilterComponent from './components/MyShareFilterComponent.vue';
 import OtherShareComponent from './components/OtherShareComponent.vue';
 import OtherShareFilterComponent from './components/OtherShareFilterComponent.vue';
+import ConfirmComponent from './components/ConfirmComponent.vue';
 
 const app = createApp({});
 
@@ -53,4 +54,5 @@ app.component('share-component',ShareComponent);
 app.component('my-shareFilter-component',MyShareFilterComponent);
 app.component('other-share-component',OtherShareComponent)
 app.component('other-shareFilter-component',OtherShareFilterComponent);
+app.component('confirm-component',ConfirmComponent);
 app.mount("#app");

@@ -106,14 +106,6 @@ export default {
         onChangeEvent(event){  
             this.files = [];
             this.files = Array.from(event.target.files);   
-            // if(this.files.length > 50){
-            //     swal({
-            //         text: "Your files less than 50.",
-            //         buttons : false,
-            //         timer : 1000
-            //     });
-
-            // }
             let file = this.files[0].webkitRelativePath;
             this.fileName = file.split('/')[0];
             axios.get(`/upload-exist?fileName=${this.fileName}`)
