@@ -50,10 +50,8 @@
     </div>
 </body>
 <script src="https://code.jquery.com/jquery-3.6.1.min.js" integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+<script src="{{ asset('backend/vendors/js/vendor.bundle.base.js') }}"></script>
 <!-- endinject -->
-<!-- Plugin js for this page -->
-<script src="{{ asset('backend/vendors/chart.js/Chart.min.js') }}"></script>
-<!-- End plugin js for this page -->
 <script src="{{ mix('js/app.js') }}"></script>
 <!-- Datatable -->
 <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
