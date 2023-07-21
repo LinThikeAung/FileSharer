@@ -277,7 +277,7 @@ class UploadController extends Controller
                     if (!$file->isDir()) {
                         $filePath = $file->getRealPath();
                         $fileArray = explode('\\',$filePath);
-                        $new_file = array_slice($fileArray,1);
+                        $new_file = array_slice($fileArray,7);
                         $path = implode('/',$new_file);
                         $relativePath = $path;
                         $zip->addFile($filePath, $relativePath);
@@ -296,6 +296,8 @@ class UploadController extends Controller
     $array = explode("/",$sub_folder->path);
     $new_name = implode('/',$array);
     $folderPath = $new_name.'/'.request()->fileName; // Specify the path of the folder you want to download
+    $edit_folderPath = explode("/",$folderPath);
+    $count = count(array_slice($edit_folderPath,1));
     $zipFileName = request()->fileName.'.zip';
     $zip = new ZipArchive();
 
@@ -308,7 +310,7 @@ class UploadController extends Controller
                 if (!$file->isDir()) {
                     $filePath = $file->getRealPath();
                     $fileArray = explode('\\',$filePath);
-                    $new_file = array_slice($fileArray,1);
+                    $new_file = array_slice($fileArray,$count);
                     $path = implode('/',$new_file);
                     $relativePath = $path;
                     $zip->addFile($filePath, $relativePath);
