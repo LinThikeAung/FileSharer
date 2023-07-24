@@ -87,10 +87,15 @@ class UploadController extends Controller
     }
     public function delete(){
         $data = MainFolder::where('file',request()->getContent())->first();
+        $real_time = $data->created_at->format('Y-m-d');
+        $array = explode('-',$real_time);
+        $year = $array[0];
+        $month = $array[1];
+        $day = $array[2];
         if($data){
             $data->delete();
             $name = auth()->user()->id;
-            Storage::disk('chitmaymay')->delete(date('Y').'/'.date('m').'/'.date('d').'/'."$name/".$data->file);
+            Storage::disk('chitmaymay')->delete($year.'/'.$month.'/'.$day.'/'."$name/".$data->file);
             return response()->json([
                 'status'=>'success',
                 'message'=>'Successfully Created'
@@ -204,11 +209,16 @@ class UploadController extends Controller
 }
     public function uploadOption(Request $request){
         $file = MainFolder::firstWhere('name',$request->fileName);
+        $real_time = $file->created_at->format('Y-m-d');
+        $array = explode('-',$real_time);
+        $year = $array[0];
+        $month = $array[1];
+        $day = $array[2];
         if($file){
                 $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
                 $array  = $sub_folder->toArray();
                 SubFolder::whereIn('main_sub_id',$array)->delete();
-                FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$file->name));                
+                FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name));                
                 $file->delete();
                 return response()->json([
                     'status'=>'success'
@@ -222,7 +232,7 @@ class UploadController extends Controller
             $sub_folder = SubFolder::where('main_sub_id',$file->id)->delete();
             $array = explode(",",$file->path);
             $name = implode('/',$array);
-            FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.$name.'/'.$file->name));                
+            FacadeFile::deleteDirectory(public_path('storage/'.$name.'/'.$file->name));                
             $file->delete();
             return response()->json([
                 'status'=>'success'
@@ -263,7 +273,13 @@ class UploadController extends Controller
   }
 
   public function uploadZip(){
-    $folderPath = '/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.request()->fileName; 
+    $main_folder = MainFolder::firstWhere('name',request()->fileName);
+    $real_time = $main_folder->created_at->format('Y-m-d');
+    $array = explode('-',$real_time);
+    $year = $array[0];
+    $month = $array[1];
+    $day = $array[2];
+    $folderPath = '/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.request()->fileName; 
     // Specify the path of the folder you want to download
         $zipFileName = request()->fileName.'.zip';
         $zip = new ZipArchive();
@@ -347,7 +363,13 @@ class UploadController extends Controller
   }
 
   public function download(){
-    return response()->download(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->user()->id.'/'.request()->name));
+    $main_folder = MainFolder::firstWhere('file',request()->name);
+    $real_time = $main_folder->created_at->format('Y-m-d');
+    $array = explode('-',$real_time);
+    $year = $array[0];
+    $month = $array[1];
+    $day = $array[2];
+    return response()->download(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.request()->name));
   }
 
   public function downloadSubFile(){
@@ -362,7 +384,12 @@ class UploadController extends Controller
 
   public function deleteFile(){
         $file = MainFolder::firstWhere('id',request()->fileName);
-        FacadeFile::delete(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->user()->id.'/'.$file->file));
+        $real_time = $file->created_at->format('Y-m-d');
+        $array = explode('-',$real_time);
+        $year = $array[0];
+        $month = $array[1];
+        $day = $array[2];
+        FacadeFile::delete(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.$file->file));
         $file->delete();
         return response()->json([
             'status'=>'success'
