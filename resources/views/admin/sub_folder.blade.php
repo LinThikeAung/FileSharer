@@ -149,53 +149,100 @@
 
     $('#table').on('click','.file_delete',event=>{
         let value = event.target.id;
-            Swal.fire({
-            title: 'Are you sure?',
-            text: "you want to delete!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: 'red',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!',
-            reverseButtons : true,
-            focusConfirm : false
-            }).then((result) => {
-            if (result.isConfirmed) {
-               axios.post(`/upload-subFile-delete?fileName=${value}`)
-               .then(response=>{
-                    if(response.data.status == 'success'){
-                        window.location.reload();
+        let message = "Delete";
+        Swal.fire({
+            title: `To confirm, type "${message}" in the box below`,
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: false,
+            confirmButtonText: 'Delete this file',
+            focusConfirm : false,
+            preConfirm: (input) => {
+                return axios.get(`/delete-confirm?input=${input}&message=${message}`)
+                .then(response => {
+                    if(response.data.status == 'fail'){
+                        Swal.showValidationMessage( 
+                            response.data.message
+                        );
                     }
-               })
-               .catch(console.error());
-            }
+                    if(response.data.status == 'success'){
+                       Swal.fire({
+                        title: 'Are you sure?',
+                        text: "you want to delete!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: 'red',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Yes, delete it!',
+                        reverseButtons : true,
+                        focusConfirm : false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                axios.post(`/upload-subFile-delete?fileName=${value}`)
+                                .then(response=>{
+                                        if(response.data.status == 'success'){
+                                            window.location.reload();
+                                        }
+                                })
+                                .catch(console.error());
+                            }
+                        })
+                    }
+                })
+                .catch(console.error());
+            },
         })
     })
 
     $('#table').on('click', '.delete_folder', (event) => {
         let value = event.target.id;
+        let message = "Delete";
         Swal.fire({
-        title: 'Are you sure?',
-        text: "you want to delete!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: 'red',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        reverseButtons : true,
-        focusConfirm : false
-        }).then((result) => {
-        if (result.isConfirmed) {
-           axios.post(`/delete-subFolder?fileName=${value}`)
-           .then(response=>{
-                if(response.data.status == 'success'){
-                   window.location.reload();
-                }
-           })
-           .catch(console.error());
-        }
-    })
-
-});
+            title: `To confirm, type "${message}" in the box below`,
+            input: 'text',
+            inputAttributes: {
+                autocapitalize: 'off'
+            },
+            showCancelButton: false,
+            confirmButtonText: 'Delete this file',
+            focusConfirm : false,
+            preConfirm: (input) => {
+                return axios.get(`/delete-confirm?input=${input}&message=${message}`)
+                .then(response => {
+                    if(response.data.status == 'fail'){
+                        Swal.showValidationMessage( 
+                            response.data.message
+                        );
+                    }
+                    if(response.data.status == 'success'){
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "you want to delete!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: 'red',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, delete it!',
+                            reverseButtons : true,
+                            focusConfirm : false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                axios.post(`/delete-subFolder?fileName=${value}`)
+                                .then(response=>{
+                                    if(response.data.status == 'success'){
+                                        window.location.reload();
+                                    }
+                                })
+                                .catch(console.error());
+                            }
+                        })
+                    }
+                })
+                .catch(console.error());
+            },
+        })
+    });
 </script>    
 @endsection

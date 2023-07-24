@@ -271,53 +271,101 @@ export default {
 
                 $('#datatable').on('click', '.delete_folder', (event) => {
                     let value = event.target.id;
+                    let message = "Delete";
                     Swal.fire({
-                    title: 'Are you sure?',
-                    text: "you want to delete!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: 'red',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!',
-                    reverseButtons : true,
-                    focusConfirm : false
-                    }).then((result) => {
-                    if (result.isConfirmed) {
-                       axios.post(`/upload-option-check?fileName=${value}`)
-                       .then(response=>{
-                            if(response.data.status == 'success'){
-                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-                            }
-                       })
-                       .catch(console.error());
-                    }
+                        title: `To confirm, type "${message}" in the box below`,
+                        input: 'text',
+                        inputAttributes: {
+                            autocapitalize: 'off'
+                        },
+                        showCancelButton: false,
+                        confirmButtonText: 'Delete this file',
+                        focusConfirm : false,
+                        preConfirm: (input) => {
+                            return axios.get(`/delete-confirm?input=${input}&message=${message}`)
+                            .then(response => {
+                                if(response.data.status == 'fail'){
+                                    Swal.showValidationMessage( 
+                                        response.data.message
+                                    );
+                                }
+                                if(response.data.status == 'success'){
+                                    Swal.fire({
+                                        title: 'Are you sure?',
+                                        text: "you want to delete!",
+                                        icon: 'warning',
+                                        showCancelButton: true,
+                                        confirmButtonColor: 'red',
+                                        cancelButtonColor: '#d33',
+                                        confirmButtonText: 'Yes, delete it!',
+                                        reverseButtons : true,
+                                        focusConfirm : false,
+                                        showLoaderOnConfirm: true,
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            axios.post(`/upload-option-check?fileName=${value}`)
+                                            .then(response=>{
+                                                    if(response.data.status == 'success'){
+                                                        $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                                                    }
+                                            })
+                                            .catch(console.error());
+                                        }
+                                    })
+                                }
+                            })
+                            .catch(console.error());
+                        },
                     })
                 });
 
             $('#datatable').on('click', '.delete', (event) => {
-                    let value = event.target.id;
-                    Swal.fire({
-                    title: 'Are you sure?',
-                    text: "you want to delete!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: 'red',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!',
-                    reverseButtons : true,
-                    focusConfirm : false
-                    }).then((result) => {
-                    if (result.isConfirmed) {
-                       axios.post(`/upload-file-delete?fileName=${value}`)
-                       .then(response=>{
-                            if(response.data.status == 'success'){
-                                $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                let value = event.target.id;
+                let message = "Delete";
+                Swal.fire({
+                    title: `To confirm, type "${message}" in the box below`,
+                    input: 'text',
+                    inputAttributes: {
+                        autocapitalize: 'off'
+                    },
+                    showCancelButton: false,
+                    confirmButtonText: 'Delete this file',
+                    focusConfirm : false,
+                    preConfirm: (input) => {
+                        return axios.get(`/delete-confirm?input=${input}&message=${message}`)
+                        .then(response => {
+                            if(response.data.status == 'fail'){
+                                Swal.showValidationMessage( 
+                                    response.data.message
+                                );
                             }
-                       })
-                       .catch(console.error());
-                    }
-                    })
-                });
+                            if(response.data.status == 'success'){
+                                Swal.fire({
+                                    title: 'Are you sure?',
+                                    text: "you want to delete!",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: 'red',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, delete it!',
+                                    reverseButtons : true,
+                                    focusConfirm : false
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        axios.post(`/upload-file-delete?fileName=${value}`)
+                                        .then(response=>{
+                                                if(response.data.status == 'success'){
+                                                    $('#datatable').DataTable().ajax.url('/upload-list/data').load();
+                                                }
+                                        })
+                                        .catch(console.error());
+                                    }
+                                })
+                            }
+                        })
+                        .catch(console.error());
+                    },
+                })
             })
 
             $('#datatable').on('click','.share',event=>{
@@ -329,7 +377,7 @@ export default {
                     this.showShareComponent = true;
                 })
                 .catch(console.error());
-                
+                })
             })
         },
         onFileUpload(){

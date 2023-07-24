@@ -166,6 +166,22 @@ button.dropdown-toggle{
     border-radius: 0px !important;
 }
 
+.swal2-input{
+    width: 80% !important;
+    box-shadow: none !important;
+}
+
+#swal2-html-container .swal2-input{
+    border: 1px solid crimson !important;
+}
+.swal2-validation-message{
+    color: crimson !important;
+}
+
+#swal2-html-container .swal2-input:focus{
+    border: 1px solid blue !important;
+}
+
 div:where(.swal2-container) .swal2-html-container {
     font-size: 15px !important;
     text-align: left !important;
@@ -198,11 +214,15 @@ outline: none !important;
 div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm{
     border-radius: 15px !important;
     background-color: transparent !important;
-    color: #1568b1 !important;
+    color: crimson !important;
     font-size: 14px !important;
     font-weight: normal !important;
 }
 
+div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm:hover{
+background-color: crimson !important;
+color: white !important;
+}
 
 .table td img{
     width: 19px !important;

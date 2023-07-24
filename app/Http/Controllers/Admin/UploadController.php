@@ -415,4 +415,25 @@ class UploadController extends Controller
             'data'=>$users
         ]);
     }
+
+    public function deleteConfirm(){
+        if(request()->input == ""){
+            return response()->json([
+                'status'=>'fail',
+                'message'=>'Please filled in the box'
+            ]);
+        }
+
+        if(request()->input != request()->message){
+            return response()->json([
+                'status'=>'fail',
+                'message'=>'Your text is wrong'
+            ]);
+        }
+
+        return response()->json([
+            'status'=>'success',
+            'message'=>'success'
+        ]);
+    }
 }
