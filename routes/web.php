@@ -58,6 +58,7 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/other-share-list/type',[ShareController::class,'getOtherShare']);
     Route::get('/otherShare-getUser',[ShareController::class,'getOtherUser']);
     Route::get('/delete-confirm',[UploadController::class,'deleteConfirm']);
+    Route::post('/delete-uploadFolder',[UploadController::class,'deleteUploadFolder']);
 });
 
 

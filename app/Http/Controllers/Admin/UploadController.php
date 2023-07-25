@@ -3,18 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use ZipArchive;
-use Carbon\Carbon;
 use App\Models\File;
 use App\Models\User;
-use App\Models\MainFile;
 use App\Models\SubFolder;
 use App\Models\MainFolder;
-use App\Models\UploadFile;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Repositories\FileUploadRepository;
@@ -257,11 +251,6 @@ class UploadController extends Controller
     $files = File::where('main_folder_id',$id)->get();
     $user = auth()->user();
     return view('admin.sub_folder',compact('array','folders','files','user'));
-    // $sub_folders 
-    // return response()->json([
-    //     'status'=>'success',
-    //     'data'=>request()->id
-    // ]);
   }
 
   public function getSubFolder($id){
@@ -281,16 +270,6 @@ class UploadController extends Controller
         }
     }
     array_push($unique,$data);
-    // $new_array = $main_folder[0]->toArray();
-    // array_push($unique,$new_array);
-    // $sub_folder = SubFolder::whereIn('name',$init_array)->get();
-    // $sub_array = $sub_folder->toArray();
-    // if(count($sub_array) > 0){
-    //     foreach($sub_array as $edit_array){
-    //         array_push($unique,$edit_array);
-    //     }
-    // }
-    // array_push($unique,$data);
     $collection = collect($unique);
     $array = $collection->unique();
     $folders = SubFolder::where('main_sub_id',$id)->get();
@@ -307,27 +286,10 @@ class UploadController extends Controller
     $month = $array[1];
     $day = $array[2];
     $folderPath = '/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.request()->fileName; 
-    // Specify the path of the folder you want to download
         $zipFileName = request()->fileName.'.zip';
         $zip = new ZipArchive();
 
         if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
-            /*$files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($folderPath),
-                \RecursiveIteratorIterator::LEAVES_ONLY
-            );
-            foreach ($files as $name => $file) {
-                if($file != '.' && $file != '..'){
-                    if (!$file->isDir()) {
-                        $filePath = $file->getRealPath();
-                        $fileArray = explode('\\',$filePath);
-                        $new_file = array_slice($fileArray,7);
-                        $path = implode('/',$new_file);
-                        $relativePath = $path;
-                        $zip->addFile($filePath, $relativePath);
-                    }
-                }
-            }*/
 	    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
 	   while ($iterator->valid()) {
             if (!$iterator->isDot()) {
@@ -462,5 +424,13 @@ class UploadController extends Controller
             'status'=>'success',
             'message'=>'success'
         ]);
+    }
+
+    public function deleteUploadFolder(Request $request){
+        $folderName = $request->folderName;
+        FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName));  
+        return response()->json([
+            'status'=>'success'
+        ]);         
     }
 }

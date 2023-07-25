@@ -99,7 +99,8 @@ export default {
             showFilter : false,
             showShareComponent : false,
             shareName : null,
-            users : []
+            users : [],
+            folderName : ""
         }
     },
     methods:{
@@ -128,6 +129,7 @@ export default {
             {
                 formData.append('folder[]',this.files[i]);
             }
+            this.folderName = this.files[0].webkitRelativePath.split('/')[0];
             this.uploadCancel = false;
             this.showProgress = true;
             this.showSuccess = false;
@@ -151,10 +153,7 @@ export default {
                     cancelToken: this.uploadCancelToken.token
             })
             .then(response=>{
-            //    if(response.data.status == 'success'){
-            //     $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-            //    }
-            window.location.reload();
+                window.location.reload();
             })
             .catch(error=>{
                 if (axios.isCancel(error)) {
@@ -166,13 +165,19 @@ export default {
         },
         updateParentData(){
             if (this.uploadCancelToken) {
-                this.uploadCancelToken.cancel('Upload canceled by the user.');
-                this.uploadProgress = 0;
-                this.files = [];
-                this.$refs.fileInput.value = '';
-                this.uploading = false;
-                this.uploadCancel = true;
-                this.files = [];
+                axios.post(`/delete-uploadFolder?folderName=${this.folderName}`)
+                .then(response=>{
+                    if(response.data.status == 'success'){
+                        this.uploadCancelToken.cancel('Upload canceled by the user.');
+                        this.uploadProgress = 0;
+                        this.files = [];
+                        this.$refs.fileInput.value = '';
+                        this.uploading = false;
+                        this.uploadCancel = true;
+                        this.files = [];
+                    }
+                })
+                .catch(console.error());
             }
         },
         onCloseDialoag(){
