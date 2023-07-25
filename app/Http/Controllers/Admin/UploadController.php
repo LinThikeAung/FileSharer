@@ -151,13 +151,13 @@ class UploadController extends Controller
         );
         $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
         $path = str_replace("\\", "/", $path);
-        $this->listFolderFiles($path,$main_folder->id);
+        $this->listFolderFiles($path,$main_folder->id,null,$main_folder->id);
         return response()->json([
             'status'=>'success'
         ]);
     }
 
-    public function listFolderFiles($dir,$main_id,$sub_id = null){
+    public function listFolderFiles($dir,$main_id,$sub_id = null,$main){
         $directory = scandir($dir);
         foreach($directory as $folder){
             if($folder != '.' && $folder != '..'){
@@ -165,6 +165,7 @@ class UploadController extends Controller
                     $array = explode('/',$dir);
                     $real_path = implode('/',$array);
                     $sub_folder = new SubFolder();
+                    $sub_folder->main_id = $main;
                     $sub_folder->parent_id = $main_id??null;
                     $sub_folder->main_sub_id = $sub_id??null;
                     $sub_folder->name = $folder;
@@ -179,7 +180,7 @@ class UploadController extends Controller
                             'url' => env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
                         ]
                     );
-                    $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id);
+                    $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id,$sub_folder->main_id);
                 }else{
                     $array = $_FILES['folder']['name'];
                     $index = null;
@@ -215,11 +216,8 @@ class UploadController extends Controller
         $month = $array[1];
         $day = $array[2];
         if($file){
-                $sub_folder = SubFolder::where('parent_id',$file->id)->get('id');
-                $array  = $sub_folder->toArray();
-                SubFolder::whereIn('main_sub_id',$array)->delete();
-                FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name));                
-                $file->delete();
+                FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name));           
+                $file->delete();     
                 return response()->json([
                     'status'=>'success'
                 ]);
