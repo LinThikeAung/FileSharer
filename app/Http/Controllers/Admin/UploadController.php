@@ -269,17 +269,28 @@ class UploadController extends Controller
     $main = SubFolder::firstWhere('id',$id);
     $data = $main->toArray();
     $init_array = explode('/',$main->path);
-    $main_folder = MainFolder::whereIn('name',$init_array)->get();
-    $new_array = $main_folder[0]->toArray();
-    array_push($unique,$new_array);
-    $sub_folder = SubFolder::whereIn('name',$init_array)->get();
-    $sub_array = $sub_folder->toArray();
-    if(count($sub_array) > 0){
-        foreach($sub_array as $edit_array){
-            array_push($unique,$edit_array);
+    $splice_array = array_splice($init_array,7);
+    $main_folder = MainFolder::whereIn('name',$splice_array)->get();
+    $change_array = $main_folder->toArray();
+    array_push($unique,$change_array[0]);
+    $sub_folder = SubFolder::whereIn('name',$splice_array)->get();
+    $edit_array = $sub_folder->toArray();
+    if(count($edit_array) > 0){
+        foreach($edit_array as $item){
+            array_push($unique,$item);
         }
     }
     array_push($unique,$data);
+    // $new_array = $main_folder[0]->toArray();
+    // array_push($unique,$new_array);
+    // $sub_folder = SubFolder::whereIn('name',$init_array)->get();
+    // $sub_array = $sub_folder->toArray();
+    // if(count($sub_array) > 0){
+    //     foreach($sub_array as $edit_array){
+    //         array_push($unique,$edit_array);
+    //     }
+    // }
+    // array_push($unique,$data);
     $collection = collect($unique);
     $array = $collection->unique();
     $folders = SubFolder::where('main_sub_id',$id)->get();
