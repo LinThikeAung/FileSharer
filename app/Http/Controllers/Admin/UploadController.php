@@ -428,8 +428,7 @@ class UploadController extends Controller
 
     public function deleteUploadFolder(Request $request){
         $folderName = $request->folderName;
-        Storage::disk('chitmaymay')->deleteDirectory(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName);
-        // FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName));  
+        Storage::deleteDirectory(storage_path('/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName));
         return response()->json([
             'status'=>'success'
         ]);         
