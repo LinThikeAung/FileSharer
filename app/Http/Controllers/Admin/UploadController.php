@@ -267,21 +267,23 @@ class UploadController extends Controller
   }
 
   public function getSubFolder($id){
-    $array = [];
+    $unique = [];
     $main = SubFolder::firstWhere('id',$id);
     $data = $main->toArray();
     $init_array = explode('/',$main->path);
     $main_folder = MainFolder::whereIn('name',$init_array)->get();
     $new_array = $main_folder[0]->toArray();
-    array_push($array,$new_array);
+    array_push($unique,$new_array);
     $sub_folder = SubFolder::whereIn('name',$init_array)->get();
     $sub_array = $sub_folder->toArray();
     if(count($sub_array) > 0){
         foreach($sub_array as $edit_array){
-            array_push($array,$edit_array);
+            array_push($unique,$edit_array);
         }
     }
-    array_push($array,$data);
+    array_push($unique,$data);
+    $collection = collect($unique);
+    $array = $collection->unique();
     $folders = SubFolder::where('main_sub_id',$id)->get();
     $files = File::where('sub_folder_id',$id)->get();
     $user = auth()->user();
