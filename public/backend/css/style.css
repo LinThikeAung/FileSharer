@@ -261,3 +261,16 @@ div:where(.swal2-icon).swal2-warning.swal2-icon-show {
     color: #1568b1 !important;
     text-decoration: underline;
 }
+
+.masthead .card{
+    border: none;
+    border-radius: 5px !important;
+}
+
+.masthead input{
+    border-radius: 5px !important;
+}
+
+.masthead button{
+    padding: 10px !important;
+}
