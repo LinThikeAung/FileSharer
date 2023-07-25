@@ -256,3 +256,8 @@ div:where(.swal2-icon).swal2-warning.swal2-icon-show {
     margin-top: 10px !important;
     margin-bottom: 0px !important;
 }
+
+.breadcrumb-item{
+    color: #1568b1 !important;
+    text-decoration: underline;
+}
