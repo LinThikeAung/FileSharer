@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\MainFolder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SubFolder extends Model
 {
@@ -12,4 +13,8 @@ class SubFolder extends Model
     protected $casts = [
         'path' => 'array',
     ];
+
+    public function main_folder(){
+        return $this->belongsTo(MainFolder::class,'parent_id');
+    }
 }

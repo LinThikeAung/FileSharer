@@ -253,10 +253,12 @@ class UploadController extends Controller
 
   public function getFolder($id){ 
     $main = MainFolder::firstWhere('id',$id);
+    $array = [];
+    $array[] = $main;
     $folders = SubFolder::where('parent_id',$id)->get();
     $files = File::where('main_folder_id',$id)->get();
     $user = auth()->user();
-    return view('admin.sub_folder',compact('main','folders','files','user'));
+    return view('admin.sub_folder',compact('array','folders','files','user'));
     // $sub_folders 
     // return response()->json([
     //     'status'=>'success',
@@ -265,11 +267,25 @@ class UploadController extends Controller
   }
 
   public function getSubFolder($id){
+    $array = [];
     $main = SubFolder::firstWhere('id',$id);
+    $data = $main->toArray();
+    $init_array = explode('/',$main->path);
+    $main_folder = MainFolder::whereIn('name',$init_array)->get();
+    $new_array = $main_folder[0]->toArray();
+    array_push($array,$new_array);
+    $sub_folder = SubFolder::whereIn('name',$init_array)->get();
+    $sub_array = $sub_folder->toArray();
+    if(count($sub_array) > 0){
+        foreach($sub_array as $edit_array){
+            array_push($array,$edit_array);
+        }
+    }
+    array_push($array,$data);
     $folders = SubFolder::where('main_sub_id',$id)->get();
     $files = File::where('sub_folder_id',$id)->get();
     $user = auth()->user();
-    return view('admin.sub_folder',compact('main','folders','files','user'));
+    return view('admin.sub_folder',compact('array','folders','files','user'));
   }
 
   public function uploadZip(){

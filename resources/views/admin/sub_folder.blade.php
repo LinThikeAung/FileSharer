@@ -5,8 +5,10 @@
 <div class="content-wrapper">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="/upload-list">Upload Lists</a></li>
-          <li class="breadcrumb-item">{{ $main->name }}</li>
+          <li class="breadcrumb-item"><a href="/upload-list" class="text-dark breadcrumb-item">Upload Lists</a></li>
+            @foreach ($array as $item)
+            <li class="breadcrumb-item"><a href="{{ $item['url'] }}" class="text-dark breadcrumb-item">{{ $item['name'] }}</a></li>
+            @endforeach
         </ol>
     </nav>
     <div class="card shadow">
