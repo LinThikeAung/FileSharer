@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('sub_folders', function (Blueprint $table) {
-            $table->foreignId('main_id')->constrained('main_folders')->cascadeOnDelete();
+            $table->string('size')->nullable()->after('type');
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('sub_folders', function (Blueprint $table) {
-            $table->dropColumn('main_id');
+            $table->dropColumn('size');
         });
     }
 };

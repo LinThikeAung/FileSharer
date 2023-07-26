@@ -19,7 +19,6 @@
                         <img :src="imageUrl" class="folder-image mr-4"/>
                         <span>{{ fileName }}</span>
                     </div>
-                    <i class="bi bi-x" style="cursor: pointer;" @click="cancelUpload"></i>
                 </div>
                     <div class="progress my-1" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
                         <div class="progress-bar" :style="{width :uploadProgress+'%' }">{{ uploadProgress }}%</div>
@@ -56,9 +55,6 @@ data(){
     }
 },
 methods:{
-    cancelUpload(){
-        this.$emit('update-parent-data');
-    },
     closeDialoag(){
         this.$emit('close-dialoag');
     },

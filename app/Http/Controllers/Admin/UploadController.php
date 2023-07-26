@@ -120,20 +120,24 @@ class UploadController extends Controller
         $dirs = [];
         $parent = [];
         $filename = [];
+        $file_size = 0;
         foreach($folders as $path=>$name)
         {
             $dir = dirname($path).'/';
             Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            $file_size += $_FILES['folder']['size'][$index];
             $index++;
             $parent = explode('/',$dir);
             $sub = ltrim($dir,$parent[0]);
             $dirs[] = $parent[0].$sub.$name;
             $filename[] = $name;
         }
+        $size =$this->formatFileSize($file_size);
         $main_folder = new MainFolder();
         $main_folder->user_id = auth()->id();
         $main_folder->name = $parent[0];
         $main_folder->type = "folder";
+        $main_folder->size = $size;
         $main_folder->save();
         MainFolder::updateOrCreate(
             [
@@ -156,6 +160,14 @@ class UploadController extends Controller
         foreach($directory as $folder){
             if($folder != '.' && $folder != '..'){
                 if(is_dir($dir.'/'.$folder)){
+                    $folderPath = $dir.'/'.$folder;
+                    $file_size = 0;
+                    $files =  FacadeFile::allFiles($folderPath);
+                    foreach($files as $file){
+                        $file_size += $file->getSize();
+                    }
+                    // $files = Storage::disk('chitmaymay')->files($folderPath);
+                    $size =$this->formatFileSize($file_size);
                     $array = explode('/',$dir);
                     $real_path = implode('/',$array);
                     $sub_folder = new SubFolder();
@@ -165,6 +177,7 @@ class UploadController extends Controller
                     $sub_folder->name = $folder;
                     $sub_folder->type = 'folder';
                     $sub_folder->path = $real_path;
+                    $sub_folder->size = $size;
                     $sub_folder->save();
                     SubFolder::updateOrCreate(
                         [
@@ -309,9 +322,9 @@ class UploadController extends Controller
         }
 	$fileurl = public_path('storage/'.$zipFileName);
 	if (file_exists($fileurl)) {
-    		return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)));
+    	return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)))->deleteFileAfterSend(true);
 	} else {
-    		return ['status'=>'zip file does not exist'];
+    	return ['status'=>'zip file does not exist'];
 	}	
   }
 
@@ -345,7 +358,7 @@ class UploadController extends Controller
         }
 	$fileurl = public_path('storage/'.$zipFileName);
 	if (file_exists($fileurl)) {
-    		return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)));
+    		return Response::download($fileurl, $zipFileName, array('Content-Type: application/zip','Content-Length: '. filesize($fileurl)))->deleteFileAfterSend(true);
 	} else {
     		return ['status'=>'zip file does not exist'];
 	}	
@@ -426,11 +439,11 @@ class UploadController extends Controller
         ]);
     }
 
-    public function deleteUploadFolder(Request $request){
-        $folderName = $request->folderName;
-        Storage::deleteDirectory(storage_path('/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName));
-        return response()->json([
-            'status'=>'success'
-        ]);         
-    }
+    // public function deleteUploadFolder(Request $request){
+    //     $folderName = $request->folderName;
+    //     Storage::deleteDirectory(storage_path('/media/dkmads-upload/'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName));
+    //     return response()->json([
+    //         'status'=>'success'
+    //     ]);         
+    // }
 }
