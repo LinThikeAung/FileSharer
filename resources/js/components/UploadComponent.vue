@@ -162,23 +162,6 @@ export default {
                 }
             });
         },
-        // updateParentData(){
-        //     if (this.uploadCancelToken) {
-        //         axios.post(`/delete-uploadFolder?folderName=${this.folderName}`)
-        //         .then(response=>{
-        //             if(response.data.status == 'success'){
-        //                 this.uploadCancelToken.cancel('Upload canceled by the user.');
-        //                 this.uploadProgress = 0;
-        //                 this.files = [];
-        //                 this.$refs.fileInput.value = '';
-        //                 this.uploading = false;
-        //                 this.uploadCancel = true;
-        //                 this.files = [];
-        //             }
-        //         })
-        //         .catch(console.error());
-        //     }
-        // },
         onCloseDialoag(){
             Swal.fire({
                 title: 'Cancel upload?',
@@ -256,6 +239,7 @@ export default {
                     ],
                     
                 });
+            })
 
                 $('#datatable').on('click', '.copy', (event) => {
                     let value = event.target.id;
@@ -382,7 +366,6 @@ export default {
                 })
                 .catch(console.error());
                 })
-            })
         },
         onFileUpload(){
             this.showFilePond = true;
