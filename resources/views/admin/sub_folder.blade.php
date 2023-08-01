@@ -4,16 +4,11 @@
 @section('content')
 <div class="content-wrapper">
     <div class="d-flex justify-content-between align-items-center">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item"><a href="/upload-list" class="text-dark breadcrumb-item">Upload Lists</a></li>
-                @foreach ($array as $item)
-                <li class="breadcrumb-item"><a href="{{ $item['url'] }}" class="text-dark breadcrumb-item">{{ $item['name'] }}</a></li>
-                @endforeach
-            </ol>
-        </nav>
         <input type="hidden" value="{{ $id }}" id="folder_id">
         <input type="hidden" value="{{ $name }}" id="folder_name">
+        <div>
+            <breadcrumb-component></breadcrumb-component>
+        </div>
         <div>
             <sub-folder-upload></sub-folder-upload>
         </div>

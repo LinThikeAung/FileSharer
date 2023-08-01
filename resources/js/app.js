@@ -39,6 +39,7 @@ import OtherShareComponent from './components/OtherShareComponent.vue';
 import OtherShareFilterComponent from './components/OtherShareFilterComponent.vue';
 import ConfirmComponent from './components/ConfirmComponent.vue';
 import SubFolderUploadComponent from './components/SubFolderUploadComponent.vue';
+import BreadCrumbComponent from './components/BreadCrumbComponent.vue';
 
 const app = createApp({});
 
@@ -57,5 +58,6 @@ app.component('other-share-component',OtherShareComponent)
 app.component('other-shareFilter-component',OtherShareFilterComponent);
 app.component('confirm-component',ConfirmComponent);
 app.component('sub-folder-upload',SubFolderUploadComponent);
+app.component('breadcrumb-component',BreadCrumbComponent);
 
 app.mount("#app");

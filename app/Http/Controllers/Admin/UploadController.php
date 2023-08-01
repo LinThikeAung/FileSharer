@@ -291,39 +291,20 @@ class UploadController extends Controller
     $main = MainFolder::firstWhere('id',$id);
     $id = $main->id;
     $name = $main->name;
-    $array = [];
-    $array[] = $main;
     $folders = SubFolder::where('parent_id',$id)->get();
     $files = File::where('main_folder_id',$id)->get();
     $user = auth()->user();
-    return view('admin.sub_folder',compact('array','folders','files','user','id','name'));
+    return view('admin.sub_folder',compact('folders','files','user','id','name'));
   }
 
   public function getSubFolder($id){
-    $unique = [];
     $main = SubFolder::firstWhere('id',$id);
     $id = $main->id;
     $name = $main->name;
-    $data = $main->toArray();
-    $init_array = explode('/',$main->path);
-    $splice_array = array_splice($init_array,7);
-    $main_folder = MainFolder::whereIn('name',$splice_array)->get();
-    $change_array = $main_folder->toArray();
-    array_push($unique,$change_array[0]);
-    $sub_folder = SubFolder::whereIn('name',$splice_array)->get();
-    $edit_array = $sub_folder->toArray();
-    if(count($edit_array) > 0){
-        foreach($edit_array as $item){
-            array_push($unique,$item);
-        }
-    }
-    array_push($unique,$data);
-    $collection = collect($unique);
-    $array = $collection->unique();
     $folders = SubFolder::where('main_sub_id',$id)->get();
     $files = File::where('sub_folder_id',$id)->get();
     $user = auth()->user();
-    return view('admin.sub_folder',compact('array','folders','files','user','id','name'));
+    return view('admin.sub_folder',compact('folders','files','user','id','name'));
   }
 
   public function uploadZip(){
@@ -676,5 +657,43 @@ class UploadController extends Controller
                 }
             }
         }
+    }
+
+    public function getFolderPath(Request $request){
+        $array = [];
+        $unique_name = null;
+        $current_file = [];
+        $main_folder = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+        if($main_folder){
+            array_push($array,$main_folder->toArray());
+        }else{
+            $sub_folder = SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+            $current_file = $sub_folder->toArray();
+            $subFolder_array = explode('/',$sub_folder->path);
+            $subFolder_path = array_slice($subFolder_array,7);
+            $index = 0;
+            $unique_name = $sub_folder;
+            while($index < count($subFolder_path)){ 
+                $folder = $unique_name;
+                $parent_id = $folder->parent_id;
+                if($parent_id){
+                    $mainFolder = MainFolder::firstWhere('id',$parent_id);
+                    array_push($array,$mainFolder->toArray());
+                }else{
+                    $subFolder = SubFolder::firstWhere('id',$folder->main_sub_id);
+                    array_push($array,$subFolder->toArray());
+                    $unique_name = $subFolder;
+                }
+                $index ++;
+            }
+        }
+        $array = array_reverse($array);
+        if(count($current_file) > 0){
+            array_push($array,$current_file);
+        }
+        return response()->json([
+            'status' => 'success',
+            'data'   => $array
+        ]);
     }
 }
