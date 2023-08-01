@@ -1,5 +1,5 @@
 <template>
-    <div class="modal-content">
+    <div id="content-container">
         <div class="modal-header">
           <h5 class="modal-title">Folder upload</h5>
           <button type="button" class="close" aria-label="Close" v-if="uploading"  @click="closeDialoag">
@@ -66,7 +66,7 @@ methods:{
 </script>
 
 <style scoped>
-.modal-content {
+#content-container {
     position: fixed;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -78,13 +78,14 @@ methods:{
     width: 350px;
     max-height: 600px;
     bottom: 0;
-    right: 20px;
+    right: 20px !important;
     pointer-events: auto;
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid rgba(0,0,0,.2);
     border-radius: 0.3rem 0.3rem 0 0;
     outline: 0;
+    z-index: 99999;
 }
 
 .modal-header {

@@ -14,7 +14,9 @@
         </nav>
         <input type="hidden" value="{{ $id }}" id="folder_id">
         <input type="hidden" value="{{ $name }}" id="folder_name">
-        <sub-folder-upload></sub-folder-upload>
+        <div>
+            <sub-folder-upload></sub-folder-upload>
+        </div>
     </div>
     <div class="card shadow">
         <div class="card-body p-2">
@@ -54,7 +56,7 @@
                                         <ul class="dropdown-menu">
                                             <li class="dropdown-item copy" id="{{ $item->url }}"><i class="bi bi-link copy" id="{{ $item->url }}"></i> <p class="copy" id="{{ $item->url }}">Copy Link</p></li>
                                             <a  href="/upload-subFolder-zip?fileName={{ $item->name }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
-                                            <li class="dropdown-item delete_folder" id="{{ $item->name }}"><i class="bi bi-trash delete_folder" id="{{ $item->name }}"></i> <p class="delete_folder" id="{{ $item->name }}">Delete</p></li>
+                                            <li class="dropdown-item delete_folder" id="{{ $item->id }}"><i class="bi bi-trash delete_folder" id="{{ $item->id }}"></i> <p class="delete_folder" id="{{ $item->id }}">Delete</p></li>
                                         </ul> 
                                     </div>
                                 </td>
@@ -91,7 +93,7 @@
                                     <ul class="dropdown-menu">
                                         <li class="dropdown-item copy_file" id="{{ $item->url }}"><i class="bi bi-link copy_file" id="{{ $item->url }}"></i> <p class="copy_file" id="{{ $item->url }}">Copy Link</p></li>
                                         <a  href="/download-subFile?name={{ $item->url }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
-                                        <li class="dropdown-item file_delete" id="{{ $item->name }}"><i class="bi bi-trash file_delete" id="{{ $item->name }}"></i> <p class="file_delete" id="{{ $item->name }}">Delete</p></li>
+                                        <li class="dropdown-item file_delete" id="{{ $item->id }}"><i class="bi bi-trash file_delete" id="{{ $item->id }}"></i> <p class="file_delete" id="{{ $item->id }}">Delete</p></li>
                                     </ul> 
                                 </div>
                              </td>

@@ -78,7 +78,38 @@ class UploadController extends Controller
                 'status'=> 'fail'
             ]);
         }
+    } 
+
+    public function uploadExist(Request $request){
+        $fileName = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+        $folderArray = [];
+        if($fileName){
+            $sub_folder = SubFolder::where('parent_id',$fileName->id)->get('name');
+            $folders = $sub_folder->toArray();
+            foreach($folders as $folder){
+                $folderArray[] = $folder['name'];
+            }
+            if (in_array($request->fileName, $folderArray)) {
+                return response()->json([
+                    'status'=>'success',
+                ]);
+            } else {
+                return response()->json([
+                    'status'=> 'fail'
+                ]);
+            }
+            //  if($sub_folder){
+            //     return response()->json([
+            //         'status'=>'success',
+            //     ]);
+            // }else{
+            //     return response()->json([
+            //         'status'=> 'fail'
+            //     ]);
+            // }
+        }
     }
+
     public function delete(){
         $data = MainFolder::where('file',request()->getContent())->first();
         $real_time = $data->created_at->format('Y-m-d');
@@ -166,7 +197,6 @@ class UploadController extends Controller
                     foreach($files as $file){
                         $file_size += $file->getSize();
                     }
-                    // $files = Storage::disk('chitmaymay')->files($folderPath);
                     $size =$this->formatFileSize($file_size);
                     $array = explode('/',$dir);
                     $real_path = implode('/',$array);
@@ -214,7 +244,7 @@ class UploadController extends Controller
                 }
             }
         }
-}
+    }
     public function uploadOption(Request $request){
         $file = MainFolder::firstWhere('name',$request->fileName);
         $real_time = $file->created_at->format('Y-m-d');
@@ -232,11 +262,12 @@ class UploadController extends Controller
     }
 
     public function deleteSubFolder(){
-        $file = SubFolder::firstWhere('name',request()->fileName);
+        $file = SubFolder::firstWhere('id',request()->fileName);
         if($file){
             $sub_folder = SubFolder::where('main_sub_id',$file->id)->delete();
             $array = explode(",",$file->path);
             $name = implode('/',$array);
+            // dd($name);
             FacadeFile::deleteDirectory(public_path('storage/'.$name.'/'.$file->name));                
             $file->delete();
             return response()->json([
@@ -403,7 +434,7 @@ class UploadController extends Controller
   }
 
   public function subFileDelete(){
-        $file = File::firstWhere('name',request()->fileName);
+        $file = File::firstWhere('id',request()->fileName);
         $array = explode('/',$file->url);
         $new_array = array_slice($array,3);
         $path = implode('/',$new_array);
@@ -512,6 +543,138 @@ class UploadController extends Controller
                 'status'=>'success',
                 'message'=>'Successfully Created'
             ]);
+        }
+    }
+
+    public function SubFolderUpload(Request $request){
+        $main_folder = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+        $folderName      = null;
+        $main_folder_id  = null;
+        $main_sub_id     = null;
+        $main_id         = null;
+
+        if($main_folder)
+        {
+            $folderName      = $main_folder->name;
+            $main_folder_id  = $main_folder->id;
+            $main_id         = $main_folder->id; 
+        }
+        else
+        {
+            $sub_folder       = SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+            $main_sub_id      = $sub_folder->id;
+            $sub_folder_split = explode('/',$sub_folder->path);
+            $folderName      = implode('/',array_slice($sub_folder_split,7))."/".$sub_folder->name;
+            $main_id          = $sub_folder->main_id;
+        }
+
+        $folders   = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
+        $index     = 0;
+        $dirs      = [];
+        $parent    = [];
+        $filename  = [];
+        $file_size = 0;
+        foreach($folders as $path=>$name)
+        {
+            $dir = dirname($path).'/';
+            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            $file_size += $_FILES['folder']['size'][$index];
+            $index++;
+            $parent     = explode('/',$dir);
+            $sub        = ltrim($dir,$parent[0]);
+            $dirs[]     = $parent[0].$sub.$name;
+            $filename[] = $name;
+        }
+        
+        $size                    = $this->formatFileSize($file_size);
+        $filePath                = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName);
+        $filePath                = str_replace("\\", "/", $filePath);
+        $sub_folder              = new SubFolder();
+        $sub_folder->parent_id   = $main_folder_id;
+        $sub_folder->main_sub_id = $main_sub_id;
+        $sub_folder->name        = $parent[0]; 
+        $sub_folder->type        = "folder";
+        $sub_folder->size        = $size; 
+        $sub_folder->path        = $filePath;
+        $sub_folder->main_id     = $main_id;
+        $sub_folder->save();
+        SubFolder::updateOrCreate(
+            [
+                'id'=>$sub_folder->id
+            ],
+            [
+                'url'=>env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
+            ]
+        );
+        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$parent[0]);
+        $path = str_replace("\\", "/", $path);
+        $this->listSubFolderFiles($path,null,$sub_folder,$main_id,$folderName);
+        return response()->json([
+            'status'=>'success'
+        ]);
+    }
+
+    public function listSubFolderFiles($dir,$main_id,$sub_id = null,$main,$folderName){
+        $directory = scandir($dir);
+        foreach($directory as $folder){
+            if($folder != '.' && $folder != '..'){
+                if(is_dir($dir.'/'.$folder)){
+                    $folderPath = $dir.'/'.$folder;
+                    $file_size = 0;
+                    $files =  FacadeFile::allFiles($folderPath);
+                    foreach($files as $file){
+                        $file_size += $file->getSize();
+                    }
+                    $size =$this->formatFileSize($file_size);
+                    $array = explode('/',$dir);
+                    $real_path = implode('/',$array);
+                    $sub_folder = new SubFolder();
+                    $sub_folder->main_id = $main;
+                    $sub_folder->parent_id = $main_id??null;
+                    $sub_folder->main_sub_id = $sub_id->id??null;
+                    $sub_folder->name = $folder;
+                    $sub_folder->type = 'folder';
+                    $sub_folder->path = $real_path;
+                    $sub_folder->size = $size;
+                    $sub_folder->save();
+                    SubFolder::updateOrCreate(
+                        [
+                            'id'=>$sub_folder->id
+                        ],
+                        [
+                            'url' => env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
+                        ]
+                    );
+                    $this->listSubFolderFiles($dir.'/'.$folder,null,$sub_folder,$sub_folder->main_id,null);
+                }else{
+                    $array = $_FILES['folder']['name'];
+                    $index = null;
+                    foreach ($array as $key => $value) {
+                        if($value == $folder){
+                            $index = $key;
+                            break;
+                        }
+                    }
+                    $url                    =    $sub_id->path;
+                    $url                    =    explode('/',$url);
+                    $urlArray               =    array_slice($url,3);
+                    $fileUrl                =    implode('/',$urlArray)."/".$sub_id->name;
+                    $fileUrl                =   Storage::disk('chitmaymay')->url($fileUrl."/".$folder);
+                    $size                   =    $this->formatFileSize($_FILES['folder']['size'][$index]);
+                    $edit_type              =    explode('.',$folder);
+                    $count                  =    count($edit_type)-1;
+                    $type                   =    $edit_type[$count];
+                    $file                   =   new File();   
+                    $file->name             =   $folder;
+                    $file->url              =   $fileUrl;
+                    $file->file             =   $folder;
+                    $file->size             =   $size;
+                    $file->type             =   $type;
+                    $file->main_folder_id   =   $main_id??null;
+                    $file->sub_folder_id    =   $sub_id->id??null;
+                    $file->save();
+                }
+            }
         }
     }
 }

@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/upload',[UploadController::class,'index'])->name('upload');
     Route::post('/upload',[UploadController::class,'store']);
     Route::get('/upload-exist',[UploadController::class,'upload']);
+    Route::get('/upload-subFolder-exist',[UploadController::class,'uploadExist']);
+    Route::post('/subFolder-upload',[UploadController::class,'SubFolderUpload']);
     Route::post('/upload-delete',[UploadController::class,'delete']);
     Route::post('/upload-option-check',[UploadController::class,'uploadOption']);
     Route::post('/delete-subFolder',[UploadController::class,'deleteSubFolder']);
