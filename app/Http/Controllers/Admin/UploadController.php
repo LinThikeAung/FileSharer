@@ -5,17 +5,19 @@ namespace App\Http\Controllers\Admin;
 use ZipArchive;
 use App\Models\File;
 use App\Models\User;
+use App\Helpers\Helper;
 use App\Models\SubFolder;
 use App\Models\MainFolder;
 use Illuminate\Http\Request;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Repositories\FileUploadRepository;
 use Illuminate\Support\Facades\File as Facade;
 use Illuminate\Support\Facades\File as FacadeFile;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
+
 class UploadController extends Controller
 {
     protected $file_upload;
@@ -263,13 +265,13 @@ class UploadController extends Controller
 
     public function deleteSubFolder(){
         $file = SubFolder::firstWhere('id',request()->fileName);
-        if($file){
-            $sub_folder = SubFolder::where('main_sub_id',$file->id)->delete();
-            $array = explode(",",$file->path);
-            $name = implode('/',$array);
-            // dd($name);
-            FacadeFile::deleteDirectory(public_path('storage/'.$name.'/'.$file->name));                
+        if($file){        
+            $directories = Helper::getAllFolders($file);
+            foreach($directories as $directory){
+                $directory->delete();
+            }
             $file->delete();
+            FacadeFile::deleteDirectory(public_path('storage'.$file->path.'/'.$file->name));                
             return response()->json([
                 'status'=>'success'
             ]);

@@ -15,7 +15,7 @@
     </div>
     <div class="card shadow">
         <div class="card-body p-2">
-          {{-- <div class="table-responsive"> --}}
+           <div class="table-responsive">
             <table class="table table-hover" id="table">
                 <thead>
                   <tr>
@@ -102,7 +102,7 @@
 
                 </tbody>
             </table>
-          {{-- </div> --}}
+          </div>
         </div>
     </div>
 </div>
