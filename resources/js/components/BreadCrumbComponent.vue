@@ -24,7 +24,6 @@ export default {
         .then(response=>{
             if(response.data.status == 'success'){
                 this.folderName = response.data.data;
-                console.log(this.folderName);
             }
         })
         .catch(console.error());

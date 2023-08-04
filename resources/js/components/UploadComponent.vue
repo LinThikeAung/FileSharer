@@ -210,7 +210,6 @@ export default {
             this.uploadData();
         },
         onUpdateOptionBoth(value){
-            console.log(this.files);
             if (!this.files) return;
             for (let i = 0; i < this.files.length; i++) {
                 const fileReader = new FileReader();
@@ -221,7 +220,6 @@ export default {
                 lastModified: this.files[i].lastModified
                 });
             }
-            console.log(this.files[i]);
             }
         },
         getAllFiles(){
@@ -397,12 +395,16 @@ export default {
         this.getAllFiles();     
        $(document).ready(function(){
         $(document.getElementById('datatable')).on('dblclick', 'tr', function(event) {
-           var table  = $(document.getElementById('datatable')).DataTable();
+            var table  = $(document.getElementById('datatable')).DataTable();
             let rowData = table.row(this).data();
             if(rowData.type == 'folder'){
                window.location.replace(`/upload-list/folders/${rowData.id}`);
             }
-        }); 
+            let createElement = document.createElement('a');
+            createElement.setAttribute('href',`${rowData.url}`);
+            createElement.setAttribute('target','_blank');
+            createElement.click();
+            }); 
        })
     }
 }

@@ -60,7 +60,7 @@
                     @endif
                     @if (count($files) > 0)
                     @foreach ($files as $item)
-                         <tr>
+                         <tr data-id="{{ $item->url }}">
                              <td>
                                     <?php
                                     $backendPath = public_path('backend/images/'.$item->type.".png");
@@ -113,8 +113,15 @@
      $(document).ready(function(){
         $(document.getElementById('table')).on('dblclick', 'tr', function(event) {
                let id = $(this).data('id');
-               if(id){
-                window.location.replace(`/upload-list/folders/sub-folders/${id}`);
+               let rowData = id;
+               if(rowData){
+                    if(typeof(rowData) == 'number'){
+                        window.location.replace(`/upload-list/folders/sub-folders/${rowData}`);
+                    }
+                    let createElement = document.createElement('a');
+                    createElement.setAttribute('href',`${rowData}`);
+                    createElement.setAttribute('target','_blank');
+                    createElement.click();
                }
         }); 
        })

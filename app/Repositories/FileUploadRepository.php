@@ -58,20 +58,6 @@ class FileUploadRepository
            }else{
              return '<img src="'.asset('/backend/images/unknown.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
            }
-        
-            // // Now $images will contain an array of SplFileInfo objects representing each image file.
-        
-            // // If you want to get the file paths as strings, you can use the `getPathname` method:
-            // $imagePaths = array_map(function ($image) {
-            //     return $image->getPathname();
-            // }, $images);
-        
-            // return $imagePaths;
-            // if(Storage::disk('public')->exists("$each->type.png")){
-            //     return '<img src="'.asset('/backend/images/'.$each->type.'.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            // }else{
-            //     return '<img src="'.asset('/backend/images/unknown.png').'" class="mr-3"/> <span>'.$each->name.'</span>';
-            // }
         })
         ->addColumn('action',function($each){
             if ($each->type == 'folder') {
@@ -82,7 +68,7 @@ class FileUploadRepository
                 <ul class="dropdown-menu">
                     <li class="dropdown-item copy" id="'.$each->url.'"><i class="bi bi-link copy" id="'.$each->url.'"></i> <p class="copy" id="'.$each->url.'">Copy Link</p></li>
                     <a href="/upload-zip?fileName='.$each->name.'" class="dropdown-item"><i class="bi bi-download download"></i> <p class="download"">Download</p></a>
-                    <li class="dropdown-item share" id="'.$each->name.'"><i class="bi bi-share share" id="'.$each->name.'"></i> <p class="share" id="'.$each->name.'">Share</p></li>
+                    <a class="dropdown-item share" id="'.$each->name.'"><i class="bi bi-share share" id="'.$each->name.'"></i> <p class="share" id="'.$each->name.'">Share</p></a>
                     <li class="dropdown-item delete_folder"  id="'.$each->name.'"><i class="bi bi-trash delete_folder" id="'.$each->name.'"></i> <p class="delete_folder" id="'.$each->name.'">Delete</p></li>
                 </ul> 
             </div>';
