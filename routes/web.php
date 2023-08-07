@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/subfolder-upload',[UploadController::class,'FileUpload']);
     Route::post('/upload-subFolder-delete',[UploadController::class,'deleteUploadFolder']);
     Route::get('/getFolderPath',[UploadController::class,'getFolderPath']);
+    Route::post('/folder-upload-test',[UploadController::class,'FolderUploadTest']);
 });
 
 
