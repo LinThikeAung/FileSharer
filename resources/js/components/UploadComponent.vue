@@ -50,8 +50,6 @@
         :uploading="uploading" 
         :uploadCancel="uploadCancel" 
         :showSuccess="showSuccess"  
-        :count = "count"
-        :totalFile = "totalFile"
         @close-dialoag="onCloseDialoag"
         @close-upload = "onCloseUpload"
         >
@@ -101,12 +99,7 @@ export default {
             showShareComponent : false,
             shareName : null,
             users : [],
-            folderName : "",
-            folderPath : [],
-            count : 0,
-            totalFile : 0,
-            totalSize : 0,
-            fileSize : 0
+            folderName : ""
         }
     },
     methods:{
@@ -118,9 +111,8 @@ export default {
             axios.get(`/upload-exist?fileName=${this.fileName}`)
             .then(response=>{
                     if(response.data.status == 'success'){
-                        alert('This folder is already exists');
-                        // this.showOptionComponent = true;
-                        // this.fileName = response.data.name;
+                        this.showOptionComponent = true;
+                        this.fileName = response.data.name;
                     }else{
                         this.uploadData();
                     }
@@ -131,65 +123,44 @@ export default {
             
         },
         async uploadData(){
-            this.totalSize = 0;
-            this.fileSize = 0;
-            this.totalFile = 0;
-            for (let index = 0; index < this.files.length; index++) {
-                this.totalSize += this.files[index].size;
+            let formData = new FormData();
+            for(var i=0;i < this.files.length;i++)
+            {
+                formData.append('folder[]',this.files[i]);
             }
+            this.folderName = this.files[0].webkitRelativePath.split('/')[0];
             this.uploadCancel = false;
             this.showProgress = true;
             this.showSuccess = false;
             this.uploadProgress = 0;
             this.uploading = true;
-            this.count = 0;
-            this.totalFile = this.files.length;
-            // this.uploadCancelToken = axios.CancelToken.source();
-            let formData = new FormData();
-            for(var i=0;i < this.files.length;i++)
-            {
-                this.fileSize +=this.files[i].size;
-                formData.append('folder',this.files[i]);
-                await axios.post('/reset',formData,{
+            this.uploadCancelToken = axios.CancelToken.source();
+            await axios.post('/reset',formData,{
                     headers : {
                         'Content-Type': 'multipart/form-data'
                     },
                     onUploadProgress: (progressEvent) => {
                         this.uploadProgress = Math.round(
-                            (this.fileSize * 100 ) / this.totalSize
+                            (progressEvent.loaded / progressEvent.total) * 100
                         );
-                    },
-                    // cancelToken: this.uploadCancelToken.token
-                })
-                .then(response=>{
-                    if(response.data.status == 'success'){
-                        this.count ++ ;
-                        this.folderPath.push(response.data.data);
-                        if(this.folderPath.length == this.files.length){
-                            this.folderName = this.files[0].webkitRelativePath.split('/')[0];
-                            let formData = new FormData();
-                            formData.append('fileName',this.folderPath[0]);
-                            axios.post('/folder-upload-test',formData)
-                            .then(response=>{
-                                if(response.data.status == 'success'){
-                                    this.uploading = false;
-                                    this.showSuccess = true;
-                                    this.$refs.fileInput.value = '';
-                                    $('#datatable').DataTable().ajax.url('/upload-list/data').load();
-                                }
-                            })
-                            .catch(console.error());
+                        if(this.uploadProgress === 100){
+                            this.uploading = false;
+                            this.showSuccess = true;
+                            this.$refs.fileInput.value = '';
                         }
-                    }
-                })
-                .catch(error=>{
-                    if (axios.isCancel(error)) {
-                        console.log(error);
-                    } else {
-                        console.log('Error:', error.message);
-                    }
-                });
-            }
+                    },
+                    cancelToken: this.uploadCancelToken.token
+            })
+            .then(response=>{
+                window.location.reload();
+            })
+            .catch(error=>{
+                if (axios.isCancel(error)) {
+                    console.log(error);
+                } else {
+                    console.log('Error:', error.message);
+                }
+            });
         },
         onCloseDialoag(){
             Swal.fire({

@@ -15,8 +15,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
 use App\Repositories\FileUploadRepository;
+use Illuminate\Support\Facades\File as Facade;
 use Illuminate\Support\Facades\File as FacadeFile;
-
 
 class UploadController extends Controller
 {
@@ -69,7 +69,7 @@ class UploadController extends Controller
     }
 
     public function upload(Request $request){ 
-        $fileName = MainFolder::where('name',$request->fileName)->where('user_id',auth()->id())->first();
+        $fileName = MainFolder::firstWhere('name',$request->fileName);
         if($fileName){
             return response()->json([
                 'status'=>'success',
@@ -148,70 +148,27 @@ class UploadController extends Controller
     }
 
     public function test(Request $request){
-        $path = $_FILES['folder']['full_path'];
-        $name = $_FILES['folder']['name'];
-        $dir = dirname($path).'/';
-        $parent = explode('/',$dir)[0];
-        Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name']));
-        return response()->json([
-            'status'=>'success',
-            'data'=>$parent
-        ]);
-        // $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent);
-        // dd($path);
-        // dd($_FILES['folder']['name']);
-        // $folders = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
-        // $index   = 0;
-        // $dirs = [];
-        // $parent = [];
-        // $filename = [];
-        // $file_size = 0;
-        // foreach($folders as $path=>$name)
-        // {
-        //     $dir = dirname($path).'/';
-        //     Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
-        //     $file_size += $_FILES['folder']['size'][$index];
-        //     $index++;
-        //     $parent = explode('/',$dir);
-        //     $sub = ltrim($dir,$parent[0]);
-        //     $dirs[] = $parent[0].$sub.$name;
-        //     $filename[] = $name;
-        // }
-        // $size =$this->formatFileSize($file_size);
-        // $main_folder = new MainFolder();
-        // $main_folder->user_id = auth()->id();
-        // $main_folder->name = $parent[0];
-        // $main_folder->type = "folder";
-        // $main_folder->size = $size;
-        // $main_folder->save();
-        // MainFolder::updateOrCreate(
-        //     [
-        //         'id'=>$main_folder->id
-        //     ],
-        //     [
-        //         'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
-        //     ]
-        // );
-        // $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
-        // $path = str_replace("\\", "/", $path);
-        // $this->listFolderFiles($path,$main_folder->id,null,$main_folder->id);
-        // return response()->json([
-        //     'status'=>'success'
-        // ]);
-    }
-
-    public function FolderUploadTest(Request $request){
-        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$request->fileName);
-        $path = str_replace("\\", "/", $path);
+        $folders = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
+        $index   = 0;
+        $dirs = [];
+        $parent = [];
+        $filename = [];
         $file_size = 0;
-        $files =  FacadeFile::allFiles($path);
-        foreach($files as $file){
-            $file_size += $file->getSize();
+        foreach($folders as $path=>$name)
+        {
+            $dir = dirname($path).'/';
+            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            $file_size += $_FILES['folder']['size'][$index];
+            $index++;
+            $parent = explode('/',$dir);
+            $sub = ltrim($dir,$parent[0]);
+            $dirs[] = $parent[0].$sub.$name;
+            $filename[] = $name;
         }
         $size =$this->formatFileSize($file_size);
         $main_folder = new MainFolder();
         $main_folder->user_id = auth()->id();
-        $main_folder->name = $request->fileName;
+        $main_folder->name = $parent[0];
         $main_folder->type = "folder";
         $main_folder->size = $size;
         $main_folder->save();
@@ -223,6 +180,8 @@ class UploadController extends Controller
                 'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
             ]
         );
+        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
+        $path = str_replace("\\", "/", $path);
         $this->listFolderFiles($path,$main_folder->id,null,$main_folder->id);
         return response()->json([
             'status'=>'success'
@@ -262,24 +221,19 @@ class UploadController extends Controller
                     );
                     $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id,$sub_folder->main_id);
                 }else{
-                    $array =  FacadeFile::allFiles($dir);
+                    $array = $_FILES['folder']['name'];
                     $index = null;
-                    $filePath = null;
-                    $size = null;
-                    $type = null;
-                    foreach ($array as $key => $value) {  
-                        if($value->getFileName() == $folder){
-                            $filepath = $value->getPath();
-                            $size = $value->getSize();
-                            $type = $value->getExtension();
-                            $filePath = $value->getPathName();
+                    foreach ($array as $key => $value) {
+                        if($value == $folder){
                             $index = $key;
                             break;
                         }
                     }
-                    $path = str_replace("\\", "/", $filePath);
-                    $url = env('APP_URL').'/storage'.$path;
-                    $size =$this->formatFileSize($size);
+                    $url =  Storage::disk('chitmaymay')->url(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$_FILES['folder']['full_path'][$index]);
+                    $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
+                    $edit_type = explode('.',$folder);
+                    $count = count($edit_type)-1;
+                    $type = $edit_type[$count];
                     $file = new File();   
                     $file->name = $folder;
                     $file->url = $url;

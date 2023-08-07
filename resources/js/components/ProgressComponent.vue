@@ -18,7 +18,6 @@
                     <div class="d-flex align-items-center">
                         <img :src="imageUrl" class="folder-image mr-4"/>
                         <span>{{ fileName }}</span>
-                        <span class="ml-4">{{ count }} of {{ totalFile }} </span>
                     </div>
                 </div>
                     <div class="progress my-1" role="progressbar" aria-label="Example with label" aria-valuemin="0" aria-valuemax="100">
@@ -49,7 +48,7 @@
 
 <script>
 export default {
-props : ['fileName','uploadProgress','uploading','uploadCancel','showSuccess','count','totalFile'],
+props : ['fileName','uploadProgress','uploading','uploadCancel','showSuccess'],
 data(){
     return  {
         imageUrl : '/backend/images/folder.png'
