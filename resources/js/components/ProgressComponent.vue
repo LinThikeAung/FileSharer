@@ -14,7 +14,19 @@
         </div>
         <div class="modal-body">    
             <div v-if="uploading">
-                <div class="d-flex align-items-center justify-content-between">
+                <div class="bg-light mb-2">
+                    <div class="py-2 pl-2 text-dark d-flex align-items-center">
+                        <p class="mb-0 mr-2">
+                           Retrieving files to upload
+                        </p>
+                        <div class="spinner">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mb-2">
                     <div class="d-flex align-items-center">
                         <img :src="imageUrl" class="folder-image mr-4"/>
                         <span>{{ fileName }}</span>

@@ -111,8 +111,9 @@ export default {
             axios.get(`/upload-exist?fileName=${this.fileName}`)
             .then(response=>{
                     if(response.data.status == 'success'){
-                        this.showOptionComponent = true;
-                        this.fileName = response.data.name;
+                        alert('This folder is already exists');
+                        // this.showOptionComponent = true;
+                        // this.fileName = response.data.name;
                     }else{
                         this.uploadData();
                     }
