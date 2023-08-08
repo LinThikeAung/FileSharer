@@ -34,6 +34,18 @@
                 </div>            
             </div>
             <div v-if="showSuccess">
+                <div class="bg-light">
+                    <div class="py-2 pl-2 text-dark d-flex align-items-center">
+                        <p class="mb-0 mr-2">
+                            Please wait to upload 
+                        </p>
+                        <div class="spinner">
+                            <div class="bounce1"></div>
+                            <div class="bounce2"></div>
+                            <div class="bounce3"></div>
+                        </div>
+                    </div>
+                </div>
                 <div class="d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
                         <img :src="imageUrl" class="folder-image mr-4"/>
@@ -139,5 +151,41 @@ i{
     border-radius: 50%;
     font-size: 16px;
     color: white;
+}
+.spinner > div {
+  width: 6px;
+  height: 6px;
+  margin-right: 3px;
+  background-color: #333;
+
+  border-radius: 100%;
+  display: inline-block;
+  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+  animation: sk-bouncedelay 1.4s infinite ease-in-out both;
+}
+
+.spinner .bounce1 {
+  -webkit-animation-delay: -0.32s;
+  animation-delay: -0.32s;
+}
+
+.spinner .bounce2 {
+  -webkit-animation-delay: -0.16s;
+  animation-delay: -0.16s;
+}
+
+@-webkit-keyframes sk-bouncedelay {
+  0%, 80%, 100% { -webkit-transform: scale(0) }
+  40% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bouncedelay {
+  0%, 80%, 100% { 
+    -webkit-transform: scale(0);
+    transform: scale(0);
+  } 40% { 
+    -webkit-transform: scale(1.0);
+    transform: scale(1.0);
+  }
 }
 </style>

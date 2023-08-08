@@ -60,6 +60,14 @@ class UploadController extends Controller
         return $fileName;
     }
 
+    private function unFormatFileSize($value){
+        $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        $search_value = explode(' ',$value)[1];
+        $size = explode(' ',$value)[0];
+        $index = array_search($search_value,$sizes);
+        return round($size * pow (1024 , $index));
+    }
+
     private function formatFileSize($bytes)
     {
         $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -270,6 +278,19 @@ class UploadController extends Controller
             foreach($directories as $directory){
                 $directory->delete();
             }
+            if($file->main_folder){
+                $mainSize =  $this->unFormatFileSize($file->main_folder->size);
+                $fileSize = $this->unFormatFileSize($file->size);
+                $file->main_folder->size = $this->formatFileSize($mainSize - $fileSize);
+                $file->main_folder->update();
+             }else{
+                $subFolder = SubFolder::firstWhere('id',$file->main_sub_id);
+                $subFolderSize = $this->unFormatFileSize($subFolder->size);
+                $fileSize = $this->unFormatFileSize($file->size);
+                $subFolder->size =  $this->formatFileSize($subFolderSize -  $fileSize);
+                $subFolder->update();
+                Helper::deleteAllFiles($subFolder, $fileSize );
+            }
             $file->delete();
             FacadeFile::deleteDirectory(public_path('storage'.$file->path.'/'.$file->name));                
             return response()->json([
@@ -422,6 +443,18 @@ class UploadController extends Controller
         $new_array = array_slice($array,3);
         $path = implode('/',$new_array);
         FacadeFile::delete(public_path($path));
+        if($file->folder){
+            $mainSize =  $this->unFormatFileSize($file->folder->size);
+            $fileSize = $this->unFormatFileSize($file->size);
+            $file->folder->size = $this->formatFileSize($mainSize - $fileSize);
+            $file->folder->update();
+         }else{
+             $subFolderSize = $this->unFormatFileSize($file->subFolder->size);
+             $fileSize = $this->unFormatFileSize($file->size);
+             $file->subFolder->size =  $this->formatFileSize($subFolderSize -  $fileSize);
+             $file->subFolder->update();
+             Helper::deleteAllFiles($file->subFolder, $fileSize );
+         }
         $file->delete();
         return response()->json([
             'status'=>'success'
@@ -463,11 +496,15 @@ class UploadController extends Controller
     $main_folder_id = null;
     $sub_folder_id = null;
     $folder_name = null;
+    $mainFolder      = null;
+    $subFolder       = null;
     if($main_folder){
+        $mainFolder = $main_folder;
        $main_folder_id = $main_folder->id;
        $folder_name = $main_folder->name;
     }else{
         $sub_folder = SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+        $subFolder = $sub_folder;
         $sub_folder_id = $sub_folder->id;
         $sub_folder_split = explode('/',$sub_folder->path);
         $folder_name = implode('/',array_slice($sub_folder_split,7))."/".$sub_folder->name;
@@ -497,17 +534,31 @@ class UploadController extends Controller
         $file_upload->main_folder_id = $main_folder_id;
         $file_upload->sub_folder_id = $sub_folder_id;
         $file_upload->save();
+        if($mainFolder){
+            $mainSize =  $this->unFormatFileSize($mainFolder->size);
+            $mainFolder->size = $this->formatFileSize($mainSize + $fileSize);
+            $mainFolder->update();
+         }else{
+             $subFolderSize = $this->unFormatFileSize($subFolder->size);
+             $subFolder->size =  $this->formatFileSize($subFolderSize +  $fileSize);
+             $subFolder->update();
+             Helper::updateAllFolders($subFolder, $fileSize);
+        }
         return $fileName;
     }
 
     public function deleteUploadFolder(Request $request){
         $main_folder = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
         $folder_name = null;
+        $mainFolder  = null;
+        $subFolder   = null;
         if($main_folder){
+            $mainFolder = $main_folder;
            $main_folder_id = $main_folder->id;
            $folder_name = $main_folder->name;
         }else{
             $sub_folder = SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+            $subFolder = $sub_folder;
             $sub_folder_split = explode('/',$sub_folder->path);
             $folder_name = implode('/',array_slice($sub_folder_split,7))."/".$sub_folder->name;
         }
@@ -520,6 +571,18 @@ class UploadController extends Controller
         $day = $array[2];
         if($data){
             $data->delete();
+            if($mainFolder){
+                $mainSize =  $this->unFormatFileSize($mainFolder->size);
+                $fileSize = $this->unFormatFileSize($data->size);
+                $mainFolder->size = $this->formatFileSize($mainSize - $fileSize);
+                $mainFolder->update();
+             }else{
+                 $subFolderSize = $this->unFormatFileSize($subFolder->size);
+                 $fileSize = $this->unFormatFileSize($data->size);
+                 $subFolder->size =  $this->formatFileSize($subFolderSize -  $fileSize);
+                 $subFolder->update();
+                 Helper::subtrationAllFolder($subFolder, $fileSize );
+             }
             $name = auth()->user()->id;
             Storage::disk('chitmaymay')->delete($year.'/'.$month.'/'.$day.'/'."$name/$folder_name/".$data->file);
             return response()->json([
@@ -535,9 +598,11 @@ class UploadController extends Controller
         $main_folder_id  = null;
         $main_sub_id     = null;
         $main_id         = null;
-
+        $mainFolder      = null;
+        $subFolder       = null;
         if($main_folder)
         {
+            $mainFolder      = $main_folder;
             $folderName      = $main_folder->name;
             $main_folder_id  = $main_folder->id;
             $main_id         = $main_folder->id; 
@@ -545,6 +610,7 @@ class UploadController extends Controller
         else
         {
             $sub_folder       = SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+            $subFolder = $sub_folder;
             $main_sub_id      = $sub_folder->id;
             $sub_folder_split = explode('/',$sub_folder->path);
             $folderName      = implode('/',array_slice($sub_folder_split,7))."/".$sub_folder->name;
@@ -581,6 +647,16 @@ class UploadController extends Controller
         $sub_folder->path        = $filePath;
         $sub_folder->main_id     = $main_id;
         $sub_folder->save();
+        if($mainFolder){
+           $mainSize =  $this->unFormatFileSize($mainFolder->size);
+           $mainFolder->size = $this->formatFileSize($mainSize + $file_size);
+           $mainFolder->update();
+        }else{
+            $subFolderSize = $this->unFormatFileSize($subFolder->size);
+            $subFolder->size =  $this->formatFileSize($subFolderSize + $file_size);
+            $subFolder->update();
+            Helper::updateAllFolders($subFolder,$file_size);
+        }
         SubFolder::updateOrCreate(
             [
                 'id'=>$sub_folder->id
