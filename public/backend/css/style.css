@@ -274,3 +274,7 @@ div:where(.swal2-icon).swal2-warning.swal2-icon-show {
 .masthead button{
     padding: 10px !important;
 }
+
+.dropdown-menu{
+    z-index: 1000 !important;
+}

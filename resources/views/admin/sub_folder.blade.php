@@ -6,6 +6,7 @@
     <div class="d-flex justify-content-between align-items-center">
         <input type="hidden" value="{{ $id }}" id="folder_id">
         <input type="hidden" value="{{ $name }}" id="folder_name">
+        <input type="hidden" value="{{ $created_at }}" id="created_at">
         <div>
             <breadcrumb-component></breadcrumb-component>
         </div>
@@ -15,8 +16,7 @@
     </div>
     <div class="card shadow">
         <div class="card-body p-2">
-           <div class="table-responsive">
-            <table class="table table-hover" id="table">
+            <table class="table table-hover responsive-table" id="table" style="width:100%">
                 <thead>
                   <tr>
                     <th scope="col" class="pl-3">Name</th>
@@ -44,11 +44,11 @@
                                         {{ $item->created_at->format('d-m-Y h:i A') }}
                                 </td>
                                 <td>
-                                    <div class="btn-group dropstart">
+                                    <div class="btn-group dropstart" >
                                         <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                             <i class="bi bi-three-dots-vertical"></i>
                                         </button>
-                                        <ul class="dropdown-menu">
+                                        <ul class="dropdown-menu"  style="border-radius: 8px;z-index: 999;">
                                             <li class="dropdown-item copy" id="{{ $item->url }}"><i class="bi bi-link copy" id="{{ $item->url }}"></i> <p class="copy" id="{{ $item->url }}">Copy Link</p></li>
                                             <a  href="/upload-subFolder-zip?fileName={{ $item->name }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
                                             <li class="dropdown-item delete_folder" id="{{ $item->id }}"><i class="bi bi-trash delete_folder" id="{{ $item->id }}"></i> <p class="delete_folder" id="{{ $item->id }}">Delete</p></li>
@@ -59,50 +59,49 @@
                        @endforeach
                     @endif
                     @if (count($files) > 0)
-                    @foreach ($files as $item)
-                         <tr data-id="{{ $item->url }}">
-                             <td>
-                                    <?php
-                                    $backendPath = public_path('backend/images/'.$item->type.".png");
-                                   if(File::exists($backendPath)){
-                               ?>
-                                      <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
-                                      <span>{{ $item->name }}</span>
-                               <?php
-                                   }else{
-                               ?>
-                                   <img src='{{ asset("/backend/images/unknown.png") }}' class="mr-3"/> 
-                                   <span>{{ $item->name }}</span>
-                               <?php
-                                   }
-                               ?>
-                            </td>
-                             <td>{{ $item->size }}</td>
-                             <td>{{ $item->type }}</td>
-                             <td>{{ $item->created_at->format('d-m-Y h:i A') }}</td>
-                             <td>
-                                <div class="btn-group dropstart">
-                                    <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="bi bi-three-dots-vertical"></i>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-item copy_file" id="{{ $item->url }}"><i class="bi bi-link copy_file" id="{{ $item->url }}"></i> <p class="copy_file" id="{{ $item->url }}">Copy Link</p></li>
-                                        <a  href="/download-subFile?name={{ $item->url }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
-                                        <li class="dropdown-item file_delete" id="{{ $item->id }}"><i class="bi bi-trash file_delete" id="{{ $item->id }}"></i> <p class="file_delete" id="{{ $item->id }}">Delete</p></li>
-                                    </ul> 
-                                </div>
-                             </td>
-                         </tr>
-                    @endforeach
-                    @else
-                    <tr>
-                        <td colspan="5" class="text-center">No data available in table</td>
-                    </tr>
+                        @foreach ($files as $item)
+                            <tr data-id="{{ $item->url }}">
+                                <td>
+                                        <?php
+                                        $backendPath = public_path('backend/images/'.$item->type.".png");
+                                    if(File::exists($backendPath)){
+                                ?>
+                                        <img src='{{ asset("/backend/images/$item->type.png") }}' class="mr-3"/> 
+                                        <span>{{ $item->name }}</span>
+                                <?php
+                                    }else{
+                                ?>
+                                    <img src='{{ asset("/backend/images/unknown.png") }}' class="mr-3"/> 
+                                    <span>{{ $item->name }}</span>
+                                <?php
+                                    }
+                                ?>
+                                </td>
+                                <td>{{ $item->size }}</td>
+                                <td>{{ $item->type }}</td>
+                                <td>{{ $item->created_at->format('d-m-Y h:i A') }}</td>
+                                <td>
+                                    <div class="btn-group dropstart">
+                                        <button type="button" class="dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li class="dropdown-item copy_file" id="{{ $item->url }}"><i class="bi bi-link copy_file" id="{{ $item->url }}"></i> <p class="copy_file" id="{{ $item->url }}">Copy Link</p></li>
+                                            <a  href="/download-subFile?name={{ $item->url }}" class="dropdown-item" style="padding:11px 20px;"><i class="bi bi-download"></i> <p>Download</p></a>
+                                            <li class="dropdown-item file_delete" id="{{ $item->id }}"><i class="bi bi-trash file_delete" id="{{ $item->id }}"></i> <p class="file_delete" id="{{ $item->id }}">Delete</p></li>
+                                        </ul> 
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
                     @endif
-
+                    @if (count($folders) < 1 && count($files) < 1)
+                        <tr>
+                            <td colspan="5" class="text-center">No data available in table</td>
+                        </tr>
+                    @endif
                 </tbody>
             </table>
-          </div>
         </div>
     </div>
 </div>
@@ -111,6 +110,7 @@
 <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 <script>
      $(document).ready(function(){
+
         $(document.getElementById('table')).on('dblclick', 'tr', function(event) {
                let id = $(this).data('id');
                let rowData = id;

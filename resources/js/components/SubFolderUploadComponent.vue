@@ -6,6 +6,8 @@
             </button>
             <ul class="dropdown-menu mr-1 shadow" style="border-radius: 8px;z-index: 999;">
                 <input type="file" hidden ref="fileInput" webkitdirectory directory multiple @change="onChangeEvent">
+                <li class="text-dark" @click="onCreateEvent"><button class="dropdown-item px-3" type="button"><img :src="newFolderUrl" class="image"/><span class="mr-4">New Folder</span></button></li>
+                    <hr>
                 <li class="mb-2 text-dark" @click="onFileUpload"><button class="dropdown-item px-3" type="button"><img
                             :src="fileImageUrl" class="image" /><span class="mr-4">File upload</span></button></li>
                 <li class="mb-2" @click="onClickHandler"><button class="dropdown-item px-3" type="button"><img
@@ -49,6 +51,9 @@
             </div>
         </div>
     </div>
+    <div v-if="showCreateSubFolder">
+        <create-subFolder-component @closeCreateFolder="onCloseCreateFolder" :fileId="fileId" :subFolderName="subFolderName" :time="time"></create-subFolder-component>
+    </div>
 </template>
 
 <script>
@@ -65,6 +70,7 @@ export default {
         return {
             fileImageUrl: "/backend/images/upload-file.png",
             folderImageUrl: "/backend/images/upload-folder.png",
+            newFolderUrl : "/backend/images/new-folder.png",
             showFilePond: false,
             token: csrf_token,
             showError: false,
@@ -79,7 +85,9 @@ export default {
             showSuccess: false,
             uploadProgress: 0,
             uploading: false,
-            uploadCancelToken: null
+            uploadCancelToken: null,
+            showCreateSubFolder : false,
+            time : null,
         }
     },
     methods: {
@@ -191,10 +199,17 @@ export default {
                 this.uploading = false;
             }
         },
+        onCreateEvent(){
+            this.showCreateSubFolder = true;
+        },
+        onCloseCreateFolder(){
+            this.showCreateSubFolder = false;
+        }
     },
     mounted() {
         this.fileId = $('#folder_id').val();
         this.subFolderName = $('#folder_name').val();
+        this.time = $('#created_at').val();
     },
 }
 </script>

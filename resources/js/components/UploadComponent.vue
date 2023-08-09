@@ -11,6 +11,8 @@
                 </button>
                 <ul class="dropdown-menu mr-1 shadow" style="border-radius: 8px;z-index: 999;">
                     <input type="file" hidden ref="fileInput" webkitdirectory directory multiple @change="onChangeEvent" :disabled="uploading">
+                    <li class="text-dark" @click="onCreateEvent"><button class="dropdown-item px-3" type="button"><img :src="newFolderUrl" class="image"/><span class="mr-4">New Folder</span></button></li>
+                    <hr>
                     <li class="mb-2 text-dark" @click="onFileUpload"><button class="dropdown-item px-3" type="button"><img :src="fileImageUrl" class="image"/><span class="mr-4">File upload</span></button></li>
                     <li class="mb-2" @click="onClickHandler"><button class="dropdown-item px-3" type="button"><img :src="folderImageUrl" class="image"/><span class="mr-4">Folder upload</span></button></li>
                 </ul>
@@ -71,6 +73,9 @@
    <div v-if="showShareComponent">
     <share-component :shareName = "shareName" :users="users" @close="closeShareModal"></share-component>
    </div>
+   <div v-if="showCreateFolder">
+        <create-folder-component @closeCreateFolder="closeCreateFolder"></create-folder-component>
+   </div>
 </template>
 
 <script>
@@ -92,6 +97,7 @@ export default {
             showSuccess : false,
             fileImageUrl: "/backend/images/upload-file.png",
             folderImageUrl : "/backend/images/upload-folder.png",
+            newFolderUrl : "/backend/images/new-folder.png",
             showOptionComponent : false,
             showFilePond : false,
             folders : [],
@@ -99,7 +105,8 @@ export default {
             showShareComponent : false,
             shareName : null,
             users : [],
-            folderName : ""
+            folderName : "",
+            showCreateFolder : false,
         }
     },
     methods:{
@@ -159,7 +166,7 @@ export default {
                 if (axios.isCancel(error)) {
                     console.log(error);
                 } else {
-                    console.log('Error:', error.message);
+                    console.log('Error:1234567890', error.message);
                 }
             });
         },
@@ -390,6 +397,12 @@ export default {
         closeShareModal(){
             this.showShareComponent = false;
             window.location.reload();
+        },
+        onCreateEvent(){
+            this.showCreateFolder = true;
+        },
+        closeCreateFolder(){
+            this.showCreateFolder = false;
         }
     },
     mounted(){

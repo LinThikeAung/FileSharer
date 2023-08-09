@@ -16,13 +16,22 @@ class Helper{
 
     public static function updateAllFolders($directory,$fileSize){
         if($directory->main_folder){
-            $size =  Helper::unFormatFileSize($directory->main_folder->size) + $fileSize;
+            if($directory->main_folder->size){
+                $size =  Helper::unFormatFileSize($directory->main_folder->size) + $fileSize;
+            }else{
+                $size =  0 + $fileSize;
+            }
+            
             $directory->main_folder->size = Helper::formatFileSize($size);
             $directory->main_folder->update();
         }else{
             $subDirectory = SubFolder::where('id',$directory->main_sub_id)->first();
             if($subDirectory){
-                $size =  Helper::unFormatFileSize($subDirectory->size) + $fileSize;
+                if($subDirectory->size){
+                    $size =  Helper::unFormatFileSize($subDirectory->size) + $fileSize;
+                }else{
+                    $size = 0 + $fileSize;
+                }
                 $subDirectory->size = Helper::formatFileSize($size);
                 $subDirectory->update();
                 self::updateAllFolders($subDirectory,$fileSize);
@@ -33,13 +42,21 @@ class Helper{
     public static function subtrationAllFolder($directory,$fileSize){
         if($directory->main_folder){
             $size =  Helper::unFormatFileSize($directory->main_folder->size) - $fileSize;
-            $directory->main_folder->size = Helper::formatFileSize($size);
+            if($size == 0){
+                $directory->main_folder->size = null;
+            }else{
+                $directory->main_folder->size = Helper::formatFileSize($size);
+            }
             $directory->main_folder->update();
         }else{
             $subDirectory = SubFolder::where('id',$directory->main_sub_id)->first();
             if($subDirectory){
                 $size =  Helper::unFormatFileSize($subDirectory->size) - $fileSize;
-                $subDirectory->size = Helper::formatFileSize($size);
+                if($size == 0){
+                    $subDirectory->size = null;
+                }else{
+                    $subDirectory->size = Helper::formatFileSize($size);
+                }
                 $subDirectory->update();
                 self::subtrationAllFolder($subDirectory,$fileSize);
             }
@@ -49,14 +66,32 @@ class Helper{
     public static function deleteAllFiles($file,$fileSize){
         $directory= SubFolder::where('id',$file->id)->first();
         if($directory->main_folder){
-            $size =  Helper::unFormatFileSize($directory->main_folder->size) - $fileSize;
-            $directory->main_folder->size = Helper::formatFileSize($size);
+            if($directory->main_folder->size == null){
+                $mainFolderSize = 0;
+            }else{
+                $mainFolderSize = Helper::unFormatFileSize($directory->main_folder->size);
+            }
+            $size =  $mainFolderSize- $fileSize;
+            if($size == 0){
+                $directory->main_folder->size = null;
+            }else{
+                $directory->main_folder->size = Helper::formatFileSize($size);
+            }
             $directory->main_folder->update();
         }else{
             $subDirectory = SubFolder::where('id',$directory->main_sub_id)->first();
             if($subDirectory){
-                $size =  Helper::unFormatFileSize($subDirectory->size) - $fileSize;
-                $subDirectory->size = Helper::formatFileSize($size);
+                if($subDirectory->size == null){
+                    $subDirectorySize = 0;
+                }else{
+                    $subDirectorySize =  Helper::unFormatFileSize($subDirectory->size);
+                }
+                $size =   $subDirectorySize - $fileSize;
+                if($size == 0){
+                    $subDirectory->size = null;
+                }else{
+                    $subDirectory->size = Helper::formatFileSize($size);
+                }
                 $subDirectory->update();
                 self::subtrationAllFolder($subDirectory,$fileSize);
             }
