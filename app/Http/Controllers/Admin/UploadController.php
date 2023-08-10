@@ -666,6 +666,7 @@ class UploadController extends Controller
             $main_id          = $sub_folder->main_id;
         }
 
+        Log::info($_FILES['folder']['tmp_name']);
         $folders   = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
         $index     = 0;
         $dirs      = [];
@@ -676,16 +677,16 @@ class UploadController extends Controller
         {
           if($path && $name){
             $dir = dirname($path).'/';
-            Log::info('Sub Folder Upload =>'.$path . $name);
-            Log::info('Sub Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
+            Log::info('Sub Folder Name=>'.$path . $name);
+            Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
             Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
-            $index++;
             $parent     = explode('/',$dir);
             $sub        = ltrim($dir,$parent[0]);
             $dirs[]     = $parent[0].$sub.$name;
             $filename[] = $name;
-          }
+            }
+            $index++;
         }
         
         $size                    = $this->formatFileSize($file_size);
