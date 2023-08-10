@@ -115,25 +115,27 @@ class UploadController extends Controller
                 ]);
             }
         }else{
-            $subFolder =  SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
-            $sub_folder = SubFolder::where('main_sub_id',$subFolder->id)->get('name');
-            $folders = $sub_folder->toArray();
-            foreach($folders as $folder){
-                $folderArray[] = $folder['name'];
-            }
-            if (in_array($request->fileName, $folderArray)) {
-                return response()->json([
-                    'status'=>'success',
-                    'data'=>$request->fileName
-                ]);
-            } 
-            else 
-            {
-                return response()->json([
+                  return response()->json([
                     'status' => 'fail',
-                    'data'   => $request->fileName
                 ]);
-            }
+            // $subFolder =  SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
+            // $sub_folder = SubFolder::where('main_sub_id',$subFolder->id)->get('name');
+            // $folders = $sub_folder->toArray();
+            // foreach($folders as $folder){
+            //     $folderArray[] = $folder['name'];
+            // }
+            // if (in_array($request->fileName, $folderArray)) {
+            //     return response()->json([
+            //         'status'=>'success',
+            //     ]);
+            // } 
+            // else 
+            // {
+            //     return response()->json([
+            //         'status' => 'fail',
+            //         'data'   => $request->fileName
+            //     ]);
+            // }
         }
     }
 
@@ -183,8 +185,8 @@ class UploadController extends Controller
         {
             if($path && $name){
                 $dir = dirname($path).'/';
-                Log::info('Folder Upload =>'.$path && $name);
-                Log::info('Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+                Log::info('Folder Upload =>'.$path . $name);
+                Log::info('Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
                 Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
                 $index++;
@@ -674,8 +676,8 @@ class UploadController extends Controller
         {
           if($path && $name){
             $dir = dirname($path).'/';
-            Log::info('Sub Folder Upload =>'.$path && $name);
-            Log::info('Sub Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            Log::info('Sub Folder Upload =>'.$path . $name);
+            Log::info('Sub Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
             Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
             $index++;
