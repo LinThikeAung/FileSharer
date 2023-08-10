@@ -91,7 +91,7 @@ class UploadController extends Controller
     } 
 
     public function uploadExist(Request $request){
-        $fileName = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->first();
+        $fileName = MainFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
         $folderArray = [];
         if($fileName){
             $sub_folder = SubFolder::where('parent_id',$fileName->id)->get('name');
@@ -102,21 +102,36 @@ class UploadController extends Controller
             if (in_array($request->fileName, $folderArray)) {
                 return response()->json([
                     'status'=>'success',
+                    'data'=>$request->fileName
                 ]);
-            } else {
+            } 
+            else 
+            {
                 return response()->json([
-                    'status'=> 'fail'
+                    'status' => 'fail',
+                    'data'   =>  $request->fileName
                 ]);
             }
-            //  if($sub_folder){
-            //     return response()->json([
-            //         'status'=>'success',
-            //     ]);
-            // }else{
-            //     return response()->json([
-            //         'status'=> 'fail'
-            //     ]);
-            // }
+        }else{
+            $subFolder =  SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
+            $sub_folder = SubFolder::where('main_sub_id',$subFolder->id)->get('name');
+            $folders = $sub_folder->toArray();
+            foreach($folders as $folder){
+                $folderArray[] = $folder['name'];
+            }
+            if (in_array($request->fileName, $folderArray)) {
+                return response()->json([
+                    'status'=>'success',
+                    'data'=>$request->fileName
+                ]);
+            } 
+            else 
+            {
+                return response()->json([
+                    'status' => 'fail',
+                    'data'   => $request->fileName
+                ]);
+            }
         }
     }
 

@@ -166,7 +166,7 @@ export default {
                 if (axios.isCancel(error)) {
                     console.log(error);
                 } else {
-                    console.log('Error:1234567890', error.message);
+                    console.log('Error:', error.message);
                 }
             });
         },
