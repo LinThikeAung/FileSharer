@@ -11,6 +11,7 @@ use App\Models\MainFolder;
 use Illuminate\Http\Request;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -73,6 +74,7 @@ class UploadController extends Controller
         $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if ($bytes === 0) return '0 Byte';
         $i = floor(log($bytes, 1024));
+        Log::info('Bytes=> '.$bytes .' FormatFileSize Floor =>' . $i . ' Round' .pow(1024, $i) );
         return round($bytes / pow(1024, $i)).' '. $sizes[$i];
     }
 
@@ -181,6 +183,8 @@ class UploadController extends Controller
         {
             if($path && $name){
                 $dir = dirname($path).'/';
+                Log::info('Folder Upload =>'.$path && $name);
+                Log::info('Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
                 $index++;
@@ -670,6 +674,8 @@ class UploadController extends Controller
         {
           if($path && $name){
             $dir = dirname($path).'/';
+            Log::info('Sub Folder Upload =>'.$path && $name);
+            Log::info('Sub Folder Upload=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
             $index++;
