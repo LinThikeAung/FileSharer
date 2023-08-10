@@ -183,9 +183,9 @@ class UploadController extends Controller
         $file_size = 0;
         foreach($folders as $path=>$name)
         {
-            if($path && $name){
+            if($path && $name && $_FILES['folder']['tmp_name'][$index]){
                 $dir = dirname($path).'/';
-                Log::info('Folder Upload Name=>'.$path . $name. $index);
+                Log::info('Folder Upload Name=>'.$path . $name);
                 Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
                 Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
@@ -666,7 +666,6 @@ class UploadController extends Controller
             $main_id          = $sub_folder->main_id;
         }
 
-        Log::info($_FILES['folder']['tmp_name']);
         $folders   = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
         $index     = 0;
         $dirs      = [];
@@ -675,9 +674,9 @@ class UploadController extends Controller
         $file_size = 0;
         foreach($folders as $path=>$name)
         {
-          if($path && $name){
+          if($path && $name && $_FILES['folder']['tmp_name'][$index]){
             $dir = dirname($path).'/';
-            Log::info('Sub Folder Name=>'.$path . $name. $index);
+            Log::info('Sub Folder Name=>'.$path . $name);
             Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
             Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
