@@ -118,9 +118,10 @@ export default {
             axios.get(`/upload-exist?fileName=${this.fileName}`)
             .then(response=>{
                     if(response.data.status == 'success'){
-                        alert('This folder is already exists');
-                        // this.showOptionComponent = true;
-                        // this.fileName = response.data.name;
+                        Swal.fire({
+                            title: response.data.data + ' is already exists.',
+                            focusConfirm : false,
+                        })
                     }else{
                         this.uploadData();
                     }
@@ -160,7 +161,11 @@ export default {
                     cancelToken: this.uploadCancelToken.token
             })
             .then(response=>{
-                window.location.reload();
+                if(response.data.status == 'fail'){
+                    alert('You are exceeded amount.');
+                }else{
+                    window.location.reload();
+                }
             })
             .catch(error=>{
                 if (axios.isCancel(error)) {

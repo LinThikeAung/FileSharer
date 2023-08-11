@@ -79,11 +79,11 @@ class UploadController extends Controller
     }
 
     public function upload(Request $request){ 
-        $fileName = MainFolder::firstWhere('name',$request->fileName);
+        $fileName = MainFolder::where('name',$request->fileName)->where('user_id',auth()->id())->first();
         if($fileName){
             return response()->json([
                 'status'=>'success',
-                'name'=>$fileName->name
+                'data'=>$fileName->name
             ]);
         }else{
             return response()->json([
@@ -115,27 +115,25 @@ class UploadController extends Controller
                 ]);
             }
         }else{
-                  return response()->json([
-                    'status' => 'fail',
+            $subFolder =  SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
+            $sub_folder = SubFolder::where('main_sub_id',$subFolder->id)->get('name');
+            $folders = $sub_folder->toArray();
+            foreach($folders as $folder){
+                $folderArray[] = $folder['name'];
+            }
+            if (in_array($request->fileName, $folderArray)) {
+                return response()->json([
+                    'status'=>'success',
+                    'data'=>$request->fileName
                 ]);
-            // $subFolder =  SubFolder::where('id',$request->file_id)->where('name',$request->file_name)->where('created_at',$request->created_at)->first();
-            // $sub_folder = SubFolder::where('main_sub_id',$subFolder->id)->get('name');
-            // $folders = $sub_folder->toArray();
-            // foreach($folders as $folder){
-            //     $folderArray[] = $folder['name'];
-            // }
-            // if (in_array($request->fileName, $folderArray)) {
-            //     return response()->json([
-            //         'status'=>'success',
-            //     ]);
-            // } 
-            // else 
-            // {
-            //     return response()->json([
-            //         'status' => 'fail',
-            //         'data'   => $request->fileName
-            //     ]);
-            // }
+            } 
+            else 
+            {
+                return response()->json([
+                    'status' => 'fail',
+                    'data'   => $request->fileName
+                ]);
+            }
         }
     }
 
@@ -176,6 +174,15 @@ class UploadController extends Controller
 
     public function test(Request $request){
         $folders = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
+        $totalFileSize = 0;
+        $fileSizes = $_FILES['folder']['size'];
+        foreach($fileSizes as $fileSize){
+            $totalFileSize += $fileSize; 
+        }
+        $disktotal = disk_total_space('/media/dkmads-upload/');
+        $diskfree  = disk_free_space('/');
+        $diskuse = $disktotal - $diskfree;
+        $totalUploadSize = $totalFileSize + $diskuse;
         $index   = 0;
         $dirs = [];
         $parent = [];
@@ -187,7 +194,21 @@ class UploadController extends Controller
                 $dir = dirname($path).'/';
                 Log::info('Folder Upload Name=>'.$path . $name);
                 Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
-                Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+                if($totalUploadSize < $disktotal){
+                    Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+                }elseif($totalUploadSize > $disktotal){
+                    $disk_total = disk_total_space('/media/dkmads-upload2/');
+                    $disk_free  = disk_free_space('/');
+                    $disk_use = $disk_total - $disk_free;
+                    $totalUploadSize = $totalFileSize + $disk_use;
+                    if( $totalUploadSize < $disk_total ){
+                        Storage::disk('chitmaymay2')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+                    }else{
+                        return response()->json([
+                            'status'=>'fail',
+                        ]);
+                    }
+                }
                 $file_size += $_FILES['folder']['size'][$index];
                 $parent = explode('/',$dir);
                 $sub = ltrim($dir,$parent[0]);

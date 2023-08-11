@@ -47,7 +47,24 @@ return [
             'url' => env('APP_URL') . '/storage/media/dkmads-upload/',
             'visibility' => 'public',
         ],
-        
+        'chitmaymay2' => [
+            'driver' => 'local',
+            'root' => '/media/dkmads-upload2/',
+            'url' => env('APP_URL') . '/storage/media/dkmads-upload2/',
+            'visibility' => 'public',
+        ],
+        'chitmaymay-bk' => [
+            'driver' => 'local',
+            'root' => '/media/dkmads-upload-bk/',
+            'url' => env('APP_URL') . '/storage/media/dkmads-upload-bk/',
+            'visibility' => 'public',
+        ],
+        'chitmaymay2-bk' => [
+            'driver' => 'local',
+            'root' => '/media/dkmads-upload2-bk/',
+            'url' => env('APP_URL') . '/storage/media/dkmads-upload2-bk/',
+            'visibility' => 'public',
+        ],
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

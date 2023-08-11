@@ -121,10 +121,13 @@ export default {
             this.files = Array.from(event.target.files);
             let file = this.files[0].webkitRelativePath;
             this.folderName = file.split('/')[0];
-            axios.get(`/upload-subFolder-exist?fileName=${this.folderName}&file_id=${this.fileId}&file_name=${this.subFolderName}`)
+            axios.get(`/upload-subFolder-exist?fileName=${this.folderName}&file_id=${this.fileId}&file_name=${this.subFolderName}&created_at=${this.time}`)
                 .then(response => {
                     if (response.data.status == 'success') {
-                        alert('Folder Name is already exists');
+                        Swal.fire({
+                            title: response.data.data + ' is already exists.',
+                            focusConfirm : false,
+                        })
                     } else {
                         this.uploadData();
                     }
@@ -138,6 +141,7 @@ export default {
             for (var i = 0; i < this.files.length; i++) {
                 formData.append('folder[]', this.files[i]);
             }
+            console.log(this.files);
             this.fileName = this.files[0].webkitRelativePath.split('/')[0];
             this.uploadCancel = false;
             this.showProgress = true;
