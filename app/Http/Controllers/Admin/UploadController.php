@@ -38,6 +38,26 @@ class UploadController extends Controller
         $id = auth()->id();
         $file = $request->file('file');
         $fileSize = $file->getSize();
+        $totalFileSize = $fileSize;
+        $disk = null;
+        $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
+        $diskfree  = disk_free_space('/'); 
+        $used = $disktotal - $diskfree;
+        $totalUploadSize = $totalFileSize + $used;
+        // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        if($totalUploadSize < $diskfree){
+            $disk = "chitmaymay";
+        }else{
+            $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
+            $disk_free  = disk_free_space('/'); 
+            $used2 = $disk_total - $disk_free;
+            $total_upload_size = $totalFileSize + $used2;
+            if($total_upload_size < $disk_free){
+                $disk = "chitmaymay2";
+            }else{
+                return false;
+            }
+        }
         $formattedSize = $this->formatFileSize($fileSize);
         $size =$formattedSize;
         $unique_name = $file->getClientOriginalName();
@@ -45,10 +65,10 @@ class UploadController extends Controller
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
             $name = auth()->user()->id;
-            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/".$fileName, file_get_contents($file));
+            Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/".$fileName, file_get_contents($file));
         }
         $path = "$name/".$fileName;
-        $url = Storage::disk('chitmaymay')->url(date('Y').'/'.date('m').'/'.date('d').'/'.$path);
+        $url = Storage::disk($disk)->url(date('Y').'/'.date('m').'/'.date('d').'/'.$path);
         $files = [
             "name" =>$unique_name,
             "user_id"=>$id,
@@ -140,6 +160,8 @@ class UploadController extends Controller
     public function delete(){
         $data = MainFolder::where('file',request()->getContent())->first();
         $real_time = $data->created_at->format('Y-m-d');
+        $fileArray = [];
+        $disk = null;
         $array = explode('-',$real_time);
         $year = $array[0];
         $month = $array[1];
@@ -147,7 +169,14 @@ class UploadController extends Controller
         if($data){
             $data->delete();
             $name = auth()->user()->id;
-            Storage::disk('chitmaymay')->delete($year.'/'.$month.'/'.$day.'/'."$name/".$data->file);
+            $dataArray = explode('/',$data->url);
+            $url = $dataArray[5];
+            if($url == 'dkmads-upload'){
+                $disk = 'chitmaymay';
+            }else{
+                $disk = 'chitmaymay2';
+            }
+            Storage::disk($disk)->delete($year.'/'.$month.'/'.$day.'/'."$name/".$data->file);
             return response()->json([
                 'status'=>'success',
                 'message'=>'Successfully Created'
@@ -175,14 +204,31 @@ class UploadController extends Controller
     public function test(Request $request){
         $folders = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
         $totalFileSize = 0;
+        $disk = null;
         $fileSizes = $_FILES['folder']['size'];
         foreach($fileSizes as $fileSize){
             $totalFileSize += $fileSize; 
         }
-        $disktotal = disk_total_space('/media/dkmads-upload/');
-        $diskfree  = disk_free_space('/');
-        $diskuse = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $diskuse;
+        $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
+        $diskfree  = disk_free_space('/'); 
+        $used = $disktotal - $diskfree;
+        $totalUploadSize = $totalFileSize + $used;
+        // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        if($totalUploadSize < $diskfree ){
+            $disk = "chitmaymay";
+        }else{
+            $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
+            $disk_free  = disk_free_space('/'); 
+            $used2 = $disk_total - $disk_free;
+            $total_upload_size = $totalFileSize + $used2;
+            if($total_upload_size < $disk_free){
+                $disk = "chitmaymay2";
+            }else{
+                return response()->json([
+                    'status'=>'fail'
+                ]);
+            }
+        }
         $index   = 0;
         $dirs = [];
         $parent = [];
@@ -194,21 +240,7 @@ class UploadController extends Controller
                 $dir = dirname($path).'/';
                 Log::info('Folder Upload Name=>'.$path . $name);
                 Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
-                if($totalUploadSize < $disktotal){
-                    Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
-                }elseif($totalUploadSize > $disktotal){
-                    $disk_total = disk_total_space('/media/dkmads-upload2/');
-                    $disk_free  = disk_free_space('/');
-                    $disk_use = $disk_total - $disk_free;
-                    $totalUploadSize = $totalFileSize + $disk_use;
-                    if( $totalUploadSize < $disk_total ){
-                        Storage::disk('chitmaymay2')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
-                    }else{
-                        return response()->json([
-                            'status'=>'fail',
-                        ]);
-                    }
-                }
+                Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
                 $parent = explode('/',$dir);
                 $sub = ltrim($dir,$parent[0]);
@@ -232,15 +264,15 @@ class UploadController extends Controller
                 'url'=>env('APP_URL').'/upload-list/folders/'.$main_folder->id
             ]
         );
-        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
+        $path = Storage::disk($disk)->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$parent[0]);
         $path = str_replace("\\", "/", $path);
-        $this->listFolderFiles($path,$main_folder->id,null,$main_folder->id);
+        $this->listFolderFiles($path,$main_folder->id,null,$main_folder->id,$disk);
         return response()->json([
             'status'=>'success'
         ]);
     }
 
-    public function listFolderFiles($dir,$main_id,$sub_id = null,$main){
+    public function listFolderFiles($dir,$main_id,$sub_id = null,$main,$disk){
         $directory = scandir($dir);
         foreach($directory as $folder){
             if($folder != '.' && $folder != '..'){
@@ -271,7 +303,7 @@ class UploadController extends Controller
                             'url' => env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
                         ]
                     );
-                    $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id,$sub_folder->main_id);
+                    $this->listFolderFiles($dir.'/'.$folder,null,$sub_folder->id,$sub_folder->main_id,$disk);
                 }else{
                     $array = $_FILES['folder']['name'];
                     $index = null;
@@ -281,7 +313,7 @@ class UploadController extends Controller
                             break;
                         }
                     }
-                    $url =  Storage::disk('chitmaymay')->url(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$_FILES['folder']['full_path'][$index]);
+                    $url =  Storage::disk($disk)->url(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$_FILES['folder']['full_path'][$index]);
                     $size =$this->formatFileSize($_FILES['folder']['size'][$index]);
                     $edit_type = explode('.',$folder);
                     $count = count($edit_type)-1;
@@ -306,8 +338,15 @@ class UploadController extends Controller
         $year = $array[0];
         $month = $array[1];
         $day = $array[2];
+        $folderPath = null;
+        $path = Storage::disk('chitmaymay')->allDirectories($year.'/'.$month.'/'.$day.'/'.auth()->id());
+        if(in_array($year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name,$path)){
+            $folderPath = "dkmads-upload";
+        }else{
+            $folderPath = "dkmads-upload2";
+        }
         if($file){
-                FacadeFile::deleteDirectory(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name));           
+                FacadeFile::deleteDirectory(public_path("storage/media/$folderPath/".$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$file->name));           
                 $file->delete();     
                 return response()->json([
                     'status'=>'success'
@@ -399,11 +438,16 @@ class UploadController extends Controller
     $year = $array[0];
     $month = $array[1];
     $day = $array[2];
-    $folderPath = '/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.request()->fileName; 
-        $zipFileName = request()->fileName.'.zip';
-        $zip = new ZipArchive();
-
-        if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+    $folderPath = null;
+    $path = Storage::disk('chitmaymay')->allDirectories($year.'/'.$month.'/'.$day.'/'.auth()->id());
+    if(in_array($year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$main_folder->name,$path)){
+        $folderPath = Storage::disk('chitmaymay')->path($year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$main_folder->name);
+    }else{
+        $folderPath = Storage::disk('chitmaymay2')->path($year.'/'.$month.'/'.$day.'/'.auth()->id().'/'.$main_folder->name);
+    }
+    $zipFileName = request()->fileName.'.zip';
+    $zip = new ZipArchive();
+    if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
 	    $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
 	   while ($iterator->valid()) {
             if (!$iterator->isDot()) {
@@ -438,7 +482,6 @@ class UploadController extends Controller
     $count = count(array_slice($edit_folderPath,1));
     $zipFileName = request()->fileName.'.zip';
     $zip = new ZipArchive();
-
     if ($zip->open(public_path('storage/'.$zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
         $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folderPath));
 	   while ($iterator->valid()) {
@@ -472,7 +515,9 @@ class UploadController extends Controller
     $year = $array[0];
     $month = $array[1];
     $day = $array[2];
-    return response()->download(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.request()->name));
+    $data = explode('/',$main_folder->url);
+    $url = $data[5];
+    return response()->download(public_path("storage/media/$url/".$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.request()->name));
   }
 
   public function downloadSubFile(){
@@ -492,7 +537,8 @@ class UploadController extends Controller
         $year = $array[0];
         $month = $array[1];
         $day = $array[2];
-        FacadeFile::delete(public_path('storage/media/dkmads-upload/'.$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.$file->file));
+        $data = explode('/',$file->url);
+        FacadeFile::delete(public_path("storage/media/$data[5]/".$year.'/'.$month.'/'.$day.'/'.auth()->user()->id.'/'.$file->file));
         $file->delete();
         return response()->json([
             'status'=>'success'
@@ -575,6 +621,26 @@ class UploadController extends Controller
         $id = auth()->id();
         $file = $request->file('file');
         $fileSize = $file->getSize();
+        $totalFileSize = $fileSize;
+        $disk = null;
+        $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
+        $diskfree  = disk_free_space('/'); 
+        $used = $disktotal - $diskfree;
+        $totalUploadSize = $totalFileSize + $used;
+        // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        if($totalUploadSize < $diskfree){
+            $disk = "chitmaymay";
+        }else{
+            $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
+            $disk_free  = disk_free_space('/'); 
+            $used2 = $disk_total - $disk_free;
+            $total_upload_size = $totalFileSize + $used2;
+            if($total_upload_size < $disk_free){
+                $disk = "chitmaymay2";
+            }else{
+                return false;
+            }
+        }
         $formattedSize = $this->formatFileSize($fileSize);
         $size =$formattedSize;
         $unique_name = $file->getClientOriginalName();
@@ -582,10 +648,11 @@ class UploadController extends Controller
             $fileName = uniqid(). "_" .uniqid() . ".".$file->getClientOriginalExtension();
             $type = $file->getClientOriginalExtension();
             $name = auth()->user()->id;
-            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/$folder_name/".$fileName, file_get_contents($file));
+
+            Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/$folder_name/".$fileName, file_get_contents($file));
         }
         $path = "$name/$folder_name/".$fileName;
-        $url = Storage::disk('chitmaymay')->url(date('Y').'/'.date('m').'/'.date('d').'/'.$path);
+        $url = Storage::disk($disk)->url(date('Y').'/'.date('m').'/'.date('d').'/'.$path);
 
         $file_upload = new File();
         $file_upload->name =$unique_name;
@@ -622,6 +689,7 @@ class UploadController extends Controller
         $folder_name = null;
         $mainFolder  = null;
         $subFolder   = null;
+        $disk = null;
         if($main_folder){
             $mainFolder = $main_folder;
            $main_folder_id = $main_folder->id;
@@ -654,7 +722,14 @@ class UploadController extends Controller
                  Helper::subtrationAllFolder($subFolder, $fileSize );
              }
             $name = auth()->user()->id;
-            Storage::disk('chitmaymay')->delete($year.'/'.$month.'/'.$day.'/'."$name/$folder_name/".$data->file);
+            $dataArray = explode('/',$data->url);
+            $url = $dataArray[5];
+            if($url == 'dkmads-upload'){
+                $disk = 'chitmaymay';
+            }else{
+                $disk = 'chitmaymay2';
+            }
+            Storage::disk($disk)->delete($year.'/'.$month.'/'.$day.'/'."$name/$folder_name/".$data->file);
             return response()->json([
                 'status'=>'success',
                 'message'=>'Successfully Created'
@@ -688,6 +763,32 @@ class UploadController extends Controller
         }
 
         $folders   = array_combine($_FILES['folder']['full_path'],$_FILES['folder']['name']);
+        $totalFileSize = 0;
+        $disk = null;
+        $fileSizes = $_FILES['folder']['size'];
+        foreach($fileSizes as $fileSize){
+            $totalFileSize += $fileSize; 
+        }
+        $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
+        $diskfree  = disk_free_space('/'); 
+        $used = $disktotal - $diskfree;
+        $totalUploadSize = $totalFileSize + $used;
+        // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        if($totalUploadSize < $diskfree ){
+            $disk = "chitmaymay";
+        }else{
+            $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
+            $disk_free  = disk_free_space('/'); 
+            $used2 = $disk_total - $disk_free;
+            $total_upload_size = $totalFileSize + $used2;
+            if($total_upload_size < $disk_free){
+                $disk = "chitmaymay2";
+            }else{
+                return response()->json([
+                    'status'=>'fail'
+                ]);
+            }
+        }
         $index     = 0;
         $dirs      = [];
         $parent    = [];
@@ -699,7 +800,7 @@ class UploadController extends Controller
             $dir = dirname($path).'/';
             Log::info('Sub Folder Name=>'.$path . $name);
             Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
-            Storage::disk('chitmaymay')->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
+            Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
             $parent     = explode('/',$dir);
             $sub        = ltrim($dir,$parent[0]);
@@ -710,7 +811,7 @@ class UploadController extends Controller
         }
         
         $size                    = $this->formatFileSize($file_size);
-        $filePath                = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName);
+        $filePath                = Storage::disk($disk)->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName);
         $filePath                = str_replace("\\", "/", $filePath);
         $sub_folder              = new SubFolder();
         $sub_folder->parent_id   = $main_folder_id;
@@ -747,15 +848,15 @@ class UploadController extends Controller
                 'url'=>env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
             ]
         );
-        $path = Storage::disk('chitmaymay')->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$parent[0]);
+        $path = Storage::disk($disk)->path(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$parent[0]);
         $path = str_replace("\\", "/", $path);
-        $this->listSubFolderFiles($path,null,$sub_folder,$main_id,$folderName);
+        $this->listSubFolderFiles($path,null,$sub_folder,$main_id,$folderName,$disk);
         return response()->json([
             'status'=>'success'
         ]);
     }
 
-    public function listSubFolderFiles($dir,$main_id,$sub_id = null,$main,$folderName){
+    public function listSubFolderFiles($dir,$main_id,$sub_id = null,$main,$folderName,$disk){
         $directory = scandir($dir);
         foreach($directory as $folder){
             if($folder != '.' && $folder != '..'){
@@ -786,7 +887,7 @@ class UploadController extends Controller
                             'url' => env('APP_URL').'/upload-list/folders/sub-folders/'.$sub_folder->id
                         ]
                     );
-                    $this->listSubFolderFiles($dir.'/'.$folder,null,$sub_folder,$sub_folder->main_id,null);
+                    $this->listSubFolderFiles($dir.'/'.$folder,null,$sub_folder,$sub_folder->main_id,null,$disk);
                 }else{
                     $array = $_FILES['folder']['name'];
                     $index = null;
@@ -800,7 +901,7 @@ class UploadController extends Controller
                     $url                    =    explode('/',$url);
                     $urlArray               =    array_slice($url,3);
                     $fileUrl                =    implode('/',$urlArray)."/".$sub_id->name;
-                    $fileUrl                =   Storage::disk('chitmaymay')->url($fileUrl."/".$folder);
+                    $fileUrl                =   Storage::disk($disk)->url($fileUrl."/".$folder);
                     $size                   =    $this->formatFileSize($_FILES['folder']['size'][$index]);
                     $edit_type              =    explode('.',$folder);
                     $count                  =    count($edit_type)-1;

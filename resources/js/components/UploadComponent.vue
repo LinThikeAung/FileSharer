@@ -162,7 +162,13 @@ export default {
             })
             .then(response=>{
                 if(response.data.status == 'fail'){
-                    alert('You are exceeded amount.');
+                    Swal.fire({
+                        title: "You are exceeded",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        } 
+                    })
                 }else{
                     window.location.reload();
                 }

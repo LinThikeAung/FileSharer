@@ -166,7 +166,17 @@ export default {
                 cancelToken: this.uploadCancelToken.token
             })
                 .then(response => {
-                    window.location.reload();
+                    if(response.data.status == 'fail'){
+                    Swal.fire({
+                        title: "You are exceeded",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload();
+                        } 
+                    })
+                    }else{
+                        window.location.reload();
+                    }
                 })
                 .catch(error => {
                     if (axios.isCancel(error)) {
