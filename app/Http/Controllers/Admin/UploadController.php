@@ -41,17 +41,17 @@ class UploadController extends Controller
         $totalFileSize = $fileSize;
         $disk = null;
         $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
-        $diskfree  = disk_free_space('/'); 
+        $diskfree  = disk_free_space('/media/dkmads-upload/'); 
         $used = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $used;
+        $totalUploadSize = $totalFileSize;
         // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
         if($totalUploadSize < $diskfree){
             $disk = "chitmaymay";
         }else{
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
-            $disk_free  = disk_free_space('/'); 
+            $disk_free  = disk_free_space('/media/dkmads-upload2/'); 
             $used2 = $disk_total - $disk_free;
-            $total_upload_size = $totalFileSize + $used2;
+            $total_upload_size = $totalFileSize;
             if($total_upload_size < $disk_free){
                 $disk = "chitmaymay2";
             }else{
@@ -210,17 +210,18 @@ class UploadController extends Controller
             $totalFileSize += $fileSize; 
         }
         $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
-        $diskfree  = disk_free_space('/'); 
+        $diskfree  = disk_free_space('/media/dkmads-upload/'); 
         $used = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $used;
-        // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        $totalUploadSize = $totalFileSize;
+        
+        Log::info($this->formatFileSize($diskfree)."/////".$this->formatFileSize($totalUploadSize));
         if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
         }else{
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
-            $disk_free  = disk_free_space('/'); 
+            $disk_free  = disk_free_space('/media/dkmads-upload2/'); 
             $used2 = $disk_total - $disk_free;
-            $total_upload_size = $totalFileSize + $used2;
+            $total_upload_size = $totalFileSize;
             if($total_upload_size < $disk_free){
                 $disk = "chitmaymay2";
             }else{
@@ -229,6 +230,7 @@ class UploadController extends Controller
                 ]);
             }
         }
+        Log::info($disk);
         $index   = 0;
         $dirs = [];
         $parent = [];
@@ -624,17 +626,17 @@ class UploadController extends Controller
         $totalFileSize = $fileSize;
         $disk = null;
         $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
-        $diskfree  = disk_free_space('/'); 
+        $diskfree  = disk_free_space('/media/dkmads-upload/'); 
         $used = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $used;
+        $totalUploadSize = $totalFileSize ;
         // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
         if($totalUploadSize < $diskfree){
             $disk = "chitmaymay";
         }else{
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
-            $disk_free  = disk_free_space('/'); 
+            $disk_free  = disk_free_space('/media/dkmads-upload2/'); 
             $used2 = $disk_total - $disk_free;
-            $total_upload_size = $totalFileSize + $used2;
+            $total_upload_size = $totalFileSize;
             if($total_upload_size < $disk_free){
                 $disk = "chitmaymay2";
             }else{
@@ -770,17 +772,17 @@ class UploadController extends Controller
             $totalFileSize += $fileSize; 
         }
         $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
-        $diskfree  = disk_free_space('/'); 
+        $diskfree  = disk_free_space('/media/dkmads-upload/'); 
         $used = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $used;
+        $totalUploadSize = $totalFileSize;
         // Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
         if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
         }else{
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
-            $disk_free  = disk_free_space('/'); 
+            $disk_free  = disk_free_space('/media/dkmads-upload2/'); 
             $used2 = $disk_total - $disk_free;
-            $total_upload_size = $totalFileSize + $used2;
+            $total_upload_size = $totalFileSize;
             if($total_upload_size < $disk_free){
                 $disk = "chitmaymay2";
             }else{
