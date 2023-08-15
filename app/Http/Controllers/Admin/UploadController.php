@@ -215,7 +215,7 @@ class UploadController extends Controller
         $totalUploadSize = $totalFileSize;
         
         Log::info($this->formatFileSize($diskfree)."/////".$this->formatFileSize($totalUploadSize));
-        if($totalUploadSize > $diskfree ){
+        if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
         }else{
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
