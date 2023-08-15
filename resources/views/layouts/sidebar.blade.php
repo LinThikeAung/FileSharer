@@ -34,7 +34,7 @@
                 <div class="progress" style="border-radius: 0px;height: 7px;"> 
                     <div class="progress-bar" role="progressbar" style="width: {{ $data['diskuse'] }}"  aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <span>{{ $data['used']}} of {{ $data['disktotal'] }} used user1 - {{ $data['diskuse'] }} user2 - {{ $data['diskuse2'] }} </span>
+                <span>{{ $data['used']}} of {{ $data['disktotal'] }} used</span>
            </div>
            <div class="mt-3">
                 <span class="text-muted">Hard Disk2</span>
