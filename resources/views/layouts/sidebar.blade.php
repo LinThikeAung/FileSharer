@@ -20,6 +20,28 @@
                 <span class="menu-title">Other Share</span>
             </a>
         </li>
+
+        <li class="nav-item">
+            <a class="nav-link">
+                <i class="ti-cloud menu-icon"></i>
+                <span class="menu-title">Storage</span>
+            </a>
+        </li>
+
+        <li class="nav-item mt=4" style="padding: 0.25rem 0rem 0.8125rem 1rem;">
+           <div>
+                <div class="progress" style="border-radius: 0px;height: 7px;"> 
+                    <div class="progress-bar" role="progressbar" style="width: {{ $data['diskuse'] }}"  aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <span>{{ $data['used']}} of {{ $data['disktotal'] }} used</span>
+           </div>
+           <div class="mt-2">
+            <div class="progress" style="border-radius: 0px;height: 7px;"> 
+                <div class="progress-bar" role="progressbar"  style="width: {{ $data['diskuse2'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+            </div>
+            <span>{{ $data['used2']}} of {{ $data['disk_total'] }} used</span>
+       </div>
+        </li>
         {{-- <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                 <i class="icon-layout menu-icon"></i>

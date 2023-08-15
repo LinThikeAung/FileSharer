@@ -278,3 +278,7 @@ div:where(.swal2-icon).swal2-warning.swal2-icon-show {
 .dropdown-menu{
     z-index: 1000 !important;
 }
+
+.nav-item .progress-bar{
+    border-radius: 0px !important;
+}
