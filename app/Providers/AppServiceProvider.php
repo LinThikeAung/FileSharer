@@ -45,10 +45,10 @@ class AppServiceProvider extends ServiceProvider
                 $data = [
                     'disktotal'  => $this->formatFileSize($disktotal),
                     'used'       => $this->formatFileSize($used),
-                    'diskuse'    => $diskuse,
+                    'diskuse'    => $diskusedsize,
                     'disk_total' => $this->formatFileSize($disk_total),
                     'used2'      => $this->formatFileSize($used2),
-                    'diskuse2'   => $diskuse2,
+                    'diskuse2'   => $disk_used_size,
                 ];
                 $view->with('data',$data);
             }
