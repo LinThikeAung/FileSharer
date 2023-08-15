@@ -32,7 +32,7 @@ class ChitmaymayBackup extends Command
         $output = null;
         $returnVar = null;
         exec($chitmaymay,$output,$returnVar);
-        // exec($chitmaymay2);
+        exec($chitmaymay2);
         return Command::SUCCESS;
     }
 }
