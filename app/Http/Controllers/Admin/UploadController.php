@@ -212,7 +212,7 @@ class UploadController extends Controller
         $disktotal = disk_total_space('/media/dkmads-upload/'); //DISK usage
         $diskfree  = disk_free_space('/'); 
         $used = $disktotal - $diskfree;
-        $totalUploadSize = $totalFileSize + $used;
+        $totalUploadSize = $totalFileSize;
         Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
         if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
@@ -220,7 +220,7 @@ class UploadController extends Controller
             $disk_total = disk_total_space('/media/dkmads-upload2/'); //DISK usage
             $disk_free  = disk_free_space('/'); 
             $used2 = $disk_total - $disk_free;
-            $total_upload_size = $totalFileSize + $used2;
+            $total_upload_size = $totalFileSize;
             if($total_upload_size < $disk_free){
                 $disk = "chitmaymay2";
             }else{
