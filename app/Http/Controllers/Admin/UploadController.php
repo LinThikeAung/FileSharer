@@ -213,7 +213,8 @@ class UploadController extends Controller
         $diskfree  = disk_free_space('/'); 
         $used = $disktotal - $diskfree;
         $totalUploadSize = $totalFileSize;
-        Log::info("Free Size => $diskfree / TotalUploadSize => $totalUploadSize");
+        
+        Log::info($this->formatFileSize($diskfree)."/////".$this->formatFileSize($totalUploadSize));
         if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
         }else{
