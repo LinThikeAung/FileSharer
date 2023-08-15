@@ -32,16 +32,16 @@
            <div>
                 <span class="text-muted">Hard Disk1</span>
                 <div class="progress" style="border-radius: 0px;height: 7px;"> 
-                    <div class="progress-bar" role="progressbar" style="width: {{ $data['diskuse'] }}"  aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar" style="width: {{ $data['percent1'] }}"  aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <span>{{ $data['used']}} of {{ $data['disktotal'] }} used</span>
+                <span>{{ $data['used1']}} of {{ $data['disktotal1'] }} used</span>
            </div>
            <div class="mt-3">
                 <span class="text-muted">Hard Disk2</span>
                 <div class="progress" style="border-radius: 0px;height: 7px;"> 
-                    <div class="progress-bar" role="progressbar"  style="width: {{ $data['diskuse2'] }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar"  style="width: {{ $data['percent2'] }}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                <span>{{ $data['used2']}} of {{ $data['disk_total'] }} used</span>
+                <span>{{ $data['used2']}} of {{ $data['disktotal2'] }} used</span>
             </div>
         </li>
         {{-- <li class="nav-item">
