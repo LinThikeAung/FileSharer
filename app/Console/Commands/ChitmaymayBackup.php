@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ChitmaymayBackup extends Command
 {
@@ -27,6 +28,7 @@ class ChitmaymayBackup extends Command
      */
     public function handle()
     {
+        Log::info("Hit Clone Hardisk!");
         $chitmaymay = "sudo rsync -aAXv --update --delete --ignore-errors /media/dkmads-upload/ /media/dkmads-upload-bk/";
         $chitmaymay2 = "sudo rsync -aAXv --update --delete --ignore-errors /media/dkmads-upload2/ /media/dkmads-upload2-bk/";
         $output = null;
