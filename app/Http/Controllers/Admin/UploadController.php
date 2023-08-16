@@ -92,7 +92,7 @@ class UploadController extends Controller
     private function formatFileSize($bytes)
     {
         $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if ($bytes === 0 || $bytes == "") return '0 Byte';
+        if ($bytes === 0 || $bytes == null) return '0 Byte';
         $i = floor(log($bytes, 1024));
         Log::info('Bytes=> '.$bytes .' FormatFileSize Floor =>' . $i . ' Round' .pow(1024, $i) );
         return round($bytes / pow(1024, $i)).' '. $sizes[$i];
