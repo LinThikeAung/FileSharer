@@ -27,39 +27,28 @@ class AppServiceProvider extends ServiceProvider
     {
         View::composer('*', function ($view) {
             $data = null ;
-            if(auth()->check()){             
-                $disktotal       = disk_total_space('/media/dkmads-upload/');
-                $disktotalsize   = $disktotal / 1073741824;
-                $diskfree        = disk_free_space('/media/dkmads-upload/');
-                $used            = $disktotal - $diskfree;
-                $diskusedsize    = $used / 1073741824;
-                $diskuse1        = round(100 - (($diskusedsize / $disktotalsize) * 100));
-                $diskuse         = round(100 - ($diskuse1)) . '%';
-                $disk_total      = disk_total_space('/media/dkmads-upload2/');
-                $disk_total_size = $disk_total / 1073741824;
-                $disk_free       = disk_free_space('/media/dkmads-upload2/');  
-                $used2           = $disk_total - $disk_free;
-                $disk_used_size  = $used2 / 1073741824;
-                $diskuse2        = round(100 - (($disk_used_size / $disk_total_size) * 100));
-                $diskuse2        = round(100 - ($diskuse2)) . '%';
+            if(auth()->check()){      
+                //Disk 1       
+                $output = shell_exec('df -h /media/dkmads-upload/');
+                $lines  = explode("\n", $output);
+                $parts  = preg_split('/\s+/', $lines[1]);
+
+                //Disk 2
+                $output2 =  shell_exec('df -h /media/dkmads-upload2/');
+                $lines2  = explode("\n", $output2);
+                $parts2  = preg_split('/\s+/', $lines2[1]);
                 $data = [
-                    'disktotal'  => $this->formatFileSize($disktotal),
-                    'used'       => $this->formatFileSize($used),
-                    'diskuse'    => $diskuse,
-                    'disk_total' => $this->formatFileSize($disk_total),
-                    'used2'      => $this->formatFileSize($used2),
-                    'diskuse2'   => $diskuse2,
+                    'disktotal1'  => $parts[1],
+                    'used1'       => $parts[2],
+                    'available1'  => $parts[3],
+                    'percent1'    => $parts[4],
+                    'disktotal2'  => $parts2[1],
+                    'used2'       => $parts2[2],
+                    'available2'  => $parts2[3],
+                    'percent2'    => $parts2[4],
                 ];
                 $view->with('data',$data);
             }
         });
-    }
-
-    private function formatFileSize($bytes)
-    {
-        $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        if ($bytes === 0) return '0 Byte';
-        $i = floor(log($bytes, 1024));
-        return round($bytes / pow(1024, $i)).' '. $sizes[$i];
     }
 }
