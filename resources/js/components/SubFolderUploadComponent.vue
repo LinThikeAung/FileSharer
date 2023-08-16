@@ -30,9 +30,9 @@
                             class="bi bi-x"></i></button>
                 </div>
                 <div class="modal-body">
-                    <file-pond name="file" ref="pond" v-on:initfile="handleFilePondInit" v-on:warning="handleFilePond"
+                    <file-pond name="file" ref="pond" 
                         v-on:processfileprogress="handleFilePondProcessFile" v-on:processfile="stopFileClose"
-                        v-on:processfileabort="onProcessfileabort" allowMultiple=true maxFiles=5 :server="{
+                        v-on:processfileabort="onProcessfileabort" allowMultiple=true :server="{
                             url: '',
                             process: {
                                 url: `/subfolder-upload?file_id=${fileId}&file_name=${subFolderName}`,
@@ -46,7 +46,6 @@
                                 'X-CSRF-TOKEN': this.token
                             },
                         }" />
-                    <p v-if="showError" class="text-danger">The maximum number of files is 5</p>
                 </div>
             </div>
         </div>
@@ -73,7 +72,6 @@ export default {
             newFolderUrl : "/backend/images/new-folder.png",
             showFilePond: false,
             token: csrf_token,
-            showError: false,
             showClose: false,
             fileId: "",
             subFolderName: "",
@@ -93,12 +91,6 @@ export default {
     methods: {
         onFileUpload() {
             this.showFilePond = true;
-        },
-        handleFilePond() {
-            this.showError = true;
-        },
-        handleFilePondInit() {
-            this.showError = false;
         },
         onCloseFilePond() {
             this.showFilePond = false;
@@ -285,5 +277,10 @@ export default {
 .btn-close {
     border: 1px solid rgb(35, 35, 35) !important;
     font-weight: bold;
+}
+
+.modal-body{
+    max-height: 400px !important;
+    overflow: auto;
 }
 </style>
