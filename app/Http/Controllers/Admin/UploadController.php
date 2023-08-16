@@ -94,7 +94,7 @@ class UploadController extends Controller
         $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         if ($bytes === 0 || $bytes == null) return '0 Byte';
         $i = floor(log($bytes, 1024));
-        Log::info('Bytes=> '.$bytes .' FormatFileSize Floor =>' . $i . ' Round' .pow(1024, $i) );
+        //Log::info('Bytes=> '.$bytes .' FormatFileSize Floor =>' . $i . ' Round' .pow(1024, $i) );
         return round($bytes / pow(1024, $i)).' '. $sizes[$i];
     }
 
@@ -214,7 +214,7 @@ class UploadController extends Controller
         $used = $disktotal - $diskfree;
         $totalUploadSize = $totalFileSize;
         
-        Log::info($diskfree."/////".$totalUploadSize);
+        //Log::info($diskfree."/////".$totalUploadSize);
         if($totalUploadSize < $diskfree ){
             $disk = "chitmaymay";
         }else{
@@ -230,7 +230,7 @@ class UploadController extends Controller
                 ]);
             }
         }
-        Log::info($disk);
+        //Log::info($disk);
         $index   = 0;
         $dirs = [];
         $parent = [];
@@ -240,8 +240,8 @@ class UploadController extends Controller
         {
             if($path && $name && $_FILES['folder']['tmp_name'][$index]){
                 $dir = dirname($path).'/';
-                Log::info('Folder Upload Name=>'.$path . $name);
-                Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
+                //Log::info('Folder Upload Name=>'.$path . $name);
+                //Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
                 Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
                 $parent = explode('/',$dir);
@@ -800,8 +800,8 @@ class UploadController extends Controller
         {
           if($path && $name && $_FILES['folder']['tmp_name'][$index]){
             $dir = dirname($path).'/';
-            Log::info('Sub Folder Name=>'.$path . $name);
-            Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
+            // Log::info('Sub Folder Name=>'.$path . $name);
+            // Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
             Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
             $parent     = explode('/',$dir);
