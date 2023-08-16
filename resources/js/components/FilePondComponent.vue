@@ -9,13 +9,10 @@
                 <file-pond 
                 name="file"
                 ref="pond"
-                v-on:initfile="handleFilePondInit"
-                v-on:warning="handleFilePond"
                 v-on:processfileprogress="handleFilePondProcessFile"
                 v-on:processfile="stopFileClose"
                 v-on:processfileabort="onProcessfileabort"
                 allowMultiple = true
-                maxFiles = 5
                 :server="{
                     url : '',
                     process : {
@@ -31,7 +28,6 @@
                     },
                 }"
                 />
-                <p v-if="showError" class="text-danger">The maximum number of files is 5</p>
             </div>
         </div>
    </div>
@@ -50,17 +46,10 @@ export default {
     data(){
         return {
             token  : csrf_token,
-            showError : false,
             showClose : false
         }
     },
     methods : {
-        handleFilePond(){
-            this.showError = true;
-        },
-        handleFilePondInit(){
-            this.showError = false;
-        },
         onCloseFilePond(){
             this.$emit('close-file-pond')
         },
@@ -104,5 +93,10 @@ export default {
 .btn-close{
     border: 1px solid rgb(35, 35, 35) !important;
     font-weight: bold;
+}
+
+.modal-body{
+    max-height: 400px !important;
+    overflow: auto;
 }
 </style>
