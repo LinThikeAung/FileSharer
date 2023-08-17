@@ -84,7 +84,7 @@ class UploadController extends Controller
     private function unFormatFileSize($value){
         $sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         $search_value = explode(' ',$value)[1];
-        $size = explode(' ',$value)[0];
+        $size = (int)explode(' ',$value)[0];
         $index = array_search($search_value,$sizes);
         return round($size * pow (1024 , $index));
     }
