@@ -653,11 +653,11 @@ class UploadController extends Controller
             $name = auth()->user()->id;
             $tempPath = $file->store('temp');
             $finalPath = date('Y').'/'.date('m').'/'.date('d').'/'."$name/$folder_name/".$fileName;
-            Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/$folder_name/".$fileName, file_get_contents($file));
-            // if (Storage::move($tempPath, $finalPath)) {
-            //     // If the move is successful, delete the temporary file (though it's usually redundant since "move" itself will remove the original)
-            //     Storage::delete($tempPath);
-            // }
+            //Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'."$name/$folder_name/".$fileName, file_get_contents($file));
+            if (Storage::move($tempPath, $finalPath)) {
+                // If the move is successful, delete the temporary file (though it's usually redundant since "move" itself will remove the original)
+                Storage::delete($tempPath);
+            }
         }
         $path = "$name/$folder_name/".$fileName;
         $url = Storage::disk($disk)->url(date('Y').'/'.date('m').'/'.date('d').'/'.$path);
