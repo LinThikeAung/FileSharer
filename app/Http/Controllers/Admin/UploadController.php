@@ -242,7 +242,6 @@ class UploadController extends Controller
                 $dir = dirname($path).'/';
                 //Log::info('Folder Upload Name=>'.$path . $name);
                 //Log::info('Folder Upload Path=>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
-                $name = strtolower($name);
                 Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
                 $file_size += $_FILES['folder']['size'][$index];
                 $parent = explode('/',$dir);
@@ -311,7 +310,7 @@ class UploadController extends Controller
                     $array = $_FILES['folder']['name'];
                     $index = null;
                     foreach ($array as $key => $value) {
-                        if(strtolower($value) == strtolower($folder)){
+                        if($value == $folder){
                             $index = $key;
                             break;
                         }
@@ -803,7 +802,6 @@ class UploadController extends Controller
             $dir = dirname($path).'/';
             // Log::info('Sub Folder Name=>'.$path . $name);
             // Log::info('Sub Folder Path =>'.date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name.'TMP_Name'.$_FILES['folder']['tmp_name'][$index]);
-            $name = strtolower($name);
             Storage::disk($disk)->put(date('Y').'/'.date('m').'/'.date('d').'/'.auth()->id().'/'.$folderName.'/'.$dir.$name,file_get_contents($_FILES['folder']['tmp_name'][$index]));
             $file_size += $_FILES['folder']['size'][$index];
             $parent     = explode('/',$dir);
@@ -896,7 +894,7 @@ class UploadController extends Controller
                     $array = $_FILES['folder']['name'];
                     $index = null;
                     foreach ($array as $key => $value) {
-                        if(strtolower($value) == strtolower($folder)){
+                        if($value == $folder){
                             $index = $key;
                             break;
                         }
