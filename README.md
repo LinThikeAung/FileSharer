@@ -1,9 +1,7 @@
-composer update
-npm install
-php artisan migrate --seed
-sudo npm i vue@3.2.26
-
-
+<p>composer update</p>
+<p>npm install</p>
+<p>php artisan migrate --seed</p>
+<p>sudo npm i vue@3.2.26 </p>
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
 <p align="center">
