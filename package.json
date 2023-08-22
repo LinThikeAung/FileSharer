@@ -30,6 +30,7 @@
         "element-plus": "^2.3.6",
         "filepond": "^4.30.4",
         "filepond-plugin-file-validate-size": "^2.2.8",
+        "fine-uploader": "^5.16.2",
         "jquery": "^3.7.0",
         "laravel-vue-pagination": "^4.1.0",
         "popper.js": "^1.16.1",
